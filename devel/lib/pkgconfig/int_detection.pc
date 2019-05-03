@@ -1,0 +1,8 @@
+prefix=/home/kuriatsu/Program/Ros/master_study_ws/devel
+
+Name: int_detection
+Description: Description of int_detection
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kuriatsu/Program/Ros/master_study_ws/devel/lib 
+Requires: 
