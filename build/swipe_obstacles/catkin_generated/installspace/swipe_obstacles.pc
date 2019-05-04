@@ -1,0 +1,8 @@
+prefix=/home/kuriatsu/Program/Ros/master_study_ws/install
+
+Name: swipe_obstacles
+Description: Description of swipe_obstacles
+Version: 0.0.0
+Cflags: -I/home/kuriatsu/Program/Ros/master_study_ws/install/include
+Libs: -L/home/kuriatsu/Program/Ros/master_study_ws/install/lib -lswipe_obstacles
+Requires: std_msgs autoware_msgs interactive_markers jsk_recognition_msgs pcl_conversions pcl_msgs pcl_ros roscpp tf visualization_msgs message_runtime

@@ -1,2 +1,2 @@
-int_detection
+swipe_obstacles
 -DCATKIN_DEVEL_PREFIX=/home/kuriatsu/Program/Ros/master_study_ws/devel -DCMAKE_INSTALL_PREFIX=/home/kuriatsu/Program/Ros/master_study_ws/install -G Unix Makefiles

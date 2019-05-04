@@ -7,6 +7,9 @@
 # new environment variables
 
 # modified environment variables
-export LD_LIBRARY_PATH="/home/kuriatsu/ros/catkin_ws/devel/lib:/home/kuriatsu/Autoware/ros/devel/lib:/opt/ros/kinetic/lib:/opt/ros/kinetic/lib/x86_64-linux-gnu:/usr/local/cuda-9.0/lib64"
+export CMAKE_PREFIX_PATH="/home/kuriatsu/Program/Ros/master_study_ws/devel:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/home/kuriatsu/Program/Ros/master_study_ws/devel/lib:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD="/home/kuriatsu/Program/Ros/master_study_ws/build"
-export ROS_PACKAGE_PATH="/home/kuriatsu/Program/Ros/master_study_ws/src:/home/kuriatsu/ros/catkin_ws/src:/home/kuriatsu/Autoware/ros/src:/opt/ros/kinetic/share"
+export PYTHONPATH="/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages:/home/kuriatsu/Autoware/ros/devel/lib/python2.7/dist-packages:$PYTHONPATH"
+export ROS_PACKAGE_PATH="/home/kuriatsu/Program/Ros/master_study_ws/src:$ROS_PACKAGE_PATH"
