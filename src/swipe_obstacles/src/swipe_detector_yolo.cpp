@@ -73,7 +73,8 @@ swipe_obstacles::detected_obstacle SwipeDetectorYolo::calc_obj_info(const autowa
     out_pose.pose.position.z = lidar_hight * camera_mat[4] / ((in_obj.y + in_obj.height) - camera_mat[5]);
     out_pose.pose.position.x = (((in_obj.x + in_obj.width / 2) - camera_mat[2]) * out_pose.pose.position.z) / camera_mat[0];
 
-    ROS_INFO_STREAM(out_pose.pose.position.z);
+    // for data sampling
+    //std::cout << out_pose.pose.position.z << "," << out_pose.pose.position.x << std::endl;
 
     // add adtional informations
     out_pose.id = in_obj.id;
