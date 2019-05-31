@@ -10,8 +10,7 @@ struct obstacle_info{
     uint32 id;
     float shift;
     geometry_msgs::Pose pose;
-
-}
+};
 
 class PositionManager{
 
