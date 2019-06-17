@@ -83,7 +83,6 @@ void SwipeDetectorFixed::read_file(){
         read_obstacle.id = id;
         read_obstacle.score = 90.0;
         read_obstacle.label = "person";
-		read_obstacle.original_id = id;
 
 		obstacle_vec.push_back(read_obstacle);
 		id++;

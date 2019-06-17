@@ -20,9 +20,9 @@ class ObstacleVisualizer{
 	private:
 		ros::Subscriber sub_obj;
 		ros::Publisher pub_shift;
-        std::vector<int> prev_obj;
-        std::vector<int> current_obj;
-        
+        std::vector<uint32_t> prev_obj_ids;
+        std::vector<uint32_t> current_obj_ids;
+
 
 	public:
 		ObstacleVisualizer();
@@ -31,8 +31,8 @@ class ObstacleVisualizer{
 	private:
 		void sub_obj_callback(const swipe_obstacles::detected_obstacle_array &in_msgs);
         void shift_feedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
-
         void make_cube();
+        int id_vector_manager(const uint32_t &id);
 		visualization_msgs::InteractiveMarkerControl& make_box_control( visualization_msgs::InteractiveMarker &msg);
 		void calc_boxpose();
 };
@@ -46,30 +46,55 @@ ObstacleVisualizer::ObstacleVisualizer()
 	pub_shift = n.advertise<swipe_obstacles::detected_obstacle>("/shifted_info", 5);
 	//pub_jsk_box = n.advertise<jsk_recognition_msgs::BoundingBoxArray>("/int_boundingbox", 5);
 
-	out_jsk_msgs.dimensions.x = 1.0;
-	out_jsk_msgs.dimensions.y = 6.0;
-	out_jsk_msgs.dimensions.z = 2.0;
-	out_jsk_msgs.value = 1;
+	// out_jsk_msgs.dimensions.x = 1.0;
+	// out_jsk_msgs.dimensions.y = 6.0;
+	// out_jsk_msgs.dimensions.z = 2.0;
+	// out_jsk_msgs.value = 1;
 }
 
 
 void ObstacleVisualizer::sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs)
 {
-	for (size_t i=0; i< in_msgs.obstacles.size(); i++){
-        std::stringstream s;
-        s << in_msgs.obstacles[i].original_id;
-        if(server->get(s)){
+	for (size_t i=0; i< in_msgs.obstacles.size(); i++)
+    {
+        if(id_vector_manager(in_msgs.obstacles[i].managed_id))
+        {
             server->setPose(s, calc_boxpose(in_msgs.obstacles[i].pose, in_msgs.obstacles[i].shift));
-            current_obj
         }
-		make_cube();
-		in_jsk_msgs = msgs->boxes[i];
-		out_jsk_msgs.header = msgs->boxes[i].header;
-		out_jsk_msgs.label = 1;
+        else
+        {
+            make_cube(in_msgs.obstacles[i]);
+        }
+		// in_jsk_msgs = msgs->boxes[i];
+		// out_jsk_msgs.header = msgs->boxes[i].header;
+		// out_jsk_msgs.label = 1;
 	}
+
+    for (auto i=prev_obj_ids.begin(); i != prev_obj_ids.end(), i++)
+    {
+        server->erase(*i);
+    }
+    // idデータリスト更新,新データリストは空にシておく.
+    prev_obj_ids = current_obj_ids;
+    current_obj_ids.clear();
+}
+
+// prev_obj_idsでidが見つかったら削除return 1,見つからなくてもcurrent_obj_idsには追加 return 0
+int ObstacleVisualizer::id_vector_manager(const uint32_t &id)
+{
+    auto itr = std::find(prev_obj_ids.begin(), prev_obj_ids.end(), id);
+    current_obj_ids.push_back(id);
+
+    if (itr != prev_obj_ids.end())
+    {
+        prev_obj_ids.erase(itr);
+        return 1;
+    }
+    return 0;
 }
 
 
+////////////////////////////
 void ObstacleVisualizer::make_cube()
 {
 
@@ -126,19 +151,6 @@ void ObstacleVisualizer::calc_boxpose()
 }
 
 
-void ObstacleVisualizer::shift_feedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback){
-
-	float permanet_shift;
-	permanet_shift = std::sqrt(std::pow(feedback->pose.position.x - out_jsk_msgs.pose.position.x, 2.0) + std::pow(feedback->pose.position.y - out_jsk_msgs.pose.position.y, 2.0));
-	if ((feedback->pose.position.y - out_jsk_msgs.pose.position.y) < 0){
-		permanet_shift = -permanet_shift;
-	}
-	shift += permanet_shift;
-	calc_boxpose();
-	ROS_INFO_STREAM(shift);
-}
-
-
 visualization_msgs::InteractiveMarkerControl& ObstacleVisualizer::make_box_control( visualization_msgs::InteractiveMarker &msg){
 
 	visualization_msgs::InteractiveMarkerControl control;
@@ -162,10 +174,22 @@ visualization_msgs::InteractiveMarkerControl& ObstacleVisualizer::make_box_contr
 	control.markers.push_back(marker);
 	msg.controls.push_back(control);
 
-
-
 	return msg.controls.back();
 }
+
+
+void ObstacleVisualizer::shift_feedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback){
+
+	float permanet_shift;
+	permanet_shift = std::sqrt(std::pow(feedback->pose.position.x - out_jsk_msgs.pose.position.x, 2.0) + std::pow(feedback->pose.position.y - out_jsk_msgs.pose.position.y, 2.0));
+	if ((feedback->pose.position.y - out_jsk_msgs.pose.position.y) < 0){
+		permanet_shift = -permanet_shift;
+	}
+	shift += permanet_shift;
+	calc_boxpose();
+	ROS_INFO_STREAM(shift);
+}
+
 
 
 

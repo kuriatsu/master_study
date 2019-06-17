@@ -9,6 +9,7 @@ define
 struct obstacle_info{
 
     uint32_t id;
+    uint32_t managed_id;
     geometry_msgs::Pose pose;
     float shift;
 }
@@ -20,8 +21,9 @@ class PositionManager{
         ros::Subscriber sub_obj;
         tf::TransformListener tf_listener;
         std::vector<obstacle_info> obstacle_info_vec;
+        uint32_t managed_id;
         const static int vector_size = 10;
-        const static int keep_time = 10;
+        const static int keep_time = 3;
 
     public:
         PositionManager();
@@ -35,7 +37,7 @@ class PositionManager{
 };
 
 
-PositionManager::PositionManager()
+PositionManager::PositionManager(): managed_id(1)
 {
     ros::NodeHandle n;
 
@@ -79,7 +81,7 @@ void PositionManager::sub_obj_callback(const swipe_obstacles::detected_obstacle_
     for(size_t i=0; i<msgs.obstacles.size(); i++)
     {
         out_obstacle_info.pose = tf_transformer(in_msgs.obstacles[i].pose, in_msgs.header.frame_id);
-        out_obstacle_info.id = in_msgs.obstacles[i].id
+        out_obstacle_info.id = in_msgs.obstacles[i].id;
         store_obj(out_obstacle_info);
     }
     obstacle_info_publish();
@@ -88,29 +90,37 @@ void PositionManager::sub_obj_callback(const swipe_obstacles::detected_obstacle_
 
 void PositionManager::store_obj(obstacle_info &in_msg)
 {
-    int flag=0, original_id;
+    int flag=0, id_buf, index;
     float disance, shift_buf;
 
-    //データid=0または前データとidが同じだったらshiftを継承　.
-    if(obstacle_info_vec.at[in_id%vector_size].id == 0 || obstacle_info_vec.at[in_id%10].id == in_id)
+    index = in_msg.id % vector_size;
+
+    // 配列が空だったら
+    if (obstacle_info_vec.at[index].managed_id == 0)
     {
-        shift_buf = obstacle_info_vec.at[in_id%vector_size].shift;
-        obstacle_info_vec.at[in_id%vector_size] = in_msg;
-        obstacle_info_vec.at[in_id%vector_size].shift = shift_buf;
-    }else
+        obstacle_info_vec.at[index] = in_msg;
+        obstacle_info_vec.at[index].managed_id = managed_id;
+        managed_id++;
+    }
+    //前データとidが同じだったらposeは更新
+    else if(obstacle_info_vec.at[index].id == in_id)
     {
-        // 前データからidが変わっていたらとりあえず取得障害物の座標からの距離が2m以内の前データを見つける
+        obstacle_info_vec.at[index].pose = in_msg.pose;
+    }
+    // 前データからidが変わっていたらとりあえず取得障害物の座標からの距離が2m以内の前データを見つける
+    else
+    {
         // for(std::vector<obstacle_info>::const_iterator i = obstacle_info_vec.begin(); i != obstacle_info_vec.end(); i++)
         for(auto i = obstacle_info_vec.begin(); i != obstacle_info_vec.end(); i++)
         {
             distance = (i->pose.position.x - in_msg.pose.position.x)**2 + (i->pose.position.y - in_msg.pose.position.y)**2;
             if(distance < 4.0)
             {
-                // 見つけたら前データのshift値と元々のidを継承. 前データのいた場所のidは0にする.
-                obstacle_info_vec.at[in_id%vector_size] = in_msg;
-                obstacle_info_vec.at[in_id%vector_size].shift = i->shift;
-                obstacle_info_vec.at[in_id%vector_size].original_id = i->original_id;
-                i->id = 0;
+                // 見つけたら前データのshift値とmanaged_idを継承. 前データのいた場所は0にする.
+                obstacle_info_vec.at[index] = in_msg;
+                obstacle_info_vec.at[index].shift = i->shift;
+                obstacle_info_vec.at[index].managed_id = i->managed_id;
+                *i = {};
                 flag = 1;
                 break;
             }
@@ -119,6 +129,8 @@ void PositionManager::store_obj(obstacle_info &in_msg)
         if(flag == 0)
         {
             obstacle_info_vec.at[in_id%vector_size] = in_msg;
+            obstacle_info_vec.at[index].managed_id = managed_id;
+            managed_id++;
         }
     }
 }
