@@ -1,9 +1,11 @@
 std_msgs/Header header
 
 uint32 id
+uint32 original_id
 string label
 float32 score
+geometry_msgs/Pose pose
 
-geometry_msgs/Point position
-geometry_msgs/Quaternion orientation
-
+float32 shift
+bool visible
+time detected_time
