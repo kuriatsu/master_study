@@ -27,7 +27,7 @@ class ObstacleVisualizer
 		void sync_jsk_box();
 
 	private:
-		void sub_obj_callback(const swipe_obstacles::detected_obstacle_array &in_msgs);
+		void sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs);
         void shift_feedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
         void make_cube(const swipe_obstacles::detected_obstacle &in_msg);
         int id_vector_manager(const uint32_t &id);
