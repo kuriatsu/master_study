@@ -6,6 +6,7 @@ string label
 float32 score
 geometry_msgs/Pose pose
 
-float32 shift
+float32 shift_x
+float32 shift_y
 bool visible
 time detected_time
