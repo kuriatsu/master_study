@@ -8,5 +8,5 @@ geometry_msgs/Pose pose
 
 float32 shift_x
 float32 shift_y
-bool visible
+uint32 visible
 time detected_time
