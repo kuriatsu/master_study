@@ -7,10 +7,11 @@ import struct
 
 import swipe_obstacles.msg
 import geometry_msgs.msg
+import genpy
 import std_msgs.msg
 
 class detected_obstacle_array(genpy.Message):
-  _md5sum = "53847f7fcca9cc1d891c94d84db3bd10"
+  _md5sum = "e900cf0096e79af6967f71da5a89cfd0"
   _type = "swipe_obstacles/detected_obstacle_array"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
@@ -39,10 +40,15 @@ MSG: swipe_obstacles/detected_obstacle
 std_msgs/Header header
 
 uint32 id
+uint32 managed_id
 string label
 float32 score
-
 geometry_msgs/Pose pose
+
+float32 shift_x
+float32 shift_y
+uint32 visible
+time detected_time
 
 ================================================================================
 MSG: geometry_msgs/Pose
@@ -128,7 +134,8 @@ float64 w
           _x = _x.encode('utf-8')
           length = len(_x)
         buff.write(struct.pack('<I%ss'%length, length, _x))
-        buff.write(_get_struct_I().pack(val1.id))
+        _x = val1
+        buff.write(_get_struct_2I().pack(_x.id, _x.managed_id))
         _x = val1.label
         length = len(_x)
         if python3 or type(_x) == unicode:
@@ -143,6 +150,11 @@ float64 w
         _v5 = _v3.orientation
         _x = _v5
         buff.write(_get_struct_4d().pack(_x.x, _x.y, _x.z, _x.w))
+        _x = val1
+        buff.write(_get_struct_2fI().pack(_x.shift_x, _x.shift_y, _x.visible))
+        _v6 = val1.detected_time
+        _x = _v6
+        buff.write(_get_struct_2I().pack(_x.secs, _x.nsecs))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -176,12 +188,12 @@ float64 w
       self.obstacles = []
       for i in range(0, length):
         val1 = swipe_obstacles.msg.detected_obstacle()
-        _v6 = val1.header
+        _v7 = val1.header
         start = end
         end += 4
-        (_v6.seq,) = _get_struct_I().unpack(str[start:end])
-        _v7 = _v6.stamp
-        _x = _v7
+        (_v7.seq,) = _get_struct_I().unpack(str[start:end])
+        _v8 = _v7.stamp
+        _x = _v8
         start = end
         end += 8
         (_x.secs, _x.nsecs,) = _get_struct_2I().unpack(str[start:end])
@@ -191,12 +203,13 @@ float64 w
         start = end
         end += length
         if python3:
-          _v6.frame_id = str[start:end].decode('utf-8')
+          _v7.frame_id = str[start:end].decode('utf-8')
         else:
-          _v6.frame_id = str[start:end]
+          _v7.frame_id = str[start:end]
+        _x = val1
         start = end
-        end += 4
-        (val1.id,) = _get_struct_I().unpack(str[start:end])
+        end += 8
+        (_x.id, _x.managed_id,) = _get_struct_2I().unpack(str[start:end])
         start = end
         end += 4
         (length,) = _struct_I.unpack(str[start:end])
@@ -209,17 +222,26 @@ float64 w
         start = end
         end += 4
         (val1.score,) = _get_struct_f().unpack(str[start:end])
-        _v8 = val1.pose
-        _v9 = _v8.position
-        _x = _v9
+        _v9 = val1.pose
+        _v10 = _v9.position
+        _x = _v10
         start = end
         end += 24
         (_x.x, _x.y, _x.z,) = _get_struct_3d().unpack(str[start:end])
-        _v10 = _v8.orientation
-        _x = _v10
+        _v11 = _v9.orientation
+        _x = _v11
         start = end
         end += 32
         (_x.x, _x.y, _x.z, _x.w,) = _get_struct_4d().unpack(str[start:end])
+        _x = val1
+        start = end
+        end += 12
+        (_x.shift_x, _x.shift_y, _x.visible,) = _get_struct_2fI().unpack(str[start:end])
+        _v12 = val1.detected_time
+        _x = _v12
+        start = end
+        end += 8
+        (_x.secs, _x.nsecs,) = _get_struct_2I().unpack(str[start:end])
         self.obstacles.append(val1)
       return self
     except struct.error as e:
@@ -244,18 +266,19 @@ float64 w
       length = len(self.obstacles)
       buff.write(_struct_I.pack(length))
       for val1 in self.obstacles:
-        _v11 = val1.header
-        buff.write(_get_struct_I().pack(_v11.seq))
-        _v12 = _v11.stamp
-        _x = _v12
+        _v13 = val1.header
+        buff.write(_get_struct_I().pack(_v13.seq))
+        _v14 = _v13.stamp
+        _x = _v14
         buff.write(_get_struct_2I().pack(_x.secs, _x.nsecs))
-        _x = _v11.frame_id
+        _x = _v13.frame_id
         length = len(_x)
         if python3 or type(_x) == unicode:
           _x = _x.encode('utf-8')
           length = len(_x)
         buff.write(struct.pack('<I%ss'%length, length, _x))
-        buff.write(_get_struct_I().pack(val1.id))
+        _x = val1
+        buff.write(_get_struct_2I().pack(_x.id, _x.managed_id))
         _x = val1.label
         length = len(_x)
         if python3 or type(_x) == unicode:
@@ -263,13 +286,18 @@ float64 w
           length = len(_x)
         buff.write(struct.pack('<I%ss'%length, length, _x))
         buff.write(_get_struct_f().pack(val1.score))
-        _v13 = val1.pose
-        _v14 = _v13.position
-        _x = _v14
+        _v15 = val1.pose
+        _v16 = _v15.position
+        _x = _v16
         buff.write(_get_struct_3d().pack(_x.x, _x.y, _x.z))
-        _v15 = _v13.orientation
-        _x = _v15
+        _v17 = _v15.orientation
+        _x = _v17
         buff.write(_get_struct_4d().pack(_x.x, _x.y, _x.z, _x.w))
+        _x = val1
+        buff.write(_get_struct_2fI().pack(_x.shift_x, _x.shift_y, _x.visible))
+        _v18 = val1.detected_time
+        _x = _v18
+        buff.write(_get_struct_2I().pack(_x.secs, _x.nsecs))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -304,12 +332,12 @@ float64 w
       self.obstacles = []
       for i in range(0, length):
         val1 = swipe_obstacles.msg.detected_obstacle()
-        _v16 = val1.header
+        _v19 = val1.header
         start = end
         end += 4
-        (_v16.seq,) = _get_struct_I().unpack(str[start:end])
-        _v17 = _v16.stamp
-        _x = _v17
+        (_v19.seq,) = _get_struct_I().unpack(str[start:end])
+        _v20 = _v19.stamp
+        _x = _v20
         start = end
         end += 8
         (_x.secs, _x.nsecs,) = _get_struct_2I().unpack(str[start:end])
@@ -319,12 +347,13 @@ float64 w
         start = end
         end += length
         if python3:
-          _v16.frame_id = str[start:end].decode('utf-8')
+          _v19.frame_id = str[start:end].decode('utf-8')
         else:
-          _v16.frame_id = str[start:end]
+          _v19.frame_id = str[start:end]
+        _x = val1
         start = end
-        end += 4
-        (val1.id,) = _get_struct_I().unpack(str[start:end])
+        end += 8
+        (_x.id, _x.managed_id,) = _get_struct_2I().unpack(str[start:end])
         start = end
         end += 4
         (length,) = _struct_I.unpack(str[start:end])
@@ -337,17 +366,26 @@ float64 w
         start = end
         end += 4
         (val1.score,) = _get_struct_f().unpack(str[start:end])
-        _v18 = val1.pose
-        _v19 = _v18.position
-        _x = _v19
+        _v21 = val1.pose
+        _v22 = _v21.position
+        _x = _v22
         start = end
         end += 24
         (_x.x, _x.y, _x.z,) = _get_struct_3d().unpack(str[start:end])
-        _v20 = _v18.orientation
-        _x = _v20
+        _v23 = _v21.orientation
+        _x = _v23
         start = end
         end += 32
         (_x.x, _x.y, _x.z, _x.w,) = _get_struct_4d().unpack(str[start:end])
+        _x = val1
+        start = end
+        end += 12
+        (_x.shift_x, _x.shift_y, _x.visible,) = _get_struct_2fI().unpack(str[start:end])
+        _v24 = val1.detected_time
+        _x = _v24
+        start = end
+        end += 8
+        (_x.secs, _x.nsecs,) = _get_struct_2I().unpack(str[start:end])
         self.obstacles.append(val1)
       return self
     except struct.error as e:
@@ -363,6 +401,12 @@ def _get_struct_f():
     if _struct_f is None:
         _struct_f = struct.Struct("<f")
     return _struct_f
+_struct_2fI = None
+def _get_struct_2fI():
+    global _struct_2fI
+    if _struct_2fI is None:
+        _struct_2fI = struct.Struct("<2fI")
+    return _struct_2fI
 _struct_3I = None
 def _get_struct_3I():
     global _struct_3I

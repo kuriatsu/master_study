@@ -6,6 +6,7 @@ swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixe
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_detector_fixed.cpp
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Point.h
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Pose.h
+swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/geometry_msgs/PoseStamped.h
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/geometry_msgs/Quaternion.h
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/ros/advertise_options.h
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/ros/advertise_service_options.h
@@ -64,6 +65,7 @@ swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixe
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/ros/wall_timer_options.h
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/rosconsole/macros_generated.h
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/std_msgs/Header.h
+swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/std_msgs/Int32.h
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/xmlrpcpp/XmlRpcDecl.h
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /opt/ros/kinetic/include/xmlrpcpp/XmlRpcValue.h
 swipe_obstacles/CMakeFiles/swipe_detector_fixed_node.dir/src/swipe_detector_fixed.cpp.o: /usr/include/x86_64-linux-gnu/bits/select.h

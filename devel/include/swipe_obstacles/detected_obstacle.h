@@ -28,16 +28,26 @@ struct detected_obstacle_
   detected_obstacle_()
     : header()
     , id(0)
+    , managed_id(0)
     , label()
     , score(0.0)
-    , pose()  {
+    , pose()
+    , shift_x(0.0)
+    , shift_y(0.0)
+    , visible(0)
+    , detected_time()  {
     }
   detected_obstacle_(const ContainerAllocator& _alloc)
     : header(_alloc)
     , id(0)
+    , managed_id(0)
     , label(_alloc)
     , score(0.0)
-    , pose(_alloc)  {
+    , pose(_alloc)
+    , shift_x(0.0)
+    , shift_y(0.0)
+    , visible(0)
+    , detected_time()  {
   (void)_alloc;
     }
 
@@ -49,6 +59,9 @@ struct detected_obstacle_
    typedef uint32_t _id_type;
   _id_type id;
 
+   typedef uint32_t _managed_id_type;
+  _managed_id_type managed_id;
+
    typedef std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other >  _label_type;
   _label_type label;
 
@@ -57,6 +70,18 @@ struct detected_obstacle_
 
    typedef  ::geometry_msgs::Pose_<ContainerAllocator>  _pose_type;
   _pose_type pose;
+
+   typedef float _shift_x_type;
+  _shift_x_type shift_x;
+
+   typedef float _shift_y_type;
+  _shift_y_type shift_y;
+
+   typedef uint32_t _visible_type;
+  _visible_type visible;
+
+   typedef ros::Time _detected_time_type;
+  _detected_time_type detected_time;
 
 
 
@@ -136,12 +161,12 @@ struct MD5Sum< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "a62aaa9b642cbcb51fb4da53b7bb0ae8";
+    return "41baf25da7882eba333abb4d93085641";
   }
 
   static const char* value(const ::swipe_obstacles::detected_obstacle_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0xa62aaa9b642cbcb5ULL;
-  static const uint64_t static_value2 = 0x1fb4da53b7bb0ae8ULL;
+  static const uint64_t static_value1 = 0x41baf25da7882ebaULL;
+  static const uint64_t static_value2 = 0x333abb4d93085641ULL;
 };
 
 template<class ContainerAllocator>
@@ -163,10 +188,15 @@ struct Definition< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
     return "std_msgs/Header header\n\
 \n\
 uint32 id\n\
+uint32 managed_id\n\
 string label\n\
 float32 score\n\
-\n\
 geometry_msgs/Pose pose\n\
+\n\
+float32 shift_x\n\
+float32 shift_y\n\
+uint32 visible\n\
+time detected_time\n\
 \n\
 ================================================================================\n\
 MSG: std_msgs/Header\n\
@@ -227,9 +257,14 @@ namespace serialization
     {
       stream.next(m.header);
       stream.next(m.id);
+      stream.next(m.managed_id);
       stream.next(m.label);
       stream.next(m.score);
       stream.next(m.pose);
+      stream.next(m.shift_x);
+      stream.next(m.shift_y);
+      stream.next(m.visible);
+      stream.next(m.detected_time);
     }
 
     ROS_DECLARE_ALLINONE_SERIALIZER
@@ -253,6 +288,8 @@ struct Printer< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
     Printer< ::std_msgs::Header_<ContainerAllocator> >::stream(s, indent + "  ", v.header);
     s << indent << "id: ";
     Printer<uint32_t>::stream(s, indent + "  ", v.id);
+    s << indent << "managed_id: ";
+    Printer<uint32_t>::stream(s, indent + "  ", v.managed_id);
     s << indent << "label: ";
     Printer<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > >::stream(s, indent + "  ", v.label);
     s << indent << "score: ";
@@ -260,6 +297,14 @@ struct Printer< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
     s << indent << "pose: ";
     s << std::endl;
     Printer< ::geometry_msgs::Pose_<ContainerAllocator> >::stream(s, indent + "  ", v.pose);
+    s << indent << "shift_x: ";
+    Printer<float>::stream(s, indent + "  ", v.shift_x);
+    s << indent << "shift_y: ";
+    Printer<float>::stream(s, indent + "  ", v.shift_y);
+    s << indent << "visible: ";
+    Printer<uint32_t>::stream(s, indent + "  ", v.visible);
+    s << indent << "detected_time: ";
+    Printer<ros::Time>::stream(s, indent + "  ", v.detected_time);
   }
 };
 

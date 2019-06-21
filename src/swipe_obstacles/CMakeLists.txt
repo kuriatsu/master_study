@@ -144,6 +144,9 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(swipe_detector_fixed_node src/swipe_detector_fixed.cpp)
 add_executable(swipe_detector_yolo_node src/swipe_detector_yolo.cpp)
+add_executable(swipe_position_manager_node src/swipe_position_manager.cpp)
+add_executable(swipe_visualizer_node src/swipe_visualizer.cpp)
+add_executable(swipe_reflector_node src/swipe_reflector.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -155,10 +158,16 @@ add_executable(swipe_detector_yolo_node src/swipe_detector_yolo.cpp)
 ## same as for the library above
 add_dependencies(swipe_detector_fixed_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(swipe_detector_yolo_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(swipe_position_manager_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(swipe_visualizer_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(swipe_reflector_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(swipe_detector_fixed_node ${catkin_LIBRARIES})
 target_link_libraries(swipe_detector_yolo_node ${catkin_LIBRARIES})
+target_link_libraries(swipe_position_manager_node ${catkin_LIBRARIES})
+target_link_libraries(swipe_visualizer_node ${catkin_LIBRARIES})
+target_link_libraries(swipe_reflector_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##

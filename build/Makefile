@@ -283,6 +283,45 @@ gtest/fast:
 .PHONY : gtest/fast
 
 #=============================================================================
+# Target rules for targets named swipe_reflector_node
+
+# Build rule for target.
+swipe_reflector_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 swipe_reflector_node
+.PHONY : swipe_reflector_node
+
+# fast build rule for target.
+swipe_reflector_node/fast:
+	$(MAKE) -f swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/build
+.PHONY : swipe_reflector_node/fast
+
+#=============================================================================
+# Target rules for targets named swipe_visualizer_node
+
+# Build rule for target.
+swipe_visualizer_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 swipe_visualizer_node
+.PHONY : swipe_visualizer_node
+
+# fast build rule for target.
+swipe_visualizer_node/fast:
+	$(MAKE) -f swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/build
+.PHONY : swipe_visualizer_node/fast
+
+#=============================================================================
+# Target rules for targets named swipe_position_manager_node
+
+# Build rule for target.
+swipe_position_manager_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 swipe_position_manager_node
+.PHONY : swipe_position_manager_node
+
+# fast build rule for target.
+swipe_position_manager_node/fast:
+	$(MAKE) -f swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/build
+.PHONY : swipe_position_manager_node/fast
+
+#=============================================================================
 # Target rules for targets named swipe_detector_yolo_node
 
 # Build rule for target.
@@ -1786,6 +1825,9 @@ help:
 	@echo "... gmock"
 	@echo "... gtest_main"
 	@echo "... gtest"
+	@echo "... swipe_reflector_node"
+	@echo "... swipe_visualizer_node"
+	@echo "... swipe_position_manager_node"
 	@echo "... swipe_detector_yolo_node"
 	@echo "... swipe_obstacles_gennodejs"
 	@echo "... swipe_obstacles_generate_messages_nodejs"

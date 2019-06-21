@@ -19,10 +19,11 @@ class PositionManager
     private:
         ros::Publisher pub_obj;
         ros::Subscriber sub_obj;
+        ros::Subscriber sub_shift;
         tf::TransformListener tf_listener;
         std::vector<swipe_obstacles::detected_obstacle> obstacle_vec;
         const static int vector_size = 10;
-        const static int keep_time = 3;
+        int keep_time;
         uint32_t managed_id;
         //<real_id, managed_id>
         std::map<uint32_t, uint32_t> id_dict;
@@ -34,12 +35,12 @@ class PositionManager
         void sub_obj_callback(const swipe_obstacles::detected_obstacle_array &in_msgs);
         void sub_shift_callback(const swipe_obstacles::detected_obstacle &in_msg);
         geometry_msgs::Pose tf_transformer(const geometry_msgs::Pose &in_pose, const std::string &in_frame_id);
-        void store_obj(const swipe_obstacles::detected_obstacle *in_msg);
+        void store_obj(const swipe_obstacles::detected_obstacle &in_msg);
         void obstacle_publish();
 };
 
 
-PositionManager::PositionManager(): managed_id(0)
+PositionManager::PositionManager(): managed_id(0), keep_time(2.0)
 {
     ros::NodeHandle n;
 
@@ -54,20 +55,28 @@ PositionManager::PositionManager(): managed_id(0)
 void PositionManager::obstacle_publish()
 {
     swipe_obstacles::detected_obstacle_array out_msgs;
+    int flag = 0;
 
     // for(std::vector<obstacle_info>::const_iterator i = obstacle_info_vec.begin(); i != obstacle_info_vec.end(); i++)
     for(auto i = obstacle_vec.begin(); i != obstacle_vec.end(); i++)
     {
         // 古いデータはpublishしない.
-        if((ros::Time(0) - i->detected_time) < ros::Duration(float(keep_time))){
+        if((ros::Time::now() - i->detected_time) < ros::Duration(keep_time)){
             out_msgs.obstacles.push_back(*i);
+            ROS_INFO_STREAM(*i);
+            flag = 1;
         }
         else
         {
+            std::cout << "-" << i->id << std::endl;
             id_dict.erase(i->id);
         }
     }
-    pub_obj.publish(out_msgs);
+    if(flag)
+    {
+        pub_obj.publish(out_msgs);
+        ROS_INFO("published");
+    }
 }
 
 
@@ -79,7 +88,7 @@ void PositionManager::sub_shift_callback(const swipe_obstacles::detected_obstacl
         {
             obstacle_vec.at(i->second).shift_x = in_msg.pose.position.x - obstacle_vec.at(i->second).pose.position.x;
             obstacle_vec.at(i->second).shift_y = in_msg.pose.position.y - obstacle_vec.at(i->second).pose.position.y;
-            obstacle_vec.at(i->second).detected_time = ros::Time(0);
+            obstacle_vec.at(i->second).detected_time = ros::Time::now();
             obstacle_publish();
         }
     }
@@ -88,52 +97,58 @@ void PositionManager::sub_shift_callback(const swipe_obstacles::detected_obstacl
 
 void PositionManager::sub_obj_callback(const swipe_obstacles::detected_obstacle_array &in_msgs)
 {
-    swipe_obstacles::detected_obstacle *out_msg;
+    swipe_obstacles::detected_obstacle out_msg;
 
     ROS_INFO("Get obj info");
 
-    for(size_t i=0; i<msgs.obstacles.size(); i++)
+    for(size_t i=0; i<in_msgs.obstacles.size(); i++)
     {
-        out_msg = &in_msgs[i];
-        out_msg->pose = tf_transformer(in_msgs.obstacles[i].pose, in_msgs.header.frame_id);
+        out_msg = in_msgs.obstacles[i];
+        out_msg.pose = tf_transformer(in_msgs.obstacles[i].pose, in_msgs.header.frame_id);
         store_obj(out_msg);
     }
     obstacle_publish();
 }
 
 
-void PositionManager::store_obj(const swipe_obstacles::detected_obstacle_array *in_msg)
+void PositionManager::store_obj(const swipe_obstacles::detected_obstacle &in_msg)
 {
     int flag=0, id_buf, index;
-    float disance;
+    float distance;
 
     // index = id_dict.at(in_msg.id) % vector_size;
 
     // idがすでにid_dictに存在していたら
-    if (id_dict.count(in_msg->id))
+    if (id_dict.count(in_msg.id))
     {
-        index = id_dict.at(in_msg->id) % vector_size;
+        ROS_INFO("pose updated");
 
-        obstacle_vec.at(index).pose = in_msg->pose;
-        obstacle_vec.at(index).detected_time = in_msg->detected_time;
-        obstacle_vec.at(index).score = in_msg->score;
+        index = id_dict.at(in_msg.id) % vector_size;
+
+        obstacle_vec.at(index).pose = in_msg.pose;
+        obstacle_vec.at(index).detected_time = in_msg.detected_time;
+        obstacle_vec.at(index).score = in_msg.score;
     }
     else
     {
         for(auto i = obstacle_vec.begin(); i != obstacle_vec.end(); i++)
         {
-            distance = (i->pose.position.x - in_msg->pose.position.x)**2 + (i->pose.position.y - in_msg->pose.position.y)**2;
+            distance = std::pow(i->pose.position.x - in_msg.pose.position.x, 2) + std::pow(i->pose.position.y - in_msg.pose.position.y, 2);
             // 既に近距離に検出されていた場合
             if(distance < 4.0)
             {
+                std::cout << "+" << in_msg.id << "-" << i->id << std::endl;
+                // std::cout << id_dict << std::endl;
+                // std::cout << "new" << in_msg.id << "old" << i->id << std::endl;
                 index = id_dict.at(i->id) % vector_size;
                 // real_id を再登録
-                in_dict.erase(i->id);
-                id_dict.emplace(in_msg->id, i->managed_id);
+                id_dict.emplace(in_msg.id, i->managed_id);
+                id_dict.erase(i->id);
 
-                obstacle_vec.at(index).pose = in_msg->pose;
-                obstacle_vec.at(index).detected_time = in_msg->detected_time;
-                obstacle_vec.at(index).score = in_msg->detected_time;
+                obstacle_vec.at(index).id = in_msg.id;
+                obstacle_vec.at(index).pose = in_msg.pose;
+                obstacle_vec.at(index).detected_time = in_msg.detected_time;
+                obstacle_vec.at(index).score = in_msg.score;
                 flag = 1;
                 break;
             }
@@ -141,9 +156,11 @@ void PositionManager::store_obj(const swipe_obstacles::detected_obstacle_array *
         // 新しい障害物なら
         if (flag == 0)
         {
-            id_dict.emplace(in_msg->id, managed_id);
-            obstacle_vec.at[in_id%vector_size] = *in_msg;
-            obstacle_vec.at[index].managed_id = managed_id;
+            std::cout << "+" << in_msg.id << std::endl;
+            id_dict.emplace(in_msg.id, managed_id);
+            index = managed_id % vector_size;
+            obstacle_vec.at(index) = in_msg;
+            obstacle_vec.at(index).managed_id = managed_id;
             managed_id++;
         }
     }
@@ -158,8 +175,8 @@ geometry_msgs::Pose PositionManager::tf_transformer(const geometry_msgs::Pose &i
     tf::StampedTransform req_to_world;
 
     try{
-		tf_listener.waitForTransform(in_frame_id, "world", ros::Time(0), ros::Duration(1.0));
-		tf_listener.lookupTransform("world", in_frame_id, ros::Time(0), req_to_world);
+		tf_listener.waitForTransform(in_frame_id, "world", ros::Time::now(), ros::Duration(1.0));
+		tf_listener.lookupTransform("world", in_frame_id, ros::Time::now(), req_to_world);
 
 	}catch(...){
 		ROS_INFO("velodyne to world transform ERROR");

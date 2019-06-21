@@ -22,9 +22,14 @@ class detected_obstacle {
       // initObj === null is a special case for deserialization where we don't initialize fields
       this.header = null;
       this.id = null;
+      this.managed_id = null;
       this.label = null;
       this.score = null;
       this.pose = null;
+      this.shift_x = null;
+      this.shift_y = null;
+      this.visible = null;
+      this.detected_time = null;
     }
     else {
       if (initObj.hasOwnProperty('header')) {
@@ -38,6 +43,12 @@ class detected_obstacle {
       }
       else {
         this.id = 0;
+      }
+      if (initObj.hasOwnProperty('managed_id')) {
+        this.managed_id = initObj.managed_id
+      }
+      else {
+        this.managed_id = 0;
       }
       if (initObj.hasOwnProperty('label')) {
         this.label = initObj.label
@@ -57,6 +68,30 @@ class detected_obstacle {
       else {
         this.pose = new geometry_msgs.msg.Pose();
       }
+      if (initObj.hasOwnProperty('shift_x')) {
+        this.shift_x = initObj.shift_x
+      }
+      else {
+        this.shift_x = 0.0;
+      }
+      if (initObj.hasOwnProperty('shift_y')) {
+        this.shift_y = initObj.shift_y
+      }
+      else {
+        this.shift_y = 0.0;
+      }
+      if (initObj.hasOwnProperty('visible')) {
+        this.visible = initObj.visible
+      }
+      else {
+        this.visible = 0;
+      }
+      if (initObj.hasOwnProperty('detected_time')) {
+        this.detected_time = initObj.detected_time
+      }
+      else {
+        this.detected_time = {secs: 0, nsecs: 0};
+      }
     }
   }
 
@@ -66,12 +101,22 @@ class detected_obstacle {
     bufferOffset = std_msgs.msg.Header.serialize(obj.header, buffer, bufferOffset);
     // Serialize message field [id]
     bufferOffset = _serializer.uint32(obj.id, buffer, bufferOffset);
+    // Serialize message field [managed_id]
+    bufferOffset = _serializer.uint32(obj.managed_id, buffer, bufferOffset);
     // Serialize message field [label]
     bufferOffset = _serializer.string(obj.label, buffer, bufferOffset);
     // Serialize message field [score]
     bufferOffset = _serializer.float32(obj.score, buffer, bufferOffset);
     // Serialize message field [pose]
     bufferOffset = geometry_msgs.msg.Pose.serialize(obj.pose, buffer, bufferOffset);
+    // Serialize message field [shift_x]
+    bufferOffset = _serializer.float32(obj.shift_x, buffer, bufferOffset);
+    // Serialize message field [shift_y]
+    bufferOffset = _serializer.float32(obj.shift_y, buffer, bufferOffset);
+    // Serialize message field [visible]
+    bufferOffset = _serializer.uint32(obj.visible, buffer, bufferOffset);
+    // Serialize message field [detected_time]
+    bufferOffset = _serializer.time(obj.detected_time, buffer, bufferOffset);
     return bufferOffset;
   }
 
@@ -83,12 +128,22 @@ class detected_obstacle {
     data.header = std_msgs.msg.Header.deserialize(buffer, bufferOffset);
     // Deserialize message field [id]
     data.id = _deserializer.uint32(buffer, bufferOffset);
+    // Deserialize message field [managed_id]
+    data.managed_id = _deserializer.uint32(buffer, bufferOffset);
     // Deserialize message field [label]
     data.label = _deserializer.string(buffer, bufferOffset);
     // Deserialize message field [score]
     data.score = _deserializer.float32(buffer, bufferOffset);
     // Deserialize message field [pose]
     data.pose = geometry_msgs.msg.Pose.deserialize(buffer, bufferOffset);
+    // Deserialize message field [shift_x]
+    data.shift_x = _deserializer.float32(buffer, bufferOffset);
+    // Deserialize message field [shift_y]
+    data.shift_y = _deserializer.float32(buffer, bufferOffset);
+    // Deserialize message field [visible]
+    data.visible = _deserializer.uint32(buffer, bufferOffset);
+    // Deserialize message field [detected_time]
+    data.detected_time = _deserializer.time(buffer, bufferOffset);
     return data;
   }
 
@@ -96,7 +151,7 @@ class detected_obstacle {
     let length = 0;
     length += std_msgs.msg.Header.getMessageSize(object.header);
     length += object.label.length;
-    return length + 68;
+    return length + 92;
   }
 
   static datatype() {
@@ -106,7 +161,7 @@ class detected_obstacle {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return 'a62aaa9b642cbcb51fb4da53b7bb0ae8';
+    return '41baf25da7882eba333abb4d93085641';
   }
 
   static messageDefinition() {
@@ -115,10 +170,15 @@ class detected_obstacle {
     std_msgs/Header header
     
     uint32 id
+    uint32 managed_id
     string label
     float32 score
-    
     geometry_msgs/Pose pose
+    
+    float32 shift_x
+    float32 shift_y
+    uint32 visible
+    time detected_time
     
     ================================================================================
     MSG: std_msgs/Header
@@ -183,6 +243,13 @@ class detected_obstacle {
       resolved.id = 0
     }
 
+    if (msg.managed_id !== undefined) {
+      resolved.managed_id = msg.managed_id;
+    }
+    else {
+      resolved.managed_id = 0
+    }
+
     if (msg.label !== undefined) {
       resolved.label = msg.label;
     }
@@ -202,6 +269,34 @@ class detected_obstacle {
     }
     else {
       resolved.pose = new geometry_msgs.msg.Pose()
+    }
+
+    if (msg.shift_x !== undefined) {
+      resolved.shift_x = msg.shift_x;
+    }
+    else {
+      resolved.shift_x = 0.0
+    }
+
+    if (msg.shift_y !== undefined) {
+      resolved.shift_y = msg.shift_y;
+    }
+    else {
+      resolved.shift_y = 0.0
+    }
+
+    if (msg.visible !== undefined) {
+      resolved.visible = msg.visible;
+    }
+    else {
+      resolved.visible = 0
+    }
+
+    if (msg.detected_time !== undefined) {
+      resolved.detected_time = msg.detected_time;
+    }
+    else {
+      resolved.detected_time = {secs: 0, nsecs: 0}
     }
 
     return resolved;

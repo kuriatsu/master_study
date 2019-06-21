@@ -166,6 +166,51 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/rule:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/rule
+.PHONY : swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/rule
+
+# Convenience name for target.
+swipe_reflector_node: swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/rule
+
+.PHONY : swipe_reflector_node
+
+# fast build rule for target.
+swipe_reflector_node/fast:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/build
+.PHONY : swipe_reflector_node/fast
+
+# Convenience name for target.
+swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/rule:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/rule
+.PHONY : swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/rule
+
+# Convenience name for target.
+swipe_visualizer_node: swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/rule
+
+.PHONY : swipe_visualizer_node
+
+# fast build rule for target.
+swipe_visualizer_node/fast:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/build
+.PHONY : swipe_visualizer_node/fast
+
+# Convenience name for target.
+swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/rule:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/rule
+.PHONY : swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/rule
+
+# Convenience name for target.
+swipe_position_manager_node: swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/rule
+
+.PHONY : swipe_position_manager_node
+
+# fast build rule for target.
+swipe_position_manager_node/fast:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/build
+.PHONY : swipe_position_manager_node/fast
+
+# Convenience name for target.
 swipe_obstacles/CMakeFiles/swipe_detector_yolo_node.dir/rule:
 	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 swipe_obstacles/CMakeFiles/swipe_detector_yolo_node.dir/rule
 .PHONY : swipe_obstacles/CMakeFiles/swipe_detector_yolo_node.dir/rule
@@ -1929,6 +1974,87 @@ src/swipe_detector_yolo.cpp.s:
 	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_detector_yolo_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_detector_yolo_node.dir/src/swipe_detector_yolo.cpp.s
 .PHONY : src/swipe_detector_yolo.cpp.s
 
+src/swipe_position_manager.o: src/swipe_position_manager.cpp.o
+
+.PHONY : src/swipe_position_manager.o
+
+# target to build an object file
+src/swipe_position_manager.cpp.o:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_manager.cpp.o
+.PHONY : src/swipe_position_manager.cpp.o
+
+src/swipe_position_manager.i: src/swipe_position_manager.cpp.i
+
+.PHONY : src/swipe_position_manager.i
+
+# target to preprocess a source file
+src/swipe_position_manager.cpp.i:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_manager.cpp.i
+.PHONY : src/swipe_position_manager.cpp.i
+
+src/swipe_position_manager.s: src/swipe_position_manager.cpp.s
+
+.PHONY : src/swipe_position_manager.s
+
+# target to generate assembly for a file
+src/swipe_position_manager.cpp.s:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_manager.cpp.s
+.PHONY : src/swipe_position_manager.cpp.s
+
+src/swipe_reflector.o: src/swipe_reflector.cpp.o
+
+.PHONY : src/swipe_reflector.o
+
+# target to build an object file
+src/swipe_reflector.cpp.o:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/src/swipe_reflector.cpp.o
+.PHONY : src/swipe_reflector.cpp.o
+
+src/swipe_reflector.i: src/swipe_reflector.cpp.i
+
+.PHONY : src/swipe_reflector.i
+
+# target to preprocess a source file
+src/swipe_reflector.cpp.i:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/src/swipe_reflector.cpp.i
+.PHONY : src/swipe_reflector.cpp.i
+
+src/swipe_reflector.s: src/swipe_reflector.cpp.s
+
+.PHONY : src/swipe_reflector.s
+
+# target to generate assembly for a file
+src/swipe_reflector.cpp.s:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_reflector_node.dir/src/swipe_reflector.cpp.s
+.PHONY : src/swipe_reflector.cpp.s
+
+src/swipe_visualizer.o: src/swipe_visualizer.cpp.o
+
+.PHONY : src/swipe_visualizer.o
+
+# target to build an object file
+src/swipe_visualizer.cpp.o:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/src/swipe_visualizer.cpp.o
+.PHONY : src/swipe_visualizer.cpp.o
+
+src/swipe_visualizer.i: src/swipe_visualizer.cpp.i
+
+.PHONY : src/swipe_visualizer.i
+
+# target to preprocess a source file
+src/swipe_visualizer.cpp.i:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/src/swipe_visualizer.cpp.i
+.PHONY : src/swipe_visualizer.cpp.i
+
+src/swipe_visualizer.s: src/swipe_visualizer.cpp.s
+
+.PHONY : src/swipe_visualizer.s
+
+# target to generate assembly for a file
+src/swipe_visualizer.cpp.s:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/build.make swipe_obstacles/CMakeFiles/swipe_visualizer_node.dir/src/swipe_visualizer.cpp.s
+.PHONY : src/swipe_visualizer.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -1938,6 +2064,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... install/local"
 	@echo "... install/strip"
+	@echo "... swipe_reflector_node"
+	@echo "... swipe_visualizer_node"
+	@echo "... swipe_position_manager_node"
 	@echo "... swipe_detector_yolo_node"
 	@echo "... swipe_obstacles_gennodejs"
 	@echo "... swipe_obstacles_generate_messages_nodejs"
@@ -2062,6 +2191,15 @@ help:
 	@echo "... src/swipe_detector_yolo.o"
 	@echo "... src/swipe_detector_yolo.i"
 	@echo "... src/swipe_detector_yolo.s"
+	@echo "... src/swipe_position_manager.o"
+	@echo "... src/swipe_position_manager.i"
+	@echo "... src/swipe_position_manager.s"
+	@echo "... src/swipe_reflector.o"
+	@echo "... src/swipe_reflector.i"
+	@echo "... src/swipe_reflector.s"
+	@echo "... src/swipe_visualizer.o"
+	@echo "... src/swipe_visualizer.i"
+	@echo "... src/swipe_visualizer.s"
 .PHONY : help
 
 

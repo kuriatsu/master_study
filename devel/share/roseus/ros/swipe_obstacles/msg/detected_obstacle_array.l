@@ -78,7 +78,7 @@
    self)
   )
 
-(setf (get swipe_obstacles::detected_obstacle_array :md5sum-) "53847f7fcca9cc1d891c94d84db3bd10")
+(setf (get swipe_obstacles::detected_obstacle_array :md5sum-) "e900cf0096e79af6967f71da5a89cfd0")
 (setf (get swipe_obstacles::detected_obstacle_array :datatype-) "swipe_obstacles/detected_obstacle_array")
 (setf (get swipe_obstacles::detected_obstacle_array :definition-)
       "std_msgs/Header header
@@ -107,10 +107,15 @@ MSG: swipe_obstacles/detected_obstacle
 std_msgs/Header header
 
 uint32 id
+uint32 managed_id
 string label
 float32 score
-
 geometry_msgs/Pose pose
+
+float32 shift_x
+float32 shift_y
+uint32 visible
+time detected_time
 
 ================================================================================
 MSG: geometry_msgs/Pose
@@ -138,6 +143,6 @@ float64 w
 
 
 
-(provide :swipe_obstacles/detected_obstacle_array "53847f7fcca9cc1d891c94d84db3bd10")
+(provide :swipe_obstacles/detected_obstacle_array "e900cf0096e79af6967f71da5a89cfd0")
 
 

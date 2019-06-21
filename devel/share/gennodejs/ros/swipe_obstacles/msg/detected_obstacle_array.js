@@ -84,7 +84,7 @@ class detected_obstacle_array {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '53847f7fcca9cc1d891c94d84db3bd10';
+    return 'e900cf0096e79af6967f71da5a89cfd0';
   }
 
   static messageDefinition() {
@@ -116,10 +116,15 @@ class detected_obstacle_array {
     std_msgs/Header header
     
     uint32 id
+    uint32 managed_id
     string label
     float32 score
-    
     geometry_msgs/Pose pose
+    
+    float32 shift_x
+    float32 shift_y
+    uint32 visible
+    time detected_time
     
     ================================================================================
     MSG: geometry_msgs/Pose
