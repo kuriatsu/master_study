@@ -347,12 +347,6 @@ gtest_force_shared_crt:BOOL=OFF
 //Dependencies for the target
 gtest_main_LIB_DEPENDS:STATIC=general;-lpthread;general;gtest;
 
-//Value Computed by CMake
-int_detection_BINARY_DIR:STATIC=/home/kuriatsu/Program/Ros/master_study_ws/build/int_detection
-
-//Value Computed by CMake
-int_detection_SOURCE_DIR:STATIC=/home/kuriatsu/Program/Ros/master_study_ws/src/int_detection
-
 //The directory containing a CMake configuration file for interactive_markers.
 interactive_markers_DIR:PATH=/opt/ros/kinetic/share/interactive_markers/cmake
 

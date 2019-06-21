@@ -84,7 +84,7 @@ class detected_obstacle_array {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return 'de084b41fe681263f165f9cd28f444bc';
+    return '53847f7fcca9cc1d891c94d84db3bd10';
   }
 
   static messageDefinition() {
@@ -119,9 +119,13 @@ class detected_obstacle_array {
     string label
     float32 score
     
-    geometry_msgs/Point position
-    geometry_msgs/Quaternion orientation
+    geometry_msgs/Pose pose
     
+    ================================================================================
+    MSG: geometry_msgs/Pose
+    # A representation of pose in free space, composed of position and orientation. 
+    Point position
+    Quaternion orientation
     
     ================================================================================
     MSG: geometry_msgs/Point

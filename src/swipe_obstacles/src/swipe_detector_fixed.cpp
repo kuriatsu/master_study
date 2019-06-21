@@ -59,13 +59,13 @@ void swipe_detector_fixed::read_file(){
 			result.push_back(std::stof(field));
 		}
 
-		read_obstacle.position.x = result.at(0);
-		read_obstacle.position.y = result.at(1);
-		read_obstacle.position.z = result.at(2);
-		read_obstacle.orientation.x = result.at(3);
-		read_obstacle.orientation.y = result.at(4);
-		read_obstacle.orientation.z = result.at(5);
-		read_obstacle.orientation.w = result.at(6);
+		read_obstacle.pose.position.x = result.at(0);
+		read_obstacle.pose.position.y = result.at(1);
+		read_obstacle.pose.position.z = result.at(2);
+		read_obstacle.pose.orientation.x = result.at(3);
+		read_obstacle.pose.orientation.y = result.at(4);
+		read_obstacle.pose.orientation.z = result.at(5);
+		read_obstacle.pose.orientation.w = result.at(6);
 		read_obstacle.id = id;
 
 		obstacle_list.obstacles.push_back(read_obstacle);

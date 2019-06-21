@@ -7,8 +7,6 @@
           LABEL
           SCORE-VAL
           SCORE
-          POSITION-VAL
-          POSITION
-          ORIENTATION-VAL
-          ORIENTATION
+          POSE-VAL
+          POSE
 ))

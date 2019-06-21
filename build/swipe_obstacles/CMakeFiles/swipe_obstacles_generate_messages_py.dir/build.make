@@ -62,6 +62,7 @@ swipe_obstacles/CMakeFiles/swipe_obstacles_generate_messages_py: /home/kuriatsu/
 /home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle_array.py: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle_array.py: /opt/ros/kinetic/share/geometry_msgs/msg/Quaternion.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle_array.py: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg
+/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle_array.py: /opt/ros/kinetic/share/geometry_msgs/msg/Pose.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle_array.py: /opt/ros/kinetic/share/std_msgs/msg/Header.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle_array.py: /opt/ros/kinetic/share/geometry_msgs/msg/Point.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/kuriatsu/Program/Ros/master_study_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating Python from MSG swipe_obstacles/detected_obstacle_array"
@@ -70,6 +71,7 @@ swipe_obstacles/CMakeFiles/swipe_obstacles_generate_messages_py: /home/kuriatsu/
 /home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle.py: /opt/ros/kinetic/lib/genpy/genmsg_py.py
 /home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle.py: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle.py: /opt/ros/kinetic/share/geometry_msgs/msg/Quaternion.msg
+/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle.py: /opt/ros/kinetic/share/geometry_msgs/msg/Pose.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle.py: /opt/ros/kinetic/share/std_msgs/msg/Header.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles/msg/_detected_obstacle.py: /opt/ros/kinetic/share/geometry_msgs/msg/Point.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/kuriatsu/Program/Ros/master_study_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Generating Python from MSG swipe_obstacles/detected_obstacle"

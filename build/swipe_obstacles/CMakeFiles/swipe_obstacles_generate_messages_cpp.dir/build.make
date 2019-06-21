@@ -61,6 +61,7 @@ swipe_obstacles/CMakeFiles/swipe_obstacles_generate_messages_cpp: /home/kuriatsu
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle_array.h: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle_array.h: /opt/ros/kinetic/share/geometry_msgs/msg/Quaternion.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle_array.h: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg
+/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle_array.h: /opt/ros/kinetic/share/geometry_msgs/msg/Pose.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle_array.h: /opt/ros/kinetic/share/std_msgs/msg/Header.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle_array.h: /opt/ros/kinetic/share/geometry_msgs/msg/Point.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle_array.h: /opt/ros/kinetic/share/gencpp/msg.h.template
@@ -70,6 +71,7 @@ swipe_obstacles/CMakeFiles/swipe_obstacles_generate_messages_cpp: /home/kuriatsu
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h: /opt/ros/kinetic/lib/gencpp/gen_cpp.py
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h: /opt/ros/kinetic/share/geometry_msgs/msg/Quaternion.msg
+/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h: /opt/ros/kinetic/share/geometry_msgs/msg/Pose.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h: /opt/ros/kinetic/share/std_msgs/msg/Header.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h: /opt/ros/kinetic/share/geometry_msgs/msg/Point.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h: /opt/ros/kinetic/share/gencpp/msg.h.template

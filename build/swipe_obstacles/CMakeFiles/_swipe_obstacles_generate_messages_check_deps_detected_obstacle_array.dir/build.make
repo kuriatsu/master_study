@@ -54,7 +54,7 @@ CMAKE_BINARY_DIR = /home/kuriatsu/Program/Ros/master_study_ws/build
 include swipe_obstacles/CMakeFiles/_swipe_obstacles_generate_messages_check_deps_detected_obstacle_array.dir/progress.make
 
 swipe_obstacles/CMakeFiles/_swipe_obstacles_generate_messages_check_deps_detected_obstacle_array:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build/swipe_obstacles && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/kinetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py swipe_obstacles /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg geometry_msgs/Quaternion:swipe_obstacles/detected_obstacle:std_msgs/Header:geometry_msgs/Point
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build/swipe_obstacles && ../catkin_generated/env_cached.sh /usr/bin/python /opt/ros/kinetic/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py swipe_obstacles /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg geometry_msgs/Quaternion:swipe_obstacles/detected_obstacle:geometry_msgs/Pose:std_msgs/Header:geometry_msgs/Point
 
 _swipe_obstacles_generate_messages_check_deps_detected_obstacle_array: swipe_obstacles/CMakeFiles/_swipe_obstacles_generate_messages_check_deps_detected_obstacle_array
 _swipe_obstacles_generate_messages_check_deps_detected_obstacle_array: swipe_obstacles/CMakeFiles/_swipe_obstacles_generate_messages_check_deps_detected_obstacle_array.dir/build.make

@@ -7,9 +7,7 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/home/kuriatsu/Program/Ros/master_study_ws/devel:$CMAKE_PREFIX_PATH"
-export LD_LIBRARY_PATH="/home/kuriatsu/Program/Ros/master_study_ws/devel/lib:$LD_LIBRARY_PATH"
-export PKG_CONFIG_PATH="/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
+export LD_LIBRARY_PATH="/home/kuriatsu/Autoware/ros/devel/lib:/opt/ros/kinetic/lib:/opt/ros/kinetic/lib/x86_64-linux-gnu:/usr/local/cuda-9.0/lib64:/usr/local/cuda-9.0/lib64"
+export PKG_CONFIG_PATH="/home/kuriatsu/Autoware/ros/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig:/opt/ros/kinetic/lib/x86_64-linux-gnu/pkgconfig"
 export PWD="/home/kuriatsu/Program/Ros/master_study_ws/build"
-export PYTHONPATH="/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages:/home/kuriatsu/Autoware/ros/devel/lib/python2.7/dist-packages:$PYTHONPATH"
-export ROS_PACKAGE_PATH="/home/kuriatsu/Program/Ros/master_study_ws/src:$ROS_PACKAGE_PATH"
+export PYTHONPATH="/home/kuriatsu/Autoware/ros/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages"

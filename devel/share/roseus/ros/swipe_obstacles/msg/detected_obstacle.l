@@ -18,7 +18,7 @@
 
 (defclass swipe_obstacles::detected_obstacle
   :super ros::object
-  :slots (_header _id _label _score _position _orientation ))
+  :slots (_header _id _label _score _pose ))
 
 (defmethod swipe_obstacles::detected_obstacle
   (:init
@@ -27,16 +27,14 @@
     ((:id __id) 0)
     ((:label __label) "")
     ((:score __score) 0.0)
-    ((:position __position) (instance geometry_msgs::Point :init))
-    ((:orientation __orientation) (instance geometry_msgs::Quaternion :init))
+    ((:pose __pose) (instance geometry_msgs::Pose :init))
     )
    (send-super :init)
    (setq _header __header)
    (setq _id (round __id))
    (setq _label (string __label))
    (setq _score (float __score))
-   (setq _position __position)
-   (setq _orientation __orientation)
+   (setq _pose __pose)
    self)
   (:header
    (&rest __header)
@@ -54,20 +52,13 @@
   (:score
    (&optional __score)
    (if __score (setq _score __score)) _score)
-  (:position
-   (&rest __position)
-   (if (keywordp (car __position))
-       (send* _position __position)
+  (:pose
+   (&rest __pose)
+   (if (keywordp (car __pose))
+       (send* _pose __pose)
      (progn
-       (if __position (setq _position (car __position)))
-       _position)))
-  (:orientation
-   (&rest __orientation)
-   (if (keywordp (car __orientation))
-       (send* _orientation __orientation)
-     (progn
-       (if __orientation (setq _orientation (car __orientation)))
-       _orientation)))
+       (if __pose (setq _pose (car __pose)))
+       _pose)))
   (:serialization-length
    ()
    (+
@@ -79,10 +70,8 @@
     4 (length _label)
     ;; float32 _score
     4
-    ;; geometry_msgs/Point _position
-    (send _position :serialization-length)
-    ;; geometry_msgs/Quaternion _orientation
-    (send _orientation :serialization-length)
+    ;; geometry_msgs/Pose _pose
+    (send _pose :serialization-length)
     ))
   (:serialize
    (&optional strm)
@@ -96,10 +85,8 @@
        (write-long (length _label) s) (princ _label s)
      ;; float32 _score
        (sys::poke _score (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
-     ;; geometry_msgs/Point _position
-       (send _position :serialize s)
-     ;; geometry_msgs/Quaternion _orientation
-       (send _orientation :serialize s)
+     ;; geometry_msgs/Pose _pose
+       (send _pose :serialize s)
      ;;
      (if (null strm) (get-output-stream-string s))))
   (:deserialize
@@ -112,15 +99,13 @@
      (let (n) (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4) (setq _label (subseq buf ptr- (+ ptr- n))) (incf ptr- n))
    ;; float32 _score
      (setq _score (sys::peek buf ptr- :float)) (incf ptr- 4)
-   ;; geometry_msgs/Point _position
-     (send _position :deserialize buf ptr-) (incf ptr- (send _position :serialization-length))
-   ;; geometry_msgs/Quaternion _orientation
-     (send _orientation :deserialize buf ptr-) (incf ptr- (send _orientation :serialization-length))
+   ;; geometry_msgs/Pose _pose
+     (send _pose :deserialize buf ptr-) (incf ptr- (send _pose :serialization-length))
    ;;
    self)
   )
 
-(setf (get swipe_obstacles::detected_obstacle :md5sum-) "17028d23d94e8b0c59623a0698afe007")
+(setf (get swipe_obstacles::detected_obstacle :md5sum-) "a62aaa9b642cbcb51fb4da53b7bb0ae8")
 (setf (get swipe_obstacles::detected_obstacle :datatype-) "swipe_obstacles/detected_obstacle")
 (setf (get swipe_obstacles::detected_obstacle :definition-)
       "std_msgs/Header header
@@ -129,9 +114,7 @@ uint32 id
 string label
 float32 score
 
-geometry_msgs/Point position
-geometry_msgs/Quaternion orientation
-
+geometry_msgs/Pose pose
 
 ================================================================================
 MSG: std_msgs/Header
@@ -150,6 +133,12 @@ time stamp
 # 0: no frame
 # 1: global frame
 string frame_id
+
+================================================================================
+MSG: geometry_msgs/Pose
+# A representation of pose in free space, composed of position and orientation. 
+Point position
+Quaternion orientation
 
 ================================================================================
 MSG: geometry_msgs/Point
@@ -171,6 +160,6 @@ float64 w
 
 
 
-(provide :swipe_obstacles/detected_obstacle "17028d23d94e8b0c59623a0698afe007")
+(provide :swipe_obstacles/detected_obstacle "a62aaa9b642cbcb51fb4da53b7bb0ae8")
 
 

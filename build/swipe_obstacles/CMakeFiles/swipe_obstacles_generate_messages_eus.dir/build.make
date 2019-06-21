@@ -62,6 +62,7 @@ swipe_obstacles/CMakeFiles/swipe_obstacles_generate_messages_eus: /home/kuriatsu
 /home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle_array.l: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle_array.l: /opt/ros/kinetic/share/geometry_msgs/msg/Quaternion.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle_array.l: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg
+/home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle_array.l: /opt/ros/kinetic/share/geometry_msgs/msg/Pose.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle_array.l: /opt/ros/kinetic/share/std_msgs/msg/Header.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle_array.l: /opt/ros/kinetic/share/geometry_msgs/msg/Point.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/kuriatsu/Program/Ros/master_study_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating EusLisp code from swipe_obstacles/detected_obstacle_array.msg"
@@ -70,6 +71,7 @@ swipe_obstacles/CMakeFiles/swipe_obstacles_generate_messages_eus: /home/kuriatsu
 /home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle.l: /opt/ros/kinetic/lib/geneus/gen_eus.py
 /home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle.l: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle.l: /opt/ros/kinetic/share/geometry_msgs/msg/Quaternion.msg
+/home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle.l: /opt/ros/kinetic/share/geometry_msgs/msg/Pose.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle.l: /opt/ros/kinetic/share/std_msgs/msg/Header.msg
 /home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles/msg/detected_obstacle.l: /opt/ros/kinetic/share/geometry_msgs/msg/Point.msg
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/kuriatsu/Program/Ros/master_study_ws/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Generating EusLisp code from swipe_obstacles/detected_obstacle.msg"

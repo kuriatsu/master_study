@@ -10,7 +10,7 @@ import geometry_msgs.msg
 import std_msgs.msg
 
 class detected_obstacle_array(genpy.Message):
-  _md5sum = "de084b41fe681263f165f9cd28f444bc"
+  _md5sum = "53847f7fcca9cc1d891c94d84db3bd10"
   _type = "swipe_obstacles/detected_obstacle_array"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
@@ -42,9 +42,13 @@ uint32 id
 string label
 float32 score
 
-geometry_msgs/Point position
-geometry_msgs/Quaternion orientation
+geometry_msgs/Pose pose
 
+================================================================================
+MSG: geometry_msgs/Pose
+# A representation of pose in free space, composed of position and orientation. 
+Point position
+Quaternion orientation
 
 ================================================================================
 MSG: geometry_msgs/Point
@@ -132,11 +136,12 @@ float64 w
           length = len(_x)
         buff.write(struct.pack('<I%ss'%length, length, _x))
         buff.write(_get_struct_f().pack(val1.score))
-        _v3 = val1.position
-        _x = _v3
-        buff.write(_get_struct_3d().pack(_x.x, _x.y, _x.z))
-        _v4 = val1.orientation
+        _v3 = val1.pose
+        _v4 = _v3.position
         _x = _v4
+        buff.write(_get_struct_3d().pack(_x.x, _x.y, _x.z))
+        _v5 = _v3.orientation
+        _x = _v5
         buff.write(_get_struct_4d().pack(_x.x, _x.y, _x.z, _x.w))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
@@ -171,12 +176,12 @@ float64 w
       self.obstacles = []
       for i in range(0, length):
         val1 = swipe_obstacles.msg.detected_obstacle()
-        _v5 = val1.header
+        _v6 = val1.header
         start = end
         end += 4
-        (_v5.seq,) = _get_struct_I().unpack(str[start:end])
-        _v6 = _v5.stamp
-        _x = _v6
+        (_v6.seq,) = _get_struct_I().unpack(str[start:end])
+        _v7 = _v6.stamp
+        _x = _v7
         start = end
         end += 8
         (_x.secs, _x.nsecs,) = _get_struct_2I().unpack(str[start:end])
@@ -186,9 +191,9 @@ float64 w
         start = end
         end += length
         if python3:
-          _v5.frame_id = str[start:end].decode('utf-8')
+          _v6.frame_id = str[start:end].decode('utf-8')
         else:
-          _v5.frame_id = str[start:end]
+          _v6.frame_id = str[start:end]
         start = end
         end += 4
         (val1.id,) = _get_struct_I().unpack(str[start:end])
@@ -204,13 +209,14 @@ float64 w
         start = end
         end += 4
         (val1.score,) = _get_struct_f().unpack(str[start:end])
-        _v7 = val1.position
-        _x = _v7
+        _v8 = val1.pose
+        _v9 = _v8.position
+        _x = _v9
         start = end
         end += 24
         (_x.x, _x.y, _x.z,) = _get_struct_3d().unpack(str[start:end])
-        _v8 = val1.orientation
-        _x = _v8
+        _v10 = _v8.orientation
+        _x = _v10
         start = end
         end += 32
         (_x.x, _x.y, _x.z, _x.w,) = _get_struct_4d().unpack(str[start:end])
@@ -238,12 +244,12 @@ float64 w
       length = len(self.obstacles)
       buff.write(_struct_I.pack(length))
       for val1 in self.obstacles:
-        _v9 = val1.header
-        buff.write(_get_struct_I().pack(_v9.seq))
-        _v10 = _v9.stamp
-        _x = _v10
+        _v11 = val1.header
+        buff.write(_get_struct_I().pack(_v11.seq))
+        _v12 = _v11.stamp
+        _x = _v12
         buff.write(_get_struct_2I().pack(_x.secs, _x.nsecs))
-        _x = _v9.frame_id
+        _x = _v11.frame_id
         length = len(_x)
         if python3 or type(_x) == unicode:
           _x = _x.encode('utf-8')
@@ -257,11 +263,12 @@ float64 w
           length = len(_x)
         buff.write(struct.pack('<I%ss'%length, length, _x))
         buff.write(_get_struct_f().pack(val1.score))
-        _v11 = val1.position
-        _x = _v11
+        _v13 = val1.pose
+        _v14 = _v13.position
+        _x = _v14
         buff.write(_get_struct_3d().pack(_x.x, _x.y, _x.z))
-        _v12 = val1.orientation
-        _x = _v12
+        _v15 = _v13.orientation
+        _x = _v15
         buff.write(_get_struct_4d().pack(_x.x, _x.y, _x.z, _x.w))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
@@ -297,12 +304,12 @@ float64 w
       self.obstacles = []
       for i in range(0, length):
         val1 = swipe_obstacles.msg.detected_obstacle()
-        _v13 = val1.header
+        _v16 = val1.header
         start = end
         end += 4
-        (_v13.seq,) = _get_struct_I().unpack(str[start:end])
-        _v14 = _v13.stamp
-        _x = _v14
+        (_v16.seq,) = _get_struct_I().unpack(str[start:end])
+        _v17 = _v16.stamp
+        _x = _v17
         start = end
         end += 8
         (_x.secs, _x.nsecs,) = _get_struct_2I().unpack(str[start:end])
@@ -312,9 +319,9 @@ float64 w
         start = end
         end += length
         if python3:
-          _v13.frame_id = str[start:end].decode('utf-8')
+          _v16.frame_id = str[start:end].decode('utf-8')
         else:
-          _v13.frame_id = str[start:end]
+          _v16.frame_id = str[start:end]
         start = end
         end += 4
         (val1.id,) = _get_struct_I().unpack(str[start:end])
@@ -330,13 +337,14 @@ float64 w
         start = end
         end += 4
         (val1.score,) = _get_struct_f().unpack(str[start:end])
-        _v15 = val1.position
-        _x = _v15
+        _v18 = val1.pose
+        _v19 = _v18.position
+        _x = _v19
         start = end
         end += 24
         (_x.x, _x.y, _x.z,) = _get_struct_3d().unpack(str[start:end])
-        _v16 = val1.orientation
-        _x = _v16
+        _v20 = _v18.orientation
+        _x = _v20
         start = end
         end += 32
         (_x.x, _x.y, _x.z, _x.w,) = _get_struct_4d().unpack(str[start:end])

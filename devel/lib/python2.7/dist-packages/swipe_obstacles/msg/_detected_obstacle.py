@@ -9,7 +9,7 @@ import geometry_msgs.msg
 import std_msgs.msg
 
 class detected_obstacle(genpy.Message):
-  _md5sum = "17028d23d94e8b0c59623a0698afe007"
+  _md5sum = "a62aaa9b642cbcb51fb4da53b7bb0ae8"
   _type = "swipe_obstacles/detected_obstacle"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
@@ -18,9 +18,7 @@ uint32 id
 string label
 float32 score
 
-geometry_msgs/Point position
-geometry_msgs/Quaternion orientation
-
+geometry_msgs/Pose pose
 
 ================================================================================
 MSG: std_msgs/Header
@@ -41,6 +39,12 @@ time stamp
 string frame_id
 
 ================================================================================
+MSG: geometry_msgs/Pose
+# A representation of pose in free space, composed of position and orientation. 
+Point position
+Quaternion orientation
+
+================================================================================
 MSG: geometry_msgs/Point
 # This contains the position of a point in free space
 float64 x
@@ -56,8 +60,8 @@ float64 y
 float64 z
 float64 w
 """
-  __slots__ = ['header','id','label','score','position','orientation']
-  _slot_types = ['std_msgs/Header','uint32','string','float32','geometry_msgs/Point','geometry_msgs/Quaternion']
+  __slots__ = ['header','id','label','score','pose']
+  _slot_types = ['std_msgs/Header','uint32','string','float32','geometry_msgs/Pose']
 
   def __init__(self, *args, **kwds):
     """
@@ -67,7 +71,7 @@ float64 w
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       header,id,label,score,position,orientation
+       header,id,label,score,pose
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -84,17 +88,14 @@ float64 w
         self.label = ''
       if self.score is None:
         self.score = 0.
-      if self.position is None:
-        self.position = geometry_msgs.msg.Point()
-      if self.orientation is None:
-        self.orientation = geometry_msgs.msg.Quaternion()
+      if self.pose is None:
+        self.pose = geometry_msgs.msg.Pose()
     else:
       self.header = std_msgs.msg.Header()
       self.id = 0
       self.label = ''
       self.score = 0.
-      self.position = geometry_msgs.msg.Point()
-      self.orientation = geometry_msgs.msg.Quaternion()
+      self.pose = geometry_msgs.msg.Pose()
 
   def _get_types(self):
     """
@@ -124,7 +125,7 @@ float64 w
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_f7d().pack(_x.score, _x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w))
+      buff.write(_get_struct_f7d().pack(_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -136,10 +137,8 @@ float64 w
     try:
       if self.header is None:
         self.header = std_msgs.msg.Header()
-      if self.position is None:
-        self.position = geometry_msgs.msg.Point()
-      if self.orientation is None:
-        self.orientation = geometry_msgs.msg.Quaternion()
+      if self.pose is None:
+        self.pose = geometry_msgs.msg.Pose()
       end = 0
       _x = self
       start = end
@@ -169,7 +168,7 @@ float64 w
       _x = self
       start = end
       end += 60
-      (_x.score, _x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w,) = _get_struct_f7d().unpack(str[start:end])
+      (_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w,) = _get_struct_f7d().unpack(str[start:end])
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill
@@ -198,7 +197,7 @@ float64 w
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_f7d().pack(_x.score, _x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w))
+      buff.write(_get_struct_f7d().pack(_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -211,10 +210,8 @@ float64 w
     try:
       if self.header is None:
         self.header = std_msgs.msg.Header()
-      if self.position is None:
-        self.position = geometry_msgs.msg.Point()
-      if self.orientation is None:
-        self.orientation = geometry_msgs.msg.Quaternion()
+      if self.pose is None:
+        self.pose = geometry_msgs.msg.Pose()
       end = 0
       _x = self
       start = end
@@ -244,7 +241,7 @@ float64 w
       _x = self
       start = end
       end += 60
-      (_x.score, _x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w,) = _get_struct_f7d().unpack(str[start:end])
+      (_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w,) = _get_struct_f7d().unpack(str[start:end])
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill

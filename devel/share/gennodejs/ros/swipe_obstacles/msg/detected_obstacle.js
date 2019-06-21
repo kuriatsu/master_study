@@ -24,8 +24,7 @@ class detected_obstacle {
       this.id = null;
       this.label = null;
       this.score = null;
-      this.position = null;
-      this.orientation = null;
+      this.pose = null;
     }
     else {
       if (initObj.hasOwnProperty('header')) {
@@ -52,17 +51,11 @@ class detected_obstacle {
       else {
         this.score = 0.0;
       }
-      if (initObj.hasOwnProperty('position')) {
-        this.position = initObj.position
+      if (initObj.hasOwnProperty('pose')) {
+        this.pose = initObj.pose
       }
       else {
-        this.position = new geometry_msgs.msg.Point();
-      }
-      if (initObj.hasOwnProperty('orientation')) {
-        this.orientation = initObj.orientation
-      }
-      else {
-        this.orientation = new geometry_msgs.msg.Quaternion();
+        this.pose = new geometry_msgs.msg.Pose();
       }
     }
   }
@@ -77,10 +70,8 @@ class detected_obstacle {
     bufferOffset = _serializer.string(obj.label, buffer, bufferOffset);
     // Serialize message field [score]
     bufferOffset = _serializer.float32(obj.score, buffer, bufferOffset);
-    // Serialize message field [position]
-    bufferOffset = geometry_msgs.msg.Point.serialize(obj.position, buffer, bufferOffset);
-    // Serialize message field [orientation]
-    bufferOffset = geometry_msgs.msg.Quaternion.serialize(obj.orientation, buffer, bufferOffset);
+    // Serialize message field [pose]
+    bufferOffset = geometry_msgs.msg.Pose.serialize(obj.pose, buffer, bufferOffset);
     return bufferOffset;
   }
 
@@ -96,10 +87,8 @@ class detected_obstacle {
     data.label = _deserializer.string(buffer, bufferOffset);
     // Deserialize message field [score]
     data.score = _deserializer.float32(buffer, bufferOffset);
-    // Deserialize message field [position]
-    data.position = geometry_msgs.msg.Point.deserialize(buffer, bufferOffset);
-    // Deserialize message field [orientation]
-    data.orientation = geometry_msgs.msg.Quaternion.deserialize(buffer, bufferOffset);
+    // Deserialize message field [pose]
+    data.pose = geometry_msgs.msg.Pose.deserialize(buffer, bufferOffset);
     return data;
   }
 
@@ -117,7 +106,7 @@ class detected_obstacle {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '17028d23d94e8b0c59623a0698afe007';
+    return 'a62aaa9b642cbcb51fb4da53b7bb0ae8';
   }
 
   static messageDefinition() {
@@ -129,9 +118,7 @@ class detected_obstacle {
     string label
     float32 score
     
-    geometry_msgs/Point position
-    geometry_msgs/Quaternion orientation
-    
+    geometry_msgs/Pose pose
     
     ================================================================================
     MSG: std_msgs/Header
@@ -150,6 +137,12 @@ class detected_obstacle {
     # 0: no frame
     # 1: global frame
     string frame_id
+    
+    ================================================================================
+    MSG: geometry_msgs/Pose
+    # A representation of pose in free space, composed of position and orientation. 
+    Point position
+    Quaternion orientation
     
     ================================================================================
     MSG: geometry_msgs/Point
@@ -204,18 +197,11 @@ class detected_obstacle {
       resolved.score = 0.0
     }
 
-    if (msg.position !== undefined) {
-      resolved.position = geometry_msgs.msg.Point.Resolve(msg.position)
+    if (msg.pose !== undefined) {
+      resolved.pose = geometry_msgs.msg.Pose.Resolve(msg.pose)
     }
     else {
-      resolved.position = new geometry_msgs.msg.Point()
-    }
-
-    if (msg.orientation !== undefined) {
-      resolved.orientation = geometry_msgs.msg.Quaternion.Resolve(msg.orientation)
-    }
-    else {
-      resolved.orientation = new geometry_msgs.msg.Quaternion()
+      resolved.pose = new geometry_msgs.msg.Pose()
     }
 
     return resolved;

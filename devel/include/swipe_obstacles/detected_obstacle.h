@@ -16,8 +16,7 @@
 #include <ros/message_operations.h>
 
 #include <std_msgs/Header.h>
-#include <geometry_msgs/Point.h>
-#include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/Pose.h>
 
 namespace swipe_obstacles
 {
@@ -31,16 +30,14 @@ struct detected_obstacle_
     , id(0)
     , label()
     , score(0.0)
-    , position()
-    , orientation()  {
+    , pose()  {
     }
   detected_obstacle_(const ContainerAllocator& _alloc)
     : header(_alloc)
     , id(0)
     , label(_alloc)
     , score(0.0)
-    , position(_alloc)
-    , orientation(_alloc)  {
+    , pose(_alloc)  {
   (void)_alloc;
     }
 
@@ -58,11 +55,8 @@ struct detected_obstacle_
    typedef float _score_type;
   _score_type score;
 
-   typedef  ::geometry_msgs::Point_<ContainerAllocator>  _position_type;
-  _position_type position;
-
-   typedef  ::geometry_msgs::Quaternion_<ContainerAllocator>  _orientation_type;
-  _orientation_type orientation;
+   typedef  ::geometry_msgs::Pose_<ContainerAllocator>  _pose_type;
+  _pose_type pose;
 
 
 
@@ -142,12 +136,12 @@ struct MD5Sum< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "17028d23d94e8b0c59623a0698afe007";
+    return "a62aaa9b642cbcb51fb4da53b7bb0ae8";
   }
 
   static const char* value(const ::swipe_obstacles::detected_obstacle_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x17028d23d94e8b0cULL;
-  static const uint64_t static_value2 = 0x59623a0698afe007ULL;
+  static const uint64_t static_value1 = 0xa62aaa9b642cbcb5ULL;
+  static const uint64_t static_value2 = 0x1fb4da53b7bb0ae8ULL;
 };
 
 template<class ContainerAllocator>
@@ -172,9 +166,7 @@ uint32 id\n\
 string label\n\
 float32 score\n\
 \n\
-geometry_msgs/Point position\n\
-geometry_msgs/Quaternion orientation\n\
-\n\
+geometry_msgs/Pose pose\n\
 \n\
 ================================================================================\n\
 MSG: std_msgs/Header\n\
@@ -193,6 +185,12 @@ time stamp\n\
 # 0: no frame\n\
 # 1: global frame\n\
 string frame_id\n\
+\n\
+================================================================================\n\
+MSG: geometry_msgs/Pose\n\
+# A representation of pose in free space, composed of position and orientation. \n\
+Point position\n\
+Quaternion orientation\n\
 \n\
 ================================================================================\n\
 MSG: geometry_msgs/Point\n\
@@ -231,8 +229,7 @@ namespace serialization
       stream.next(m.id);
       stream.next(m.label);
       stream.next(m.score);
-      stream.next(m.position);
-      stream.next(m.orientation);
+      stream.next(m.pose);
     }
 
     ROS_DECLARE_ALLINONE_SERIALIZER
@@ -260,12 +257,9 @@ struct Printer< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
     Printer<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > >::stream(s, indent + "  ", v.label);
     s << indent << "score: ";
     Printer<float>::stream(s, indent + "  ", v.score);
-    s << indent << "position: ";
+    s << indent << "pose: ";
     s << std::endl;
-    Printer< ::geometry_msgs::Point_<ContainerAllocator> >::stream(s, indent + "  ", v.position);
-    s << indent << "orientation: ";
-    s << std::endl;
-    Printer< ::geometry_msgs::Quaternion_<ContainerAllocator> >::stream(s, indent + "  ", v.orientation);
+    Printer< ::geometry_msgs::Pose_<ContainerAllocator> >::stream(s, indent + "  ", v.pose);
   }
 };
 
