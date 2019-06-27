@@ -18,7 +18,7 @@
 
 (defclass swipe_obstacles::detected_obstacle
   :super ros::object
-  :slots (_header _id _managed_id _label _score _pose _shift_x _shift_y _visible _detected_time ))
+  :slots (_header _id _managed_id _label _score _pose _shift_x _shift_y _visible _detected_time _only_at_once ))
 
 (defmethod swipe_obstacles::detected_obstacle
   (:init
@@ -33,6 +33,7 @@
     ((:shift_y __shift_y) 0.0)
     ((:visible __visible) 0)
     ((:detected_time __detected_time) (instance ros::time :init))
+    ((:only_at_once __only_at_once) 0)
     )
    (send-super :init)
    (setq _header __header)
@@ -45,6 +46,7 @@
    (setq _shift_y (float __shift_y))
    (setq _visible (round __visible))
    (setq _detected_time __detected_time)
+   (setq _only_at_once (round __only_at_once))
    self)
   (:header
    (&rest __header)
@@ -84,6 +86,9 @@
   (:detected_time
    (&optional __detected_time)
    (if __detected_time (setq _detected_time __detected_time)) _detected_time)
+  (:only_at_once
+   (&optional __only_at_once)
+   (if __only_at_once (setq _only_at_once __only_at_once)) _only_at_once)
   (:serialization-length
    ()
    (+
@@ -107,6 +112,8 @@
     4
     ;; time _detected_time
     8
+    ;; uint32 _only_at_once
+    4
     ))
   (:serialize
    (&optional strm)
@@ -132,6 +139,8 @@
        (write-long _visible s)
      ;; time _detected_time
        (write-long (send _detected_time :sec) s) (write-long (send _detected_time :nsec) s)
+     ;; uint32 _only_at_once
+       (write-long _only_at_once s)
      ;;
      (if (null strm) (get-output-stream-string s))))
   (:deserialize
@@ -156,11 +165,13 @@
      (setq _visible (sys::peek buf ptr- :integer)) (incf ptr- 4)
    ;; time _detected_time
      (send _detected_time :sec (sys::peek buf ptr- :integer)) (incf ptr- 4)  (send _detected_time :nsec (sys::peek buf ptr- :integer)) (incf ptr- 4)
+   ;; uint32 _only_at_once
+     (setq _only_at_once (sys::peek buf ptr- :integer)) (incf ptr- 4)
    ;;
    self)
   )
 
-(setf (get swipe_obstacles::detected_obstacle :md5sum-) "41baf25da7882eba333abb4d93085641")
+(setf (get swipe_obstacles::detected_obstacle :md5sum-) "349df44c7371bbebb35e07570cf3966c")
 (setf (get swipe_obstacles::detected_obstacle :datatype-) "swipe_obstacles/detected_obstacle")
 (setf (get swipe_obstacles::detected_obstacle :definition-)
       "std_msgs/Header header
@@ -175,6 +186,7 @@ float32 shift_x
 float32 shift_y
 uint32 visible
 time detected_time
+uint32 only_at_once
 
 ================================================================================
 MSG: std_msgs/Header
@@ -220,6 +232,6 @@ float64 w
 
 
 
-(provide :swipe_obstacles/detected_obstacle "41baf25da7882eba333abb4d93085641")
+(provide :swipe_obstacles/detected_obstacle "349df44c7371bbebb35e07570cf3966c")
 
 

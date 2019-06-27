@@ -35,7 +35,8 @@ struct detected_obstacle_
     , shift_x(0.0)
     , shift_y(0.0)
     , visible(0)
-    , detected_time()  {
+    , detected_time()
+    , only_at_once(0)  {
     }
   detected_obstacle_(const ContainerAllocator& _alloc)
     : header(_alloc)
@@ -47,7 +48,8 @@ struct detected_obstacle_
     , shift_x(0.0)
     , shift_y(0.0)
     , visible(0)
-    , detected_time()  {
+    , detected_time()
+    , only_at_once(0)  {
   (void)_alloc;
     }
 
@@ -82,6 +84,9 @@ struct detected_obstacle_
 
    typedef ros::Time _detected_time_type;
   _detected_time_type detected_time;
+
+   typedef uint32_t _only_at_once_type;
+  _only_at_once_type only_at_once;
 
 
 
@@ -161,12 +166,12 @@ struct MD5Sum< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "41baf25da7882eba333abb4d93085641";
+    return "349df44c7371bbebb35e07570cf3966c";
   }
 
   static const char* value(const ::swipe_obstacles::detected_obstacle_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x41baf25da7882ebaULL;
-  static const uint64_t static_value2 = 0x333abb4d93085641ULL;
+  static const uint64_t static_value1 = 0x349df44c7371bbebULL;
+  static const uint64_t static_value2 = 0xb35e07570cf3966cULL;
 };
 
 template<class ContainerAllocator>
@@ -197,6 +202,7 @@ float32 shift_x\n\
 float32 shift_y\n\
 uint32 visible\n\
 time detected_time\n\
+uint32 only_at_once\n\
 \n\
 ================================================================================\n\
 MSG: std_msgs/Header\n\
@@ -265,6 +271,7 @@ namespace serialization
       stream.next(m.shift_y);
       stream.next(m.visible);
       stream.next(m.detected_time);
+      stream.next(m.only_at_once);
     }
 
     ROS_DECLARE_ALLINONE_SERIALIZER
@@ -305,6 +312,8 @@ struct Printer< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
     Printer<uint32_t>::stream(s, indent + "  ", v.visible);
     s << indent << "detected_time: ";
     Printer<ros::Time>::stream(s, indent + "  ", v.detected_time);
+    s << indent << "only_at_once: ";
+    Printer<uint32_t>::stream(s, indent + "  ", v.only_at_once);
   }
 };
 

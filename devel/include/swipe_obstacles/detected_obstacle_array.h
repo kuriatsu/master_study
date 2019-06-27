@@ -121,12 +121,12 @@ struct MD5Sum< ::swipe_obstacles::detected_obstacle_array_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "e900cf0096e79af6967f71da5a89cfd0";
+    return "e69f3def19bbe0032a126532ab559718";
   }
 
   static const char* value(const ::swipe_obstacles::detected_obstacle_array_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0xe900cf0096e79af6ULL;
-  static const uint64_t static_value2 = 0x967f71da5a89cfd0ULL;
+  static const uint64_t static_value1 = 0xe69f3def19bbe003ULL;
+  static const uint64_t static_value2 = 0x2a126532ab559718ULL;
 };
 
 template<class ContainerAllocator>
@@ -180,6 +180,7 @@ float32 shift_x\n\
 float32 shift_y\n\
 uint32 visible\n\
 time detected_time\n\
+uint32 only_at_once\n\
 \n\
 ================================================================================\n\
 MSG: geometry_msgs/Pose\n\

@@ -30,6 +30,7 @@ class detected_obstacle {
       this.shift_y = null;
       this.visible = null;
       this.detected_time = null;
+      this.only_at_once = null;
     }
     else {
       if (initObj.hasOwnProperty('header')) {
@@ -92,6 +93,12 @@ class detected_obstacle {
       else {
         this.detected_time = {secs: 0, nsecs: 0};
       }
+      if (initObj.hasOwnProperty('only_at_once')) {
+        this.only_at_once = initObj.only_at_once
+      }
+      else {
+        this.only_at_once = 0;
+      }
     }
   }
 
@@ -117,6 +124,8 @@ class detected_obstacle {
     bufferOffset = _serializer.uint32(obj.visible, buffer, bufferOffset);
     // Serialize message field [detected_time]
     bufferOffset = _serializer.time(obj.detected_time, buffer, bufferOffset);
+    // Serialize message field [only_at_once]
+    bufferOffset = _serializer.uint32(obj.only_at_once, buffer, bufferOffset);
     return bufferOffset;
   }
 
@@ -144,6 +153,8 @@ class detected_obstacle {
     data.visible = _deserializer.uint32(buffer, bufferOffset);
     // Deserialize message field [detected_time]
     data.detected_time = _deserializer.time(buffer, bufferOffset);
+    // Deserialize message field [only_at_once]
+    data.only_at_once = _deserializer.uint32(buffer, bufferOffset);
     return data;
   }
 
@@ -151,7 +162,7 @@ class detected_obstacle {
     let length = 0;
     length += std_msgs.msg.Header.getMessageSize(object.header);
     length += object.label.length;
-    return length + 92;
+    return length + 96;
   }
 
   static datatype() {
@@ -161,7 +172,7 @@ class detected_obstacle {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '41baf25da7882eba333abb4d93085641';
+    return '349df44c7371bbebb35e07570cf3966c';
   }
 
   static messageDefinition() {
@@ -179,6 +190,7 @@ class detected_obstacle {
     float32 shift_y
     uint32 visible
     time detected_time
+    uint32 only_at_once
     
     ================================================================================
     MSG: std_msgs/Header
@@ -297,6 +309,13 @@ class detected_obstacle {
     }
     else {
       resolved.detected_time = {secs: 0, nsecs: 0}
+    }
+
+    if (msg.only_at_once !== undefined) {
+      resolved.only_at_once = msg.only_at_once;
+    }
+    else {
+      resolved.only_at_once = 0
     }
 
     return resolved;

@@ -19,4 +19,6 @@
           VISIBLE
           DETECTED_TIME-VAL
           DETECTED_TIME
+          ONLY_AT_ONCE-VAL
+          ONLY_AT_ONCE
 ))

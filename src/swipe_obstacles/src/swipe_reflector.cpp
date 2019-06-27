@@ -44,6 +44,7 @@ ObstacleReflector::ObstacleReflector()
 
 	sub_obstacles = n.subscribe("/managed_obstacles", 5, &ObstacleReflector::sub_obstacles_callback, this);
     sub_erase_signal = n.subscribe("/swipe_erase_signal", 5, &ObstacleReflector::erase_signal_callback, this);
+    // pub_pointcloud = n.advertise<sensor_msgs::PointCloud2>("/points_raw", 1);
     pub_pointcloud = n.advertise<sensor_msgs::PointCloud2>("/int_pointcloud", 1);
 
     out_cloud.width = 20;
@@ -65,7 +66,7 @@ void ObstacleReflector::erase_signal_callback(const std_msgs::Int32 &in_msg)
         out_cloud.clear();
         pcl::toROSMsg(out_cloud, out_scan);
         out_scan.header.stamp = ros::Time::now();
-        out_scan.header.frame_id = "world";
+        out_scan.header.frame_id = "velodyne";
         pub_pointcloud.publish(out_scan);
     }
 }
@@ -99,13 +100,24 @@ void ObstacleReflector::sub_obstacles_callback(const swipe_obstacles::detected_o
 
 void ObstacleReflector::pub_pointcloud_Nhz(const ros::TimerEvent&)
 {
-	sensor_msgs::PointCloud2 out_scan;
+	sensor_msgs::PointCloud2 buf_scan, out_scan;
 
 	if(!out_cloud.points.empty())
     {
-        pcl::toROSMsg(out_cloud, out_scan);
+        pcl::toROSMsg(out_cloud, buf_scan);
+
+        buf_scan.header.frame_id = "world";
+        out_scan.header.frame_id = "velodyne";
+
+        try{
+            tf_listener.waitForTransform("world", "velodyne", ros::Time::now(), ros::Duration(0.2));
+        }catch(...){
+            ROS_INFO("world to velodyne transform Error");
+        }
+
+        pcl_ros::transformPointCloud("velodyne", buf_scan, out_scan, tf_listener);
+
         out_scan.header.stamp = ros::Time::now();
-        out_scan.header.frame_id = "world";
 		pub_pointcloud.publish(out_scan);
 		std::cout << "published" <<std::endl;
 	}

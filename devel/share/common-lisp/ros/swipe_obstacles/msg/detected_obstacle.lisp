@@ -56,6 +56,11 @@
     :reader detected_time
     :initarg :detected_time
     :type cl:real
+    :initform 0)
+   (only_at_once
+    :reader only_at_once
+    :initarg :only_at_once
+    :type cl:integer
     :initform 0))
 )
 
@@ -116,6 +121,11 @@
 (cl:defmethod detected_time-val ((m <detected_obstacle>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:detected_time-val is deprecated.  Use swipe_obstacles-msg:detected_time instead.")
   (detected_time m))
+
+(cl:ensure-generic-function 'only_at_once-val :lambda-list '(m))
+(cl:defmethod only_at_once-val ((m <detected_obstacle>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:only_at_once-val is deprecated.  Use swipe_obstacles-msg:only_at_once instead.")
+  (only_at_once m))
 (cl:defmethod roslisp-msg-protocol:serialize ((msg <detected_obstacle>) ostream)
   "Serializes a message object of type '<detected_obstacle>"
   (roslisp-msg-protocol:serialize (cl:slot-value msg 'header) ostream)
@@ -163,6 +173,10 @@
     (cl:write-byte (cl:ldb (cl:byte 8 8) __nsec) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 16) __nsec) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 24) __nsec) ostream))
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'only_at_once)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'only_at_once)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'only_at_once)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'only_at_once)) ostream)
 )
 (cl:defmethod roslisp-msg-protocol:deserialize ((msg <detected_obstacle>) istream)
   "Deserializes a message object of type '<detected_obstacle>"
@@ -216,6 +230,10 @@
       (cl:setf (cl:ldb (cl:byte 8 16) __nsec) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 24) __nsec) (cl:read-byte istream))
       (cl:setf (cl:slot-value msg 'detected_time) (cl:+ (cl:coerce __sec 'cl:double-float) (cl:/ __nsec 1e9))))
+    (cl:setf (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'only_at_once)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'only_at_once)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'only_at_once)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'only_at_once)) (cl:read-byte istream))
   msg
 )
 (cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql '<detected_obstacle>)))
@@ -226,16 +244,16 @@
   "swipe_obstacles/detected_obstacle")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<detected_obstacle>)))
   "Returns md5sum for a message object of type '<detected_obstacle>"
-  "41baf25da7882eba333abb4d93085641")
+  "349df44c7371bbebb35e07570cf3966c")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'detected_obstacle)))
   "Returns md5sum for a message object of type 'detected_obstacle"
-  "41baf25da7882eba333abb4d93085641")
+  "349df44c7371bbebb35e07570cf3966c")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<detected_obstacle>)))
   "Returns full string definition for message of type '<detected_obstacle>"
-  (cl:format cl:nil "std_msgs/Header header~%~%uint32 id~%uint32 managed_id~%string label~%float32 score~%geometry_msgs/Pose pose~%~%float32 shift_x~%float32 shift_y~%uint32 visible~%time detected_time~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Pose~%# A representation of pose in free space, composed of position and orientation. ~%Point position~%Quaternion orientation~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%~%"))
+  (cl:format cl:nil "std_msgs/Header header~%~%uint32 id~%uint32 managed_id~%string label~%float32 score~%geometry_msgs/Pose pose~%~%float32 shift_x~%float32 shift_y~%uint32 visible~%time detected_time~%uint32 only_at_once~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Pose~%# A representation of pose in free space, composed of position and orientation. ~%Point position~%Quaternion orientation~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'detected_obstacle)))
   "Returns full string definition for message of type 'detected_obstacle"
-  (cl:format cl:nil "std_msgs/Header header~%~%uint32 id~%uint32 managed_id~%string label~%float32 score~%geometry_msgs/Pose pose~%~%float32 shift_x~%float32 shift_y~%uint32 visible~%time detected_time~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Pose~%# A representation of pose in free space, composed of position and orientation. ~%Point position~%Quaternion orientation~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%~%"))
+  (cl:format cl:nil "std_msgs/Header header~%~%uint32 id~%uint32 managed_id~%string label~%float32 score~%geometry_msgs/Pose pose~%~%float32 shift_x~%float32 shift_y~%uint32 visible~%time detected_time~%uint32 only_at_once~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Pose~%# A representation of pose in free space, composed of position and orientation. ~%Point position~%Quaternion orientation~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <detected_obstacle>))
   (cl:+ 0
      (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'header))
@@ -248,6 +266,7 @@
      4
      4
      8
+     4
 ))
 (cl:defmethod roslisp-msg-protocol:ros-message-to-list ((msg <detected_obstacle>))
   "Converts a ROS message object to a list"
@@ -262,4 +281,5 @@
     (cl:cons ':shift_y (shift_y msg))
     (cl:cons ':visible (visible msg))
     (cl:cons ':detected_time (detected_time msg))
+    (cl:cons ':only_at_once (only_at_once msg))
 ))
