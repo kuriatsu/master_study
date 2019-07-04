@@ -8,6 +8,7 @@
 #include "swipe_obstacles/detected_obstacle.h"
 #include "swipe_obstacles/detected_obstacle_array.h"
 
+#include "std_msgs/Int32.h"
 #include <interactive_markers/interactive_marker_server.h>
 
 #include <cmath>
@@ -18,7 +19,8 @@ boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 class ObstacleVisualizer
 {
 	private:
-		ros::Subscriber sub_obj;
+        ros::Subscriber sub_obj;
+		ros::Subscriber sub_erase_signal;
 		ros::Publisher pub_shift;
         std::vector<uint32_t> id_vec;
 
@@ -27,7 +29,8 @@ class ObstacleVisualizer
 		void sync_jsk_box();
 
 	private:
-		void sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs);
+        void sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs);
+		void erase_signal_callback(const std_msgs::Int32 &in_msg);
         void shift_feedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
         void make_cube(const swipe_obstacles::detected_obstacle &in_msg);
         int id_vector_manager(const uint32_t &id);
@@ -39,14 +42,27 @@ ObstacleVisualizer::ObstacleVisualizer()
 {
 	ros::NodeHandle n;
 
-	sub_detection = n.subscribe("/managed_obstacles", 5, &ObstacleVisualizer::sub_obstacles_callback, this);
+    sub_obj = n.subscribe("/managed_obstacles", 5, &ObstacleVisualizer::sub_obstacles_callback, this);
+	sub_erase_signal = n.subscribe("/swipe_erase_signal", 5, &ObstacleVisualizer::erase_signal_callback, this);
 	pub_shift = n.advertise<swipe_obstacles::detected_obstacle>("/shifted_info", 5);
+}
+
+
+void ObstacleVisualizer::erase_signal_callback(const std_msgs::Int32 &in_msg)
+{
+    if(in_msg.data)
+    {
+        ROS_INFO_STREAM(in_msg.data);
+        server->clear();
+        server->applyChanges();
+    }
 }
 
 
 void ObstacleVisualizer::sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs)
 {
     server->clear();
+    ROS_INFO("subscribed");
 
     for (size_t i=0; i< in_msgs.obstacles.size(); i++)
     {
@@ -85,7 +101,7 @@ void ObstacleVisualizer::make_cube(const swipe_obstacles::detected_obstacle &in_
     ss << in_msg.managed_id;
 
 	visualization_msgs::InteractiveMarker int_marker;
-
+    ROS_INFO_STREAM(in_msg);
 	int_marker.header.frame_id = "world";
 	int_marker.name = ss.str();
 	int_marker.scale = 1.0;
@@ -111,7 +127,9 @@ visualization_msgs::InteractiveMarkerControl& ObstacleVisualizer::make_box_contr
 	control.orientation.w = 1;
 
 	visualization_msgs::Marker marker;
-	marker.type = visualization_msgs::Marker::CUBE;
+    marker.type = visualization_msgs::Marker::CUBE;
+    marker.ns = "swipe_obstacles";
+	marker.id = 0;
 	marker.scale.x = msg.scale;
 	marker.scale.y = msg.scale*6;
 	marker.scale.z = msg.scale*1.7;
@@ -119,6 +137,7 @@ visualization_msgs::InteractiveMarkerControl& ObstacleVisualizer::make_box_contr
 	marker.color.g = 1;
 	marker.color.b = 0;
 	marker.color.a = 0.5;
+    marker.lifetime = ros::Duration(2.0);
 
 	control.markers.push_back(marker);
 	msg.controls.push_back(control);
@@ -134,15 +153,15 @@ void ObstacleVisualizer::shift_feedback(const visualization_msgs::InteractiveMar
 
     sis = std::istringstream(feedback->marker_name);
     feedback_obstacle.pose = feedback->pose;
-    feedback_obstacle.managed_id << sis;
-    pub_shift.publish()
+    sis >> feedback_obstacle.managed_id;
+    pub_shift.publish(feedback_obstacle);
 }
 
 
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "swipe_obstacle_visualizar_node");
-	server.reset(new interactive_markers::InteractiveMarkerServer("swipe_obstacle_visualizar_node"));
+	ros::init(argc, argv, "swipe_visualizer_node");
+	server.reset(new interactive_markers::InteractiveMarkerServer("swipe_visualizer_node"));
 	ros::Duration(0.1).sleep();
 	ROS_INFO("Initializing...");
 

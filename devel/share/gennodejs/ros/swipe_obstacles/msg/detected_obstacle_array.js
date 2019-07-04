@@ -84,7 +84,7 @@ class detected_obstacle_array {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return 'de084b41fe681263f165f9cd28f444bc';
+    return 'e69f3def19bbe0032a126532ab559718';
   }
 
   static messageDefinition() {
@@ -116,12 +116,22 @@ class detected_obstacle_array {
     std_msgs/Header header
     
     uint32 id
+    uint32 managed_id
     string label
     float32 score
+    geometry_msgs/Pose pose
     
-    geometry_msgs/Point position
-    geometry_msgs/Quaternion orientation
+    float32 shift_x
+    float32 shift_y
+    uint32 visible
+    time detected_time
+    uint32 only_at_once
     
+    ================================================================================
+    MSG: geometry_msgs/Pose
+    # A representation of pose in free space, composed of position and orientation. 
+    Point position
+    Quaternion orientation
     
     ================================================================================
     MSG: geometry_msgs/Point

@@ -22,10 +22,15 @@ class detected_obstacle {
       // initObj === null is a special case for deserialization where we don't initialize fields
       this.header = null;
       this.id = null;
+      this.managed_id = null;
       this.label = null;
       this.score = null;
-      this.position = null;
-      this.orientation = null;
+      this.pose = null;
+      this.shift_x = null;
+      this.shift_y = null;
+      this.visible = null;
+      this.detected_time = null;
+      this.only_at_once = null;
     }
     else {
       if (initObj.hasOwnProperty('header')) {
@@ -40,6 +45,12 @@ class detected_obstacle {
       else {
         this.id = 0;
       }
+      if (initObj.hasOwnProperty('managed_id')) {
+        this.managed_id = initObj.managed_id
+      }
+      else {
+        this.managed_id = 0;
+      }
       if (initObj.hasOwnProperty('label')) {
         this.label = initObj.label
       }
@@ -52,17 +63,41 @@ class detected_obstacle {
       else {
         this.score = 0.0;
       }
-      if (initObj.hasOwnProperty('position')) {
-        this.position = initObj.position
+      if (initObj.hasOwnProperty('pose')) {
+        this.pose = initObj.pose
       }
       else {
-        this.position = new geometry_msgs.msg.Point();
+        this.pose = new geometry_msgs.msg.Pose();
       }
-      if (initObj.hasOwnProperty('orientation')) {
-        this.orientation = initObj.orientation
+      if (initObj.hasOwnProperty('shift_x')) {
+        this.shift_x = initObj.shift_x
       }
       else {
-        this.orientation = new geometry_msgs.msg.Quaternion();
+        this.shift_x = 0.0;
+      }
+      if (initObj.hasOwnProperty('shift_y')) {
+        this.shift_y = initObj.shift_y
+      }
+      else {
+        this.shift_y = 0.0;
+      }
+      if (initObj.hasOwnProperty('visible')) {
+        this.visible = initObj.visible
+      }
+      else {
+        this.visible = 0;
+      }
+      if (initObj.hasOwnProperty('detected_time')) {
+        this.detected_time = initObj.detected_time
+      }
+      else {
+        this.detected_time = {secs: 0, nsecs: 0};
+      }
+      if (initObj.hasOwnProperty('only_at_once')) {
+        this.only_at_once = initObj.only_at_once
+      }
+      else {
+        this.only_at_once = 0;
       }
     }
   }
@@ -73,14 +108,24 @@ class detected_obstacle {
     bufferOffset = std_msgs.msg.Header.serialize(obj.header, buffer, bufferOffset);
     // Serialize message field [id]
     bufferOffset = _serializer.uint32(obj.id, buffer, bufferOffset);
+    // Serialize message field [managed_id]
+    bufferOffset = _serializer.uint32(obj.managed_id, buffer, bufferOffset);
     // Serialize message field [label]
     bufferOffset = _serializer.string(obj.label, buffer, bufferOffset);
     // Serialize message field [score]
     bufferOffset = _serializer.float32(obj.score, buffer, bufferOffset);
-    // Serialize message field [position]
-    bufferOffset = geometry_msgs.msg.Point.serialize(obj.position, buffer, bufferOffset);
-    // Serialize message field [orientation]
-    bufferOffset = geometry_msgs.msg.Quaternion.serialize(obj.orientation, buffer, bufferOffset);
+    // Serialize message field [pose]
+    bufferOffset = geometry_msgs.msg.Pose.serialize(obj.pose, buffer, bufferOffset);
+    // Serialize message field [shift_x]
+    bufferOffset = _serializer.float32(obj.shift_x, buffer, bufferOffset);
+    // Serialize message field [shift_y]
+    bufferOffset = _serializer.float32(obj.shift_y, buffer, bufferOffset);
+    // Serialize message field [visible]
+    bufferOffset = _serializer.uint32(obj.visible, buffer, bufferOffset);
+    // Serialize message field [detected_time]
+    bufferOffset = _serializer.time(obj.detected_time, buffer, bufferOffset);
+    // Serialize message field [only_at_once]
+    bufferOffset = _serializer.uint32(obj.only_at_once, buffer, bufferOffset);
     return bufferOffset;
   }
 
@@ -92,14 +137,24 @@ class detected_obstacle {
     data.header = std_msgs.msg.Header.deserialize(buffer, bufferOffset);
     // Deserialize message field [id]
     data.id = _deserializer.uint32(buffer, bufferOffset);
+    // Deserialize message field [managed_id]
+    data.managed_id = _deserializer.uint32(buffer, bufferOffset);
     // Deserialize message field [label]
     data.label = _deserializer.string(buffer, bufferOffset);
     // Deserialize message field [score]
     data.score = _deserializer.float32(buffer, bufferOffset);
-    // Deserialize message field [position]
-    data.position = geometry_msgs.msg.Point.deserialize(buffer, bufferOffset);
-    // Deserialize message field [orientation]
-    data.orientation = geometry_msgs.msg.Quaternion.deserialize(buffer, bufferOffset);
+    // Deserialize message field [pose]
+    data.pose = geometry_msgs.msg.Pose.deserialize(buffer, bufferOffset);
+    // Deserialize message field [shift_x]
+    data.shift_x = _deserializer.float32(buffer, bufferOffset);
+    // Deserialize message field [shift_y]
+    data.shift_y = _deserializer.float32(buffer, bufferOffset);
+    // Deserialize message field [visible]
+    data.visible = _deserializer.uint32(buffer, bufferOffset);
+    // Deserialize message field [detected_time]
+    data.detected_time = _deserializer.time(buffer, bufferOffset);
+    // Deserialize message field [only_at_once]
+    data.only_at_once = _deserializer.uint32(buffer, bufferOffset);
     return data;
   }
 
@@ -107,7 +162,7 @@ class detected_obstacle {
     let length = 0;
     length += std_msgs.msg.Header.getMessageSize(object.header);
     length += object.label.length;
-    return length + 68;
+    return length + 96;
   }
 
   static datatype() {
@@ -117,7 +172,7 @@ class detected_obstacle {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '17028d23d94e8b0c59623a0698afe007';
+    return '349df44c7371bbebb35e07570cf3966c';
   }
 
   static messageDefinition() {
@@ -126,12 +181,16 @@ class detected_obstacle {
     std_msgs/Header header
     
     uint32 id
+    uint32 managed_id
     string label
     float32 score
+    geometry_msgs/Pose pose
     
-    geometry_msgs/Point position
-    geometry_msgs/Quaternion orientation
-    
+    float32 shift_x
+    float32 shift_y
+    uint32 visible
+    time detected_time
+    uint32 only_at_once
     
     ================================================================================
     MSG: std_msgs/Header
@@ -150,6 +209,12 @@ class detected_obstacle {
     # 0: no frame
     # 1: global frame
     string frame_id
+    
+    ================================================================================
+    MSG: geometry_msgs/Pose
+    # A representation of pose in free space, composed of position and orientation. 
+    Point position
+    Quaternion orientation
     
     ================================================================================
     MSG: geometry_msgs/Point
@@ -190,6 +255,13 @@ class detected_obstacle {
       resolved.id = 0
     }
 
+    if (msg.managed_id !== undefined) {
+      resolved.managed_id = msg.managed_id;
+    }
+    else {
+      resolved.managed_id = 0
+    }
+
     if (msg.label !== undefined) {
       resolved.label = msg.label;
     }
@@ -204,18 +276,46 @@ class detected_obstacle {
       resolved.score = 0.0
     }
 
-    if (msg.position !== undefined) {
-      resolved.position = geometry_msgs.msg.Point.Resolve(msg.position)
+    if (msg.pose !== undefined) {
+      resolved.pose = geometry_msgs.msg.Pose.Resolve(msg.pose)
     }
     else {
-      resolved.position = new geometry_msgs.msg.Point()
+      resolved.pose = new geometry_msgs.msg.Pose()
     }
 
-    if (msg.orientation !== undefined) {
-      resolved.orientation = geometry_msgs.msg.Quaternion.Resolve(msg.orientation)
+    if (msg.shift_x !== undefined) {
+      resolved.shift_x = msg.shift_x;
     }
     else {
-      resolved.orientation = new geometry_msgs.msg.Quaternion()
+      resolved.shift_x = 0.0
+    }
+
+    if (msg.shift_y !== undefined) {
+      resolved.shift_y = msg.shift_y;
+    }
+    else {
+      resolved.shift_y = 0.0
+    }
+
+    if (msg.visible !== undefined) {
+      resolved.visible = msg.visible;
+    }
+    else {
+      resolved.visible = 0
+    }
+
+    if (msg.detected_time !== undefined) {
+      resolved.detected_time = msg.detected_time;
+    }
+    else {
+      resolved.detected_time = {secs: 0, nsecs: 0}
+    }
+
+    if (msg.only_at_once !== undefined) {
+      resolved.only_at_once = msg.only_at_once;
+    }
+    else {
+      resolved.only_at_once = 0
     }
 
     return resolved;

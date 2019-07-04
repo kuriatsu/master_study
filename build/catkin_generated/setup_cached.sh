@@ -11,5 +11,5 @@ export CMAKE_PREFIX_PATH="/home/kuriatsu/Program/Ros/master_study_ws/devel:$CMAK
 export LD_LIBRARY_PATH="/home/kuriatsu/Program/Ros/master_study_ws/devel/lib:$LD_LIBRARY_PATH"
 export PKG_CONFIG_PATH="/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD="/home/kuriatsu/Program/Ros/master_study_ws/build"
-export PYTHONPATH="/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages:/home/kuriatsu/Autoware/ros/devel/lib/python2.7/dist-packages:$PYTHONPATH"
+export PYTHONPATH="/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages:$PYTHONPATH"
 export ROS_PACKAGE_PATH="/home/kuriatsu/Program/Ros/master_study_ws/src:$ROS_PACKAGE_PATH"

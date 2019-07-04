@@ -121,12 +121,12 @@ struct MD5Sum< ::swipe_obstacles::detected_obstacle_array_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "de084b41fe681263f165f9cd28f444bc";
+    return "e69f3def19bbe0032a126532ab559718";
   }
 
   static const char* value(const ::swipe_obstacles::detected_obstacle_array_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0xde084b41fe681263ULL;
-  static const uint64_t static_value2 = 0xf165f9cd28f444bcULL;
+  static const uint64_t static_value1 = 0xe69f3def19bbe003ULL;
+  static const uint64_t static_value2 = 0x2a126532ab559718ULL;
 };
 
 template<class ContainerAllocator>
@@ -171,12 +171,22 @@ MSG: swipe_obstacles/detected_obstacle\n\
 std_msgs/Header header\n\
 \n\
 uint32 id\n\
+uint32 managed_id\n\
 string label\n\
 float32 score\n\
+geometry_msgs/Pose pose\n\
 \n\
-geometry_msgs/Point position\n\
-geometry_msgs/Quaternion orientation\n\
+float32 shift_x\n\
+float32 shift_y\n\
+uint32 visible\n\
+time detected_time\n\
+uint32 only_at_once\n\
 \n\
+================================================================================\n\
+MSG: geometry_msgs/Pose\n\
+# A representation of pose in free space, composed of position and orientation. \n\
+Point position\n\
+Quaternion orientation\n\
 \n\
 ================================================================================\n\
 MSG: geometry_msgs/Point\n\

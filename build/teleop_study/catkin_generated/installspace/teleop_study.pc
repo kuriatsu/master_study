@@ -1,0 +1,8 @@
+prefix=/home/kuriatsu/Program/Ros/master_study_ws/install
+
+Name: teleop_study
+Description: Description of teleop_study
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kuriatsu/Program/Ros/master_study_ws/install/lib 
+Requires: 

@@ -6,21 +6,26 @@ import genpy
 import struct
 
 import geometry_msgs.msg
+import genpy
 import std_msgs.msg
 
 class detected_obstacle(genpy.Message):
-  _md5sum = "17028d23d94e8b0c59623a0698afe007"
+  _md5sum = "349df44c7371bbebb35e07570cf3966c"
   _type = "swipe_obstacles/detected_obstacle"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
 
 uint32 id
+uint32 managed_id
 string label
 float32 score
+geometry_msgs/Pose pose
 
-geometry_msgs/Point position
-geometry_msgs/Quaternion orientation
-
+float32 shift_x
+float32 shift_y
+uint32 visible
+time detected_time
+uint32 only_at_once
 
 ================================================================================
 MSG: std_msgs/Header
@@ -41,6 +46,12 @@ time stamp
 string frame_id
 
 ================================================================================
+MSG: geometry_msgs/Pose
+# A representation of pose in free space, composed of position and orientation. 
+Point position
+Quaternion orientation
+
+================================================================================
 MSG: geometry_msgs/Point
 # This contains the position of a point in free space
 float64 x
@@ -56,8 +67,8 @@ float64 y
 float64 z
 float64 w
 """
-  __slots__ = ['header','id','label','score','position','orientation']
-  _slot_types = ['std_msgs/Header','uint32','string','float32','geometry_msgs/Point','geometry_msgs/Quaternion']
+  __slots__ = ['header','id','managed_id','label','score','pose','shift_x','shift_y','visible','detected_time','only_at_once']
+  _slot_types = ['std_msgs/Header','uint32','uint32','string','float32','geometry_msgs/Pose','float32','float32','uint32','time','uint32']
 
   def __init__(self, *args, **kwds):
     """
@@ -67,7 +78,7 @@ float64 w
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       header,id,label,score,position,orientation
+       header,id,managed_id,label,score,pose,shift_x,shift_y,visible,detected_time,only_at_once
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -80,21 +91,36 @@ float64 w
         self.header = std_msgs.msg.Header()
       if self.id is None:
         self.id = 0
+      if self.managed_id is None:
+        self.managed_id = 0
       if self.label is None:
         self.label = ''
       if self.score is None:
         self.score = 0.
-      if self.position is None:
-        self.position = geometry_msgs.msg.Point()
-      if self.orientation is None:
-        self.orientation = geometry_msgs.msg.Quaternion()
+      if self.pose is None:
+        self.pose = geometry_msgs.msg.Pose()
+      if self.shift_x is None:
+        self.shift_x = 0.
+      if self.shift_y is None:
+        self.shift_y = 0.
+      if self.visible is None:
+        self.visible = 0
+      if self.detected_time is None:
+        self.detected_time = genpy.Time()
+      if self.only_at_once is None:
+        self.only_at_once = 0
     else:
       self.header = std_msgs.msg.Header()
       self.id = 0
+      self.managed_id = 0
       self.label = ''
       self.score = 0.
-      self.position = geometry_msgs.msg.Point()
-      self.orientation = geometry_msgs.msg.Quaternion()
+      self.pose = geometry_msgs.msg.Pose()
+      self.shift_x = 0.
+      self.shift_y = 0.
+      self.visible = 0
+      self.detected_time = genpy.Time()
+      self.only_at_once = 0
 
   def _get_types(self):
     """
@@ -116,7 +142,8 @@ float64 w
         _x = _x.encode('utf-8')
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
-      buff.write(_get_struct_I().pack(self.id))
+      _x = self
+      buff.write(_get_struct_2I().pack(_x.id, _x.managed_id))
       _x = self.label
       length = len(_x)
       if python3 or type(_x) == unicode:
@@ -124,7 +151,7 @@ float64 w
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_f7d().pack(_x.score, _x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w))
+      buff.write(_get_struct_f7d2f4I().pack(_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.visible, _x.detected_time.secs, _x.detected_time.nsecs, _x.only_at_once))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -136,10 +163,10 @@ float64 w
     try:
       if self.header is None:
         self.header = std_msgs.msg.Header()
-      if self.position is None:
-        self.position = geometry_msgs.msg.Point()
-      if self.orientation is None:
-        self.orientation = geometry_msgs.msg.Quaternion()
+      if self.pose is None:
+        self.pose = geometry_msgs.msg.Pose()
+      if self.detected_time is None:
+        self.detected_time = genpy.Time()
       end = 0
       _x = self
       start = end
@@ -154,9 +181,10 @@ float64 w
         self.header.frame_id = str[start:end].decode('utf-8')
       else:
         self.header.frame_id = str[start:end]
+      _x = self
       start = end
-      end += 4
-      (self.id,) = _get_struct_I().unpack(str[start:end])
+      end += 8
+      (_x.id, _x.managed_id,) = _get_struct_2I().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -168,8 +196,9 @@ float64 w
         self.label = str[start:end]
       _x = self
       start = end
-      end += 60
-      (_x.score, _x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w,) = _get_struct_f7d().unpack(str[start:end])
+      end += 84
+      (_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.visible, _x.detected_time.secs, _x.detected_time.nsecs, _x.only_at_once,) = _get_struct_f7d2f4I().unpack(str[start:end])
+      self.detected_time.canon()
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill
@@ -190,7 +219,8 @@ float64 w
         _x = _x.encode('utf-8')
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
-      buff.write(_get_struct_I().pack(self.id))
+      _x = self
+      buff.write(_get_struct_2I().pack(_x.id, _x.managed_id))
       _x = self.label
       length = len(_x)
       if python3 or type(_x) == unicode:
@@ -198,7 +228,7 @@ float64 w
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_f7d().pack(_x.score, _x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w))
+      buff.write(_get_struct_f7d2f4I().pack(_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.visible, _x.detected_time.secs, _x.detected_time.nsecs, _x.only_at_once))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -211,10 +241,10 @@ float64 w
     try:
       if self.header is None:
         self.header = std_msgs.msg.Header()
-      if self.position is None:
-        self.position = geometry_msgs.msg.Point()
-      if self.orientation is None:
-        self.orientation = geometry_msgs.msg.Quaternion()
+      if self.pose is None:
+        self.pose = geometry_msgs.msg.Pose()
+      if self.detected_time is None:
+        self.detected_time = genpy.Time()
       end = 0
       _x = self
       start = end
@@ -229,9 +259,10 @@ float64 w
         self.header.frame_id = str[start:end].decode('utf-8')
       else:
         self.header.frame_id = str[start:end]
+      _x = self
       start = end
-      end += 4
-      (self.id,) = _get_struct_I().unpack(str[start:end])
+      end += 8
+      (_x.id, _x.managed_id,) = _get_struct_2I().unpack(str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -243,8 +274,9 @@ float64 w
         self.label = str[start:end]
       _x = self
       start = end
-      end += 60
-      (_x.score, _x.position.x, _x.position.y, _x.position.z, _x.orientation.x, _x.orientation.y, _x.orientation.z, _x.orientation.w,) = _get_struct_f7d().unpack(str[start:end])
+      end += 84
+      (_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.visible, _x.detected_time.secs, _x.detected_time.nsecs, _x.only_at_once,) = _get_struct_f7d2f4I().unpack(str[start:end])
+      self.detected_time.canon()
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill
@@ -253,15 +285,21 @@ _struct_I = genpy.struct_I
 def _get_struct_I():
     global _struct_I
     return _struct_I
-_struct_f7d = None
-def _get_struct_f7d():
-    global _struct_f7d
-    if _struct_f7d is None:
-        _struct_f7d = struct.Struct("<f7d")
-    return _struct_f7d
 _struct_3I = None
 def _get_struct_3I():
     global _struct_3I
     if _struct_3I is None:
         _struct_3I = struct.Struct("<3I")
     return _struct_3I
+_struct_2I = None
+def _get_struct_2I():
+    global _struct_2I
+    if _struct_2I is None:
+        _struct_2I = struct.Struct("<2I")
+    return _struct_2I
+_struct_f7d2f4I = None
+def _get_struct_f7d2f4I():
+    global _struct_f7d2f4I
+    if _struct_f7d2f4I is None:
+        _struct_f7d2f4I = struct.Struct("<f7d2f4I")
+    return _struct_f7d2f4I

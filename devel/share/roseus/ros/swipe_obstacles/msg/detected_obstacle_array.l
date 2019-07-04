@@ -78,7 +78,7 @@
    self)
   )
 
-(setf (get swipe_obstacles::detected_obstacle_array :md5sum-) "de084b41fe681263f165f9cd28f444bc")
+(setf (get swipe_obstacles::detected_obstacle_array :md5sum-) "e69f3def19bbe0032a126532ab559718")
 (setf (get swipe_obstacles::detected_obstacle_array :datatype-) "swipe_obstacles/detected_obstacle_array")
 (setf (get swipe_obstacles::detected_obstacle_array :definition-)
       "std_msgs/Header header
@@ -107,12 +107,22 @@ MSG: swipe_obstacles/detected_obstacle
 std_msgs/Header header
 
 uint32 id
+uint32 managed_id
 string label
 float32 score
+geometry_msgs/Pose pose
 
-geometry_msgs/Point position
-geometry_msgs/Quaternion orientation
+float32 shift_x
+float32 shift_y
+uint32 visible
+time detected_time
+uint32 only_at_once
 
+================================================================================
+MSG: geometry_msgs/Pose
+# A representation of pose in free space, composed of position and orientation. 
+Point position
+Quaternion orientation
 
 ================================================================================
 MSG: geometry_msgs/Point
@@ -134,6 +144,6 @@ float64 w
 
 
 
-(provide :swipe_obstacles/detected_obstacle_array "de084b41fe681263f165f9cd28f444bc")
+(provide :swipe_obstacles/detected_obstacle_array "e69f3def19bbe0032a126532ab559718")
 
 

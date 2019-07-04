@@ -17,6 +17,11 @@
     :initarg :id
     :type cl:integer
     :initform 0)
+   (managed_id
+    :reader managed_id
+    :initarg :managed_id
+    :type cl:integer
+    :initform 0)
    (label
     :reader label
     :initarg :label
@@ -27,16 +32,36 @@
     :initarg :score
     :type cl:float
     :initform 0.0)
-   (position
-    :reader position
-    :initarg :position
-    :type geometry_msgs-msg:Point
-    :initform (cl:make-instance 'geometry_msgs-msg:Point))
-   (orientation
-    :reader orientation
-    :initarg :orientation
-    :type geometry_msgs-msg:Quaternion
-    :initform (cl:make-instance 'geometry_msgs-msg:Quaternion)))
+   (pose
+    :reader pose
+    :initarg :pose
+    :type geometry_msgs-msg:Pose
+    :initform (cl:make-instance 'geometry_msgs-msg:Pose))
+   (shift_x
+    :reader shift_x
+    :initarg :shift_x
+    :type cl:float
+    :initform 0.0)
+   (shift_y
+    :reader shift_y
+    :initarg :shift_y
+    :type cl:float
+    :initform 0.0)
+   (visible
+    :reader visible
+    :initarg :visible
+    :type cl:integer
+    :initform 0)
+   (detected_time
+    :reader detected_time
+    :initarg :detected_time
+    :type cl:real
+    :initform 0)
+   (only_at_once
+    :reader only_at_once
+    :initarg :only_at_once
+    :type cl:integer
+    :initform 0))
 )
 
 (cl:defclass detected_obstacle (<detected_obstacle>)
@@ -57,6 +82,11 @@
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:id-val is deprecated.  Use swipe_obstacles-msg:id instead.")
   (id m))
 
+(cl:ensure-generic-function 'managed_id-val :lambda-list '(m))
+(cl:defmethod managed_id-val ((m <detected_obstacle>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:managed_id-val is deprecated.  Use swipe_obstacles-msg:managed_id instead.")
+  (managed_id m))
+
 (cl:ensure-generic-function 'label-val :lambda-list '(m))
 (cl:defmethod label-val ((m <detected_obstacle>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:label-val is deprecated.  Use swipe_obstacles-msg:label instead.")
@@ -67,15 +97,35 @@
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:score-val is deprecated.  Use swipe_obstacles-msg:score instead.")
   (score m))
 
-(cl:ensure-generic-function 'position-val :lambda-list '(m))
-(cl:defmethod position-val ((m <detected_obstacle>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:position-val is deprecated.  Use swipe_obstacles-msg:position instead.")
-  (position m))
+(cl:ensure-generic-function 'pose-val :lambda-list '(m))
+(cl:defmethod pose-val ((m <detected_obstacle>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:pose-val is deprecated.  Use swipe_obstacles-msg:pose instead.")
+  (pose m))
 
-(cl:ensure-generic-function 'orientation-val :lambda-list '(m))
-(cl:defmethod orientation-val ((m <detected_obstacle>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:orientation-val is deprecated.  Use swipe_obstacles-msg:orientation instead.")
-  (orientation m))
+(cl:ensure-generic-function 'shift_x-val :lambda-list '(m))
+(cl:defmethod shift_x-val ((m <detected_obstacle>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:shift_x-val is deprecated.  Use swipe_obstacles-msg:shift_x instead.")
+  (shift_x m))
+
+(cl:ensure-generic-function 'shift_y-val :lambda-list '(m))
+(cl:defmethod shift_y-val ((m <detected_obstacle>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:shift_y-val is deprecated.  Use swipe_obstacles-msg:shift_y instead.")
+  (shift_y m))
+
+(cl:ensure-generic-function 'visible-val :lambda-list '(m))
+(cl:defmethod visible-val ((m <detected_obstacle>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:visible-val is deprecated.  Use swipe_obstacles-msg:visible instead.")
+  (visible m))
+
+(cl:ensure-generic-function 'detected_time-val :lambda-list '(m))
+(cl:defmethod detected_time-val ((m <detected_obstacle>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:detected_time-val is deprecated.  Use swipe_obstacles-msg:detected_time instead.")
+  (detected_time m))
+
+(cl:ensure-generic-function 'only_at_once-val :lambda-list '(m))
+(cl:defmethod only_at_once-val ((m <detected_obstacle>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader swipe_obstacles-msg:only_at_once-val is deprecated.  Use swipe_obstacles-msg:only_at_once instead.")
+  (only_at_once m))
 (cl:defmethod roslisp-msg-protocol:serialize ((msg <detected_obstacle>) ostream)
   "Serializes a message object of type '<detected_obstacle>"
   (roslisp-msg-protocol:serialize (cl:slot-value msg 'header) ostream)
@@ -83,6 +133,10 @@
   (cl:write-byte (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'id)) ostream)
   (cl:write-byte (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'id)) ostream)
   (cl:write-byte (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'id)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'managed_id)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'managed_id)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'managed_id)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'managed_id)) ostream)
   (cl:let ((__ros_str_len (cl:length (cl:slot-value msg 'label))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) __ros_str_len) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) __ros_str_len) ostream)
@@ -94,8 +148,35 @@
     (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream))
-  (roslisp-msg-protocol:serialize (cl:slot-value msg 'position) ostream)
-  (roslisp-msg-protocol:serialize (cl:slot-value msg 'orientation) ostream)
+  (roslisp-msg-protocol:serialize (cl:slot-value msg 'pose) ostream)
+  (cl:let ((bits (roslisp-utils:encode-single-float-bits (cl:slot-value msg 'shift_x))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream))
+  (cl:let ((bits (roslisp-utils:encode-single-float-bits (cl:slot-value msg 'shift_y))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream))
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'visible)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'visible)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'visible)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'visible)) ostream)
+  (cl:let ((__sec (cl:floor (cl:slot-value msg 'detected_time)))
+        (__nsec (cl:round (cl:* 1e9 (cl:- (cl:slot-value msg 'detected_time) (cl:floor (cl:slot-value msg 'detected_time)))))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) __sec) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) __sec) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) __sec) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) __sec) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 0) __nsec) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) __nsec) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) __nsec) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) __nsec) ostream))
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'only_at_once)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'only_at_once)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'only_at_once)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'only_at_once)) ostream)
 )
 (cl:defmethod roslisp-msg-protocol:deserialize ((msg <detected_obstacle>) istream)
   "Deserializes a message object of type '<detected_obstacle>"
@@ -104,6 +185,10 @@
     (cl:setf (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'id)) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'id)) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'id)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'managed_id)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'managed_id)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'managed_id)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'managed_id)) (cl:read-byte istream))
     (cl:let ((__ros_str_len 0))
       (cl:setf (cl:ldb (cl:byte 8 0) __ros_str_len) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 8) __ros_str_len) (cl:read-byte istream))
@@ -118,8 +203,37 @@
       (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
     (cl:setf (cl:slot-value msg 'score) (roslisp-utils:decode-single-float-bits bits)))
-  (roslisp-msg-protocol:deserialize (cl:slot-value msg 'position) istream)
-  (roslisp-msg-protocol:deserialize (cl:slot-value msg 'orientation) istream)
+  (roslisp-msg-protocol:deserialize (cl:slot-value msg 'pose) istream)
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+    (cl:setf (cl:slot-value msg 'shift_x) (roslisp-utils:decode-single-float-bits bits)))
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+    (cl:setf (cl:slot-value msg 'shift_y) (roslisp-utils:decode-single-float-bits bits)))
+    (cl:setf (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'visible)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'visible)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'visible)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'visible)) (cl:read-byte istream))
+    (cl:let ((__sec 0) (__nsec 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) __sec) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) __sec) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) __sec) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) __sec) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 0) __nsec) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) __nsec) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) __nsec) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) __nsec) (cl:read-byte istream))
+      (cl:setf (cl:slot-value msg 'detected_time) (cl:+ (cl:coerce __sec 'cl:double-float) (cl:/ __nsec 1e9))))
+    (cl:setf (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'only_at_once)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'only_at_once)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'only_at_once)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'only_at_once)) (cl:read-byte istream))
   msg
 )
 (cl:defmethod roslisp-msg-protocol:ros-datatype ((msg (cl:eql '<detected_obstacle>)))
@@ -130,32 +244,42 @@
   "swipe_obstacles/detected_obstacle")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<detected_obstacle>)))
   "Returns md5sum for a message object of type '<detected_obstacle>"
-  "17028d23d94e8b0c59623a0698afe007")
+  "349df44c7371bbebb35e07570cf3966c")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'detected_obstacle)))
   "Returns md5sum for a message object of type 'detected_obstacle"
-  "17028d23d94e8b0c59623a0698afe007")
+  "349df44c7371bbebb35e07570cf3966c")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<detected_obstacle>)))
   "Returns full string definition for message of type '<detected_obstacle>"
-  (cl:format cl:nil "std_msgs/Header header~%~%uint32 id~%string label~%float32 score~%~%geometry_msgs/Point position~%geometry_msgs/Quaternion orientation~%~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%~%"))
+  (cl:format cl:nil "std_msgs/Header header~%~%uint32 id~%uint32 managed_id~%string label~%float32 score~%geometry_msgs/Pose pose~%~%float32 shift_x~%float32 shift_y~%uint32 visible~%time detected_time~%uint32 only_at_once~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Pose~%# A representation of pose in free space, composed of position and orientation. ~%Point position~%Quaternion orientation~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'detected_obstacle)))
   "Returns full string definition for message of type 'detected_obstacle"
-  (cl:format cl:nil "std_msgs/Header header~%~%uint32 id~%string label~%float32 score~%~%geometry_msgs/Point position~%geometry_msgs/Quaternion orientation~%~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%~%"))
+  (cl:format cl:nil "std_msgs/Header header~%~%uint32 id~%uint32 managed_id~%string label~%float32 score~%geometry_msgs/Pose pose~%~%float32 shift_x~%float32 shift_y~%uint32 visible~%time detected_time~%uint32 only_at_once~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Pose~%# A representation of pose in free space, composed of position and orientation. ~%Point position~%Quaternion orientation~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <detected_obstacle>))
   (cl:+ 0
      (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'header))
      4
+     4
      4 (cl:length (cl:slot-value msg 'label))
      4
-     (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'position))
-     (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'orientation))
+     (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'pose))
+     4
+     4
+     4
+     8
+     4
 ))
 (cl:defmethod roslisp-msg-protocol:ros-message-to-list ((msg <detected_obstacle>))
   "Converts a ROS message object to a list"
   (cl:list 'detected_obstacle
     (cl:cons ':header (header msg))
     (cl:cons ':id (id msg))
+    (cl:cons ':managed_id (managed_id msg))
     (cl:cons ':label (label msg))
     (cl:cons ':score (score msg))
-    (cl:cons ':position (position msg))
-    (cl:cons ':orientation (orientation msg))
+    (cl:cons ':pose (pose msg))
+    (cl:cons ':shift_x (shift_x msg))
+    (cl:cons ':shift_y (shift_y msg))
+    (cl:cons ':visible (visible msg))
+    (cl:cons ':detected_time (detected_time msg))
+    (cl:cons ':only_at_once (only_at_once msg))
 ))
