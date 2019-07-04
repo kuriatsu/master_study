@@ -8,8 +8,8 @@
 // #include <sstream>
 // #include <iostream>
 
-class SwipeDetectorFixed{
-
+class SwipeDetectorFixed
+{
 	private:
         ros::Publisher pub_obstacle_pose;
 		ros::Subscriber sub_vehicle_pose;
@@ -31,6 +31,7 @@ class SwipeDetectorFixed{
         void sub_vehicle_pose_callback(const tf::)
         void sub_waypoint_callback(const tf::)
 };
+
 
 SwipeDetectorFixed::SwipeDetectorFixed()
 {
@@ -60,8 +61,8 @@ void sub_waypoint_callback(const &in_msg)
 }
 
 
-void SwipeDetectorFixed::read_file(){
-
+void SwipeDetectorFixed::read_file()
+{
 	swipe_obstacles::detected_obstacle read_obstacle;
 	unsigned int id = 0;
 	// std::cout << "read file" << std::endl;
@@ -124,8 +125,8 @@ void SwipeDetectorFixed::pub_obstacle_pose_timer_callback(const ros::TimerEvent&
 }
 
 
-int main(int argc, char **argv){
-
+int main(int argc, char **argv)
+{
 	ros::init(argc, argv, "swipe_detector_fixed_node");
 
 	ROS_INFO("Initializing detector...");
