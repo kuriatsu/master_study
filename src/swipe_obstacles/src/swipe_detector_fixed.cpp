@@ -61,15 +61,15 @@ SwipeDetectorFixed::SwipeDetectorFixed(const std::string &file_name): round(1)
     ros::NodeHandle n;
     pub_erase_sinal = n.advertise<std_msgs::Int32>("/swipe_erase_signal", 5);
     pub_obstacle_pose = n.advertise<swipe_obstacles::detected_obstacle_array>("/detected_obstacles", 5);
-    sub_vehicle_pose = n.subscribe("/ndt_pose", 5, &SwipeDetectorFixed::ndt_pose_callback, this);
-	sub_waypoint_callback = n.subscribe("/closest_waypoint", 5, &SwipeDetectorFixed::waypoint_callback, this);
+    sub_vehicle_pose = n.subscribe("/ndt_pose", 5, &SwipeDetectorFixed::ndtPoseCallback, this);
+	sub_waypoint_callback = n.subscribe("/closest_waypoint", 5, &SwipeDetectorFixed::waypointCallback, this);
 
     // keep_time = 2.0;
     obstacle_vec.reserve(vector_size);
 	read_file(file_name);
 
 	ros::Duration(1).sleep();
-	timer = n.createTimer(ros::Duration(0.5), &SwipeDetectorFixed::pubTimerCallback, this);
+	pub_timer = n.createTimer(ros::Duration(0.5), &SwipeDetectorFixed::pubTimerCallback, this);
 }
 
 
