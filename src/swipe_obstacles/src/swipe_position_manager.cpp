@@ -216,9 +216,6 @@ geometry_msgs::Pose PositionManager::tfTransformer(const geometry_msgs::Pose &cu
 }
 
 
-
-
-
 void PositionManager::obstacle_publish()
 {
     swipe_obstacles::detected_obstacle_array out_msgs;
