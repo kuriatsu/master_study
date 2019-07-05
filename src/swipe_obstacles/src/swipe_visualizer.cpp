@@ -30,7 +30,7 @@ class ObstacleVisualizer
 
 	private:
         void sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs);
-		void erase_signal_callback(const std_msgs::Int32 &in_msg);
+		// void erase_signal_callback(const std_msgs::Int32 &in_msg);
         void shift_feedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
         void make_cube(const swipe_obstacles::detected_obstacle &in_msg);
         int id_vector_manager(const uint32_t &id);
@@ -43,26 +43,26 @@ ObstacleVisualizer::ObstacleVisualizer()
 	ros::NodeHandle n;
 
     sub_obj = n.subscribe("/managed_obstacles", 5, &ObstacleVisualizer::sub_obstacles_callback, this);
-	sub_erase_signal = n.subscribe("/swipe_erase_signal", 5, &ObstacleVisualizer::erase_signal_callback, this);
+	// sub_erase_signal = n.subscribe("/swipe_erase_signal", 5, &ObstacleVisualizer::erase_signal_callback, this);
 	pub_shift = n.advertise<swipe_obstacles::detected_obstacle>("/shifted_info", 5);
 }
 
 
-void ObstacleVisualizer::erase_signal_callback(const std_msgs::Int32 &in_msg)
-{
-    if(in_msg.data)
-    {
-        ROS_INFO_STREAM(in_msg.data);
-        server->clear();
-        server->applyChanges();
-    }
-}
+// void ObstacleVisualizer::erase_signal_callback(const std_msgs::Int32 &in_msg)
+// {
+//     if(in_msg.data)
+//     {
+//         ROS_INFO_STREAM(in_msg.data);
+//         server->clear();
+//         server->applyChanges();
+//     }
+// }
 
 
 void ObstacleVisualizer::sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs)
 {
     server->clear();
-    ROS_INFO("subscribed");
+    ROS_INFO("visualezer subscribed");
 
     for (size_t i=0; i< in_msgs.obstacles.size(); i++)
     {
@@ -98,11 +98,11 @@ void ObstacleVisualizer::make_cube(const swipe_obstacles::detected_obstacle &in_
 {
     swipe_obstacles::detected_obstacle out_obstacle_pose;
     std::stringstream ss;
-    ss << in_msg.managed_id;
+    ss << in_msg.id;
 
 	visualization_msgs::InteractiveMarker int_marker;
     ROS_INFO_STREAM(in_msg);
-	int_marker.header.frame_id = "world";
+	int_marker.header.frame_id = "map";
 	int_marker.name = ss.str();
 	int_marker.scale = 1.0;
     int_marker.pose = in_msg.pose;
@@ -153,7 +153,7 @@ void ObstacleVisualizer::shift_feedback(const visualization_msgs::InteractiveMar
 
     sis = std::istringstream(feedback->marker_name);
     feedback_obstacle.pose = feedback->pose;
-    sis >> feedback_obstacle.managed_id;
+    sis >> feedback_obstacle.id;
     pub_shift.publish(feedback_obstacle);
 }
 

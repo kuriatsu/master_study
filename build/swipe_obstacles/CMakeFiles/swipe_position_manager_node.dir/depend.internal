@@ -83,6 +83,7 @@ swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_ma
  /opt/ros/kinetic/include/sensor_msgs/PointCloud.h
  /opt/ros/kinetic/include/std_msgs/Empty.h
  /opt/ros/kinetic/include/std_msgs/Header.h
+ /opt/ros/kinetic/include/std_msgs/Int32.h
  /opt/ros/kinetic/include/tf/FrameGraph.h
  /opt/ros/kinetic/include/tf/FrameGraphRequest.h
  /opt/ros/kinetic/include/tf/FrameGraphResponse.h

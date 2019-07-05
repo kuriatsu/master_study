@@ -11,7 +11,7 @@ import genpy
 import std_msgs.msg
 
 class detected_obstacle_array(genpy.Message):
-  _md5sum = "e69f3def19bbe0032a126532ab559718"
+  _md5sum = "e900cf0096e79af6967f71da5a89cfd0"
   _type = "swipe_obstacles/detected_obstacle_array"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
@@ -49,7 +49,6 @@ float32 shift_x
 float32 shift_y
 uint32 visible
 time detected_time
-uint32 only_at_once
 
 ================================================================================
 MSG: geometry_msgs/Pose
@@ -156,7 +155,6 @@ float64 w
         _v6 = val1.detected_time
         _x = _v6
         buff.write(_get_struct_2I().pack(_x.secs, _x.nsecs))
-        buff.write(_get_struct_I().pack(val1.only_at_once))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -244,9 +242,6 @@ float64 w
         start = end
         end += 8
         (_x.secs, _x.nsecs,) = _get_struct_2I().unpack(str[start:end])
-        start = end
-        end += 4
-        (val1.only_at_once,) = _get_struct_I().unpack(str[start:end])
         self.obstacles.append(val1)
       return self
     except struct.error as e:
@@ -303,7 +298,6 @@ float64 w
         _v18 = val1.detected_time
         _x = _v18
         buff.write(_get_struct_2I().pack(_x.secs, _x.nsecs))
-        buff.write(_get_struct_I().pack(val1.only_at_once))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -392,9 +386,6 @@ float64 w
         start = end
         end += 8
         (_x.secs, _x.nsecs,) = _get_struct_2I().unpack(str[start:end])
-        start = end
-        end += 4
-        (val1.only_at_once,) = _get_struct_I().unpack(str[start:end])
         self.obstacles.append(val1)
       return self
     except struct.error as e:

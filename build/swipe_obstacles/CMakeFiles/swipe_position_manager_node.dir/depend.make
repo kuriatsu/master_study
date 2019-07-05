@@ -82,6 +82,7 @@ swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_ma
 swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_manager.cpp.o: /opt/ros/kinetic/include/sensor_msgs/PointCloud.h
 swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_manager.cpp.o: /opt/ros/kinetic/include/std_msgs/Empty.h
 swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_manager.cpp.o: /opt/ros/kinetic/include/std_msgs/Header.h
+swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_manager.cpp.o: /opt/ros/kinetic/include/std_msgs/Int32.h
 swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_manager.cpp.o: /opt/ros/kinetic/include/tf/FrameGraph.h
 swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_manager.cpp.o: /opt/ros/kinetic/include/tf/FrameGraphRequest.h
 swipe_obstacles/CMakeFiles/swipe_position_manager_node.dir/src/swipe_position_manager.cpp.o: /opt/ros/kinetic/include/tf/FrameGraphResponse.h

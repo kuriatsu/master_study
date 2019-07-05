@@ -57,6 +57,8 @@ swipe_obstacles/detected_obstacle.h
 /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle.h
 swipe_obstacles/detected_obstacle_array.h
 /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle_array.h
+std_msgs/Int32.h
+/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/std_msgs/Int32.h
 
 /opt/ros/kinetic/include/boost_161_condition_variable.h
 boost/thread/detail/platform.hpp
@@ -1099,6 +1101,22 @@ ros/message_operations.h
 -
 
 /opt/ros/kinetic/include/std_msgs/Header.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+
+/opt/ros/kinetic/include/std_msgs/Int32.h
 string
 -
 vector

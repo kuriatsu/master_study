@@ -1,4 +1,4 @@
-#include "ros/ros.h"
+#include <ros/ros.h>
 
 // ros msgs
 #include <geometry_msgs/Pose.h>
@@ -19,7 +19,10 @@ class SwipeDetectorFixed
 	private:
         // pub sub
         ros::Publisher pub_obstacle_pose;
-        ros::Publisher pub_erase_sinal;
+// tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        // ros::Publisher test_obstacle_pose;
+        // ros::Publisher test_transform_origin;
+// tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		ros::Subscriber sub_vehicle_pose;
         ros::Subscriber sub_waypoint_callback;
 
@@ -29,7 +32,6 @@ class SwipeDetectorFixed
 
         // management information
         ros::Timer pub_timer;
-        ros::Time last_pub_time;
         // int keep_time;
         // const static int appear_dist = 200;
         tf::TransformListener tf_listener;
@@ -42,31 +44,35 @@ class SwipeDetectorFixed
         // current robot information
         int round;
         geometry_msgs::Pose vehicle_pose;
-        int32 next_waypoint_flag;
+        uint32_t next_waypoint_flag;
 
 	public:
 		SwipeDetectorFixed(const std::string &file_name);
 
 	private:
-		void readFile();
+		void readFile(const std::string &file_name);
 		void pubTimerCallback(const ros::TimerEvent&);
-        void ndtPoseCallback(const geometry_msgs::PoseStamped &in_pose);
+        // void ndtPoseCallback(const geometry_msgs::PoseStamped &in_pose);
         void waypointCallback(const std_msgs::Int32 &in_msg);
-        geometry_msgs::Pose tfTransformer(const geometry_msgs::Pose &in_pose, const std::string &current_frame_id, const std::string &target_frame_id)
+        geometry_msgs::Pose tfTransformer(const geometry_msgs::Pose &in_pose, const std::string &current_frame_id, const std::string &target_frame_id);
 
 };
 
 SwipeDetectorFixed::SwipeDetectorFixed(const std::string &file_name): round(1)
 {
     ros::NodeHandle n;
-    pub_erase_sinal = n.advertise<std_msgs::Int32>("/swipe_erase_signal", 5);
+    // pub_erase_sinal = n.advertise<std_msgs::Int32>("/swipe_erase_signal", 5);
     pub_obstacle_pose = n.advertise<swipe_obstacles::detected_obstacle_array>("/detected_obstacles", 5);
-    sub_vehicle_pose = n.subscribe("/ndt_pose", 5, &SwipeDetectorFixed::ndtPoseCallback, this);
+// tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    // test_transform_origin = n.advertise<geometry_msgs::PoseStamped>("/test_transform_origin", 5);
+    // test_obstacle_pose = n.advertise<geometry_msgs::PoseStamped>("/test_obstacle_pose", 5);
+// tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    // sub_vehicle_pose = n.subscribe("/ndt_pose", 5, &SwipeDetectorFixed::ndtPoseCallback, this);
 	sub_waypoint_callback = n.subscribe("/closest_waypoint", 5, &SwipeDetectorFixed::waypointCallback, this);
 
     // keep_time = 2.0;
     obstacle_vec.reserve(vector_size);
-	read_file(file_name);
+	readFile(file_name);
 
 	ros::Duration(1).sleep();
 	pub_timer = n.createTimer(ros::Duration(0.5), &SwipeDetectorFixed::pubTimerCallback, this);
@@ -89,7 +95,7 @@ void SwipeDetectorFixed::waypointCallback(const std_msgs::Int32 &in_msg)
     {
         next_waypoint_flag = 2;
     }
-    else if(in_msg.data == next_waypoint_frag)
+    else if(in_msg.data == next_waypoint_flag)
     {
         next_waypoint_flag = 0;
         round++;
@@ -104,7 +110,7 @@ void SwipeDetectorFixed::readFile(const std::string &file_name)
     std::string line;
     std::ifstream ifs(file_name);
 
-	if (!ifs) == 2
+	if (!ifs == 2)
     {
 		ROS_ERROR("Cannot Open File !");
 		return;
@@ -131,13 +137,13 @@ void SwipeDetectorFixed::readFile(const std::string &file_name)
 		read_obstacle.pose.orientation.y = std::stof(result.at(4));
 		read_obstacle.pose.orientation.z = std::stof(result.at(5));
         read_obstacle.pose.orientation.w = std::stof(result.at(6));
-        read_obstacle.visible = std::stoi(result.at(7);
+        read_obstacle.visible = std::stoi(result.at(7));
         read_obstacle.id = std::stoi(result.at(8));
         read_obstacle.shift_x = std::stof(result.at(9));
         read_obstacle.shift_y = std::stof(result.at(10));
         read_obstacle.score = 90.0;
         read_obstacle.label = "person";
-        read_obstacle.header.frame_id = "world";
+        read_obstacle.header.frame_id = "map";
 
 		obstacle_vec.push_back(read_obstacle);
 		// ROS_INFO_STREAM(read_obstacle);
@@ -151,25 +157,39 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
     geometry_msgs::Pose pose_from_velodyne;
     float distance;
     int flag=0;
-    std_msgs::Int32 erase_signal;
+    // std_msgs::Int32 erase_signal;
     // erase_signal.data = 0;
 
     for(auto i=obstacle_vec.begin(); i!=obstacle_vec.end(); i++)
     {
         if(i->visible == round)
         {
-            pose_from_velodyne = tfTransformer(i->pose, i->frame_id, "velodyne");
-            distance = std::pow(pose_from_velodyne.pose.position.x, 2)+std::pow(pose_from_velodyne.pose.position.y, 2);
+            pose_from_velodyne = tfTransformer(i->pose, i->header.frame_id, "/velodyne");
 
-            if(0.0 < pose_from_velodyne.pose.position.x && pose_from_velodyne.pose.position.x < 20.0)
+            // distance = std::pow(pose_from_velodyne.position.x, 2)+std::pow(pose_from_velodyne.position.y, 2);
+            // std::cout << "distance:" << distance << std::endl;
+
+// tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            // std::cout << i->header.frame_id << "to" << "velodyne" << std::endl;
+            // ROS_INFO_STREAM(i->pose);
+            // ROS_INFO("obstacle on velodyne");
+            // ROS_INFO_STREAM(pose_from_velodyne);
+            // geometry_msgs::PoseStamped pose_from_velodyne_stamp;
+            // pose_from_velodyne_stamp.header.stamp = ros::Time::now();
+            // pose_from_velodyne_stamp.header.frame_id = "velodyne";
+            // pose_from_velodyne_stamp.pose = pose_from_velodyne;
+            // test_obstacle_pose.publish(pose_from_velodyne_stamp);
+// tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+            if(0.0 < pose_from_velodyne.position.x && pose_from_velodyne.position.x < 10.0)
             {
-                if(-10.0 < pose_from_velodyne.pose.position.y && pose_from_velodyne.pose.position.y < 10.0)
+                if(-5.0 < pose_from_velodyne.position.y && pose_from_velodyne.position.y < 5.0)
                 {
                     i->detected_time = ros::Time::now();
                     std::cout << "published id:" << i->id << std::endl;
 
                     out_array.obstacles.push_back(*i);
-                    out_array.header.frame_id = "world";
+                    out_array.header.frame_id = "map";
                     out_array.header.stamp = ros::Time::now();
                     flag = 1;
                 }
@@ -208,21 +228,42 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
 
 geometry_msgs::Pose SwipeDetectorFixed::tfTransformer(const geometry_msgs::Pose &current_pose, const std::string &current_frame_id, const std::string &target_frame_id)
 {
-    geometry_msgs::Pose transformed_pose;
     tf::Pose current_tf;
-    tf::Pose transformed_tf;
     tf::StampedTransform transform;
+    tf::Pose transformed_tf;
+    geometry_msgs::Pose transformed_pose;
+    geometry_msgs::PoseStamped transform_origin;
 
     try{
-		tf_listener.waitForTransform(current_frame_id, target_frame_id, ros::Time::now(), ros::Duration(1.0));
-		tf_listener.lookupTransform(target_frame_id, current_frame_id, ros::Time::now(), transform);
+		tf_listener.waitForTransform(current_frame_id, target_frame_id,  ros::Time(0), ros::Duration(1.0));
+        // current_frame_id　から　target_frame_id　への座標変換
+		tf_listener.lookupTransform(target_frame_id, current_frame_id, ros::Time(0), transform);
 
-	}catch(...){
-		ROS_INFO("velodyne to world transform ERROR");
-	}
+	}catch (tf::TransformException &ex)  {
+        ROS_ERROR("%s", ex.what());
+        //ros::Duration(1.0).sleep();
+    }
+
+
+// tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    // // getorigin は変換後の座標における変換前の座標の原点frame_id=target_frame_idにするとgetoriginは変換前のフレームの原点にoriginがあることがわかる
+    // transform_origin.header.stamp = ros::Time::now();
+    // transform_origin.header.frame_id = "velodyne";
+    // transform_origin.pose.position.x = transform.getOrigin().x();
+    // transform_origin.pose.position.y = transform.getOrigin().y();
+    // transform_origin.pose.position.z = transform.getOrigin().z();
+    // transform_origin.pose.orientation.x = transform.getRotation().x();
+    // transform_origin.pose.orientation.y = transform.getRotation().y();
+    // transform_origin.pose.orientation.z = transform.getRotation().z();
+    // transform_origin.pose.orientation.w = transform.getRotation().w();
+    // test_transform_origin.publish(transform_origin);
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    // tf::Vector3 v = transform.getOrigin();
+    // ROS_INFO_STREAM(v.x());
 
 	tf::poseMsgToTF(current_pose, current_tf);
-	transformed_tf = current_tf * transform;
+	transformed_tf = transform * current_tf;
 	tf::poseTFToMsg(transformed_tf, transformed_pose);
 
     return transformed_pose;
