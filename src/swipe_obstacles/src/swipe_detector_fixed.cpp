@@ -5,6 +5,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include "swipe_obstacles/detected_obstacle.h"
 #include "swipe_obstacles/detected_obstacle_array.h"
+#include "swipe_obstacles/closest_obstacle.h"
 #include <tf/transform_listener.h>
 #include "std_msgs/Int32.h"
 
@@ -19,6 +20,7 @@ class SwipeDetectorFixed
 	private:
         // pub sub
         ros::Publisher pub_obstacle_pose;
+        ros::Publisher pub_closest_obstacle;
         ros::Publisher pub_erase_signal;
 // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         // ros::Publisher test_obstacle_pose;
@@ -35,15 +37,8 @@ class SwipeDetectorFixed
         ros::Timer pub_timer;
         int keep_time;
         ros::Time last_pub_time;
-        // const static int appear_dist = 200;
         tf::TransformListener tf_listener;
 
-
-        // ros::Time dis_timer_start;
-		// bool dis_timer_flag;
-        // const static int initial_waypoint = 0;
-
-        // current robot information
         int round;
         geometry_msgs::Pose vehicle_pose;
         uint32_t next_waypoint_flag;
@@ -54,7 +49,6 @@ class SwipeDetectorFixed
 	private:
 		void readFile(const std::string &file_name);
 		void pubTimerCallback(const ros::TimerEvent&);
-        // void ndtPoseCallback(const geometry_msgs::PoseStamped &in_pose);
         void waypointCallback(const std_msgs::Int32 &in_msg);
         geometry_msgs::Pose tfTransformer(const geometry_msgs::Pose &in_pose, const std::string &current_frame_id, const std::string &target_frame_id);
 
@@ -63,28 +57,21 @@ class SwipeDetectorFixed
 SwipeDetectorFixed::SwipeDetectorFixed(const std::string &file_name): round(1)
 {
     ros::NodeHandle n;
-    pub_erase_sinal = n.advertise<std_msgs::Int32>("/swipe_erase_signal", 5);
+    pub_erase_signal = n.advertise<std_msgs::Int32>("/swipe_erase_signal", 5);
     pub_obstacle_pose = n.advertise<swipe_obstacles::detected_obstacle_array>("/detected_obstacles", 5);
+    pub_closest_obstacle = n.advertise<swipe_obstacles::closest_obstacle>("/closest_obstacles", 5);
 // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // test_transform_origin = n.advertise<geometry_msgs::PoseStamped>("/test_transform_origin", 5);
     // test_obstacle_pose = n.advertise<geometry_msgs::PoseStamped>("/test_obstacle_pose", 5);
 // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    // sub_vehicle_pose = n.subscribe("/ndt_pose", 5, &SwipeDetectorFixed::ndtPoseCallback, this);
 	sub_waypoint_callback = n.subscribe("/closest_waypoint", 5, &SwipeDetectorFixed::waypointCallback, this);
 
-    // keep_time = 2.0;
     obstacle_vec.reserve(vector_size);
 	readFile(file_name);
 
 	ros::Duration(1).sleep();
 	pub_timer = n.createTimer(ros::Duration(0.5), &SwipeDetectorFixed::pubTimerCallback, this);
 }
-
-
-// void SwipeDetectorFixed::ndtPoseCallback(const geometry_msgs::PoseStamped &in_pose)
-// {
-//     vehicle_pose = in_pose.pose;
-// }
 
 
 void SwipeDetectorFixed::waypointCallback(const std_msgs::Int32 &in_msg)
@@ -156,8 +143,10 @@ void SwipeDetectorFixed::readFile(const std::string &file_name)
 void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
 {
     swipe_obstacles::detected_obstacle_array out_array;
+    swipe_obstacles::closest_obstacle closest_obstacle;
     geometry_msgs::Pose pose_from_velodyne;
-    float distance;
+    float closest_obstacle_distance = 10.0;
+    uint32_t closest_obstacle_id;
     int flag=0;
     std_msgs::Int32 erase_signal;
     // erase_signal.data = 0;
@@ -167,9 +156,6 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
         if(i->visible == round)
         {
             pose_from_velodyne = tfTransformer(i->pose, i->header.frame_id, "/velodyne");
-
-            // distance = std::pow(pose_from_velodyne.position.x, 2)+std::pow(pose_from_velodyne.position.y, 2);
-            // std::cout << "distance:" << distance << std::endl;
 
 // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             // std::cout << i->header.frame_id << "to" << "velodyne" << std::endl;
@@ -187,34 +173,31 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
             {
                 if(-5.0 < pose_from_velodyne.position.y && pose_from_velodyne.position.y < 5.0)
                 {
+                    // add obstacle to array
                     i->detected_time = ros::Time::now();
                     std::cout << "published id:" << i->id << std::endl;
-
                     out_array.obstacles.push_back(*i);
-                    out_array.header.frame_id = "map";
-                    out_array.header.stamp = ros::Time::now();
+                    // find closest obstacle
+                    if(pose_from_velodyne.position.x < closest_obstacle_distance)
+                    {
+                        closest_obstacle.distance = pose_from_velodyne.position.x;
+                        closest_obstacle.id = i->id;
+                    }
                     flag = 1;
                 }
             }
         }
     }
-            // i->id ++;
-            // if (i->only_at_once && !dis_timer_flag)
-            // {
-            //     dis_timer_flag = true;
-            //     dis_timer_start = ros::Time::now();
-            //     // i->detected_time = ros::Time::now();
-            //
-            // }else if(i->only_at_once && dis_timer_flag){
-            //     // i->detected_time = ros::Time::now();
-            //     if(i->detected_time - dis_timer_start > ros::Duration(10)){
-            //         i->detected_time -= ros::Duration(3);
-            //     }
-            // }
-            // ROS_INFO_STREAM(out_array.obstacles[0]);
+
     if(flag)
     {
+        // publish array
+        out_array.header.frame_id = "map";
+        out_array.header.stamp = ros::Time::now();
         pub_obstacle_pose.publish(out_array);
+        //publish closest obstacle
+        pub_closest_obstacle.publish(closest_obstacle);
+
         last_pub_time = ros::Time::now();
     }
     else
@@ -222,7 +205,7 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
         if(ros::Time::now() - last_pub_time > ros::Duration(keep_time))
         {
             erase_signal.data = 1;
-            pub_erase_sinal.publish(erase_signal);
+            pub_erase_signal.publish(erase_signal);
         }
     }
 }
@@ -260,9 +243,6 @@ geometry_msgs::Pose SwipeDetectorFixed::tfTransformer(const geometry_msgs::Pose 
     // transform_origin.pose.orientation.w = transform.getRotation().w();
     // test_transform_origin.publish(transform_origin);
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    // tf::Vector3 v = transform.getOrigin();
-    // ROS_INFO_STREAM(v.x());
 
 	tf::poseMsgToTF(current_pose, current_tf);
 	transformed_tf = transform * current_tf;

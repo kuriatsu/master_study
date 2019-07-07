@@ -21,11 +21,11 @@ private:
     ros::Publisher pub_pointcloud;
     ros::Subscriber sub_obstacles;
     ros::Subscriber sub_erase_signal;
-    sensor_msgs::PointCloud2 in_scan;
+    pcl::PointCloud<pcl::PointXYZRGB> in_cloud;
     ros::Timer timer;
     tf::TransformListener tf_listener;
-    ros::Time last_sub_time;
-    int keep_time;
+    // ros::Time last_sub_time;
+    // int keep_time;
 
     public :
     ObstacleReflector();
@@ -34,18 +34,18 @@ private:
 
     private :
     void make_cube();
-    // void erase_signal_callback(const std_msgs::Int32 &in_msg);
-    void sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs);
-    void pub_pointcloud_Nhz(const ros::TimerEvent&);
+    void eraseSignalCallback(const std_msgs::Int32 &in_msg);
+    void subObstaclesCallback(const swipe_obstacles::detected_obstacle_array &in_msgs);
+    void pubPointcloudNhz(const ros::TimerEvent&);
 };
 
 
-ObstacleReflector::ObstacleReflector(): keep_time(2)
+ObstacleReflector::ObstacleReflector()//: keep_time(2)
 {
     ros::NodeHandle n;
 
-    sub_obstacles = n.subscribe("/managed_obstacles", 5, &ObstacleReflector::sub_obstacles_callback, this);
-    sub_erase_signal = n.subscribe("/swipe_erase_signal", 1, &ObstacleReflector::erase_signal_callback, this);
+    sub_obstacles = n.subscribe("/managed_obstacles", 5, &ObstacleReflector::subObstaclesCallback, this);
+    sub_erase_signal = n.subscribe("/swipe_erase_signal", 1, &ObstacleReflector::eraseSignalCallback, this);
     // pub_pointcloud = n.advertise<sensor_msgs::PointCloud2>("/points_raw", 1);
     pub_pointcloud = n.advertise<sensor_msgs::PointCloud2>("/int_pointcloud", 1);
 
@@ -54,25 +54,26 @@ ObstacleReflector::ObstacleReflector(): keep_time(2)
     // in_cloud.height = 5;
 
     ros::Duration(0.5).sleep();
-    timer = n.createTimer(ros::Duration(0.2), &ObstacleReflector::pub_pointcloud_Nhz, this);
+    timer = n.createTimer(ros::Duration(0.2), &ObstacleReflector::pubPointcloudNhz, this);
 }
 
 
-void ObstacleReflector::erase_signal_callback(const std_msgs::Int32 &in_msg)
+void ObstacleReflector::eraseSignalCallback(const std_msgs::Int32 &in_msg)
 {
     if(in_msg.data)
     {
-        in_scan.clear();
-        in_scan.header.stamp = ros::Time::now();
-        in_scan.header.frame_id = "velodyne";
-        pub_pointcloud.publish(in_scan);
+        sensor_msgs::PointCloud2 empty_scan;
+        in_cloud.clear();
+        pcl::toROSMsg(in_cloud, empty_scan);
+        empty_scan.header.stamp = ros::Time::now();
+        empty_scan.header.frame_id = "velodyne";
+        pub_pointcloud.publish(empty_scan);
     }
-}
+};
 
 
-void ObstacleReflector::sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs)
+void ObstacleReflector::subObstaclesCallback(const swipe_obstacles::detected_obstacle_array &in_msgs)
 {
-    pcl::PointCloud<pcl::PointXYZRGB> in_cloud;
     double roll, pitch, yaw;
     double x, y;
     unsigned int count = 0;
@@ -80,6 +81,7 @@ void ObstacleReflector::sub_obstacles_callback(const swipe_obstacles::detected_o
 
     // std::cout << "sub" <<std::endl;
     in_cloud.points.resize(in_msgs.obstacles.size() * 20);
+    in_cloud.header.frame_id = "world";
 
     for (size_t i=0; i < in_msgs.obstacles.size(); i++)
     {
@@ -98,16 +100,14 @@ void ObstacleReflector::sub_obstacles_callback(const swipe_obstacles::detected_o
         }
     }
 
-    pcl::toROSMsg(in_cloud, in_scan);
-    in_scan.header.frame_id = "world";
-
-    last_sub_time = ros::Time::now();
+    // last_sub_time = ros::Time::now();
 }
 
 
-void ObstacleReflector::pub_pointcloud_Nhz(const ros::TimerEvent&)
+void ObstacleReflector::pubPointcloudNhz(const ros::TimerEvent&)
 {
-    sensor_msgs::PointCloud2 out_scan;
+    sensor_msgs::PointCloud2 out_scan, in_scan;
+
     // out_scan.header.frame_id = "world";
 
     if(!in_cloud.empty())
@@ -117,7 +117,7 @@ void ObstacleReflector::pub_pointcloud_Nhz(const ros::TimerEvent&)
         }catch (tf::TransformException &ex)  {
             ROS_ERROR("%s", ex.what());
         }
-
+        pcl::toROSMsg(in_cloud, in_scan);
         pcl_ros::transformPointCloud("velodyne", in_scan, out_scan, tf_listener);
         std::cout << "points published" << std::endl;
         out_scan.header.frame_id = "velodyne";

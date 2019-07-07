@@ -59,6 +59,7 @@ add_message_files(
 	FILES
     detected_obstacle.msg
     detected_obstacle_array.msg
+    closest_obstacle.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -10,6 +10,7 @@ class YpTeleopStudy
     private :
         ros::Subscriber sub_joy;
         ros::Subscriber sub_twist;
+        ros::Subscriber sub_closest_obstacle;
         ros::Publisher pub_yp_cmd;
 
         sound_play::SoundClient sc;
@@ -17,108 +18,104 @@ class YpTeleopStudy
 
         geometry_msgs::Twist in_twist;
         geometry_msgs::Twist twist;
-        float deceleration;
-        float acceleration;
         float accel;
         float brake;
         float max_twist_speed;
-        float current_twist_speed;
 		bool rosbag_flag ;
-        // ros::Time accel_start;
-        // ros::Time brake_start;
         ros::Time last_joy_time;
-        // mode=1: autoware mode=0:joystick
-		bool mode;
+        bool mode;
+		bool scenario_runner;
+        float pub_rate;
+        uint32_t closest_obstacle_id;
 
 	public :
         YpTeleopStudy();
 
     private :
-        void joy_callback(const sensor_msgs::Joy &in_msg);
-        void twist_callback(const geometry_msgs::TwistStamped &in_msg);
-        void timer_callback(const ros::TimerEvent&);
+        void joyCallback(const sensor_msgs::Joy &in_msg);
+        void twistCallback(const geometry_msgs::TwistStamped &in_msg);
+        void timerCallback(const ros::TimerEvent&);
+        void closestObstacleCallback(const swipe_obstacles::closest_obstacle &in_msg);
 };
 
 
-YpTeleopStudy::YpTeleopStudy(): mode(false), rosbag_flag(0), acceleration(0.0), deceleration(0.0), max_twist_speed(1.0)
+YpTeleopStudy::YpTeleopStudy(): mode(false), scenario_runner(false), rosbag_flag(0), pub_rate(0.1), max_twist_speed(1.0)
 {
 	ros::NodeHandle n;
-    // twist = {};
-    sub_joy = n.subscribe("/joy", 1, &YpTeleopStudy::joy_callback, this);
-    sub_twist = n.subscribe("/twist_cmd", 1, &YpTeleopStudy::twist_callback, this);
+
+    sub_joy = n.subscribe("/joy", 1, &YpTeleopStudy::joyCallback, this);
+    sub_twist = n.subscribe("/twist_cmd", 1, &YpTeleopStudy::twistCallback, this);
+    sub_closest_obstacle = n.subscribe("/closest_waypoint", 5, &YpTeleopStudy::closestObstacleCallback, this);
+    sub_waypoint_callback = n.subscribe("/closest_waypoint", 5, &YpTeleopStudy::waypointCallback, this);
+
     pub_yp_cmd = n.advertise<geometry_msgs::Twist>("/ypspur_ros/cmd_vel", 1);
-    last_joy_time = ros::Time::now();
+
     ros::Duration(1).sleep();
-    timer = n.createTimer(ros::Duration(0.1), &YpTeleopStudy::timer_callback, this);
+    timer = n.createTimer(ros::Duration(pub_rate), &YpTeleopStudy::timerCallback, this);
 }
 
 
-void YpTeleopStudy::timer_callback(const ros::TimerEvent&)
+void YpTeleopStudy::timerCallback(const ros::TimerEvent&)
 {
-    if(mode)
+    float speed_change;
+    float current_twist_speed, aim_twist_speed;
+
+    current_twist_speed = twist.linear.x;
+
+    if(!accel && !brake)
     {
-        current_twist_speed = twist.linear.x;
-
-        if(current_twist_speed < max_twist_speed){
-
-            acceleration += accel * (max_twist_speed - current_twist_speed) * 0.025;
-        }
-        std::cout << "acceleration=" << acceleration << std::endl;
-
-        if(current_twist_speed > 0.0){
-
-            deceleration += brake * (max_twist_speed + 0.1 - current_twist_speed) * 0.05;
-        }
-        std::cout << "deceleration=" << deceleration << std::endl;
-
-        if(current_twist_speed < deceleration){
-
-            twist.linear.x = 0.0;
-        }
-        else{
-
-            twist.linear.x = in_twist.linear.x + acceleration - deceleration;
-        }
-
-        if(twist.linear.x - current_twist_speed > 0.025 && current_twist_speed < max_twist_speed){
-
-            twist.linear.x = current_twist_speed + (max_twist_speed - current_twist_speed) * 0.025;
-        }
-
-        if(current_twist_speed - twist.linear.x > 0.05 && current_twist_speed > 0.0)
-        {
-            twist.linear.x = current_twist_speed - (max_twist_speed + 0.1 - current_twist_speed) * 0.05;
-            if(twist.linear.x < 0.0)
-            {
-                twist.linear.x = 0.0;
-            }
-        }
+        aim_twist_speed = in_twist.linear.x;
     }
     else
     {
-        twist.linear.x = in_twist.linear.x;
+        aim_twist_speed = current_twist_speed
+                        + accel * 0.25 * pub_rate * ((max_twist_speed - current_twist_speed) / max_twist_speed)
+                        - brake * 0.5 * pub_rate * (0.1 + (max_twist_speed - current_twist_speed) / max_twist_speed);
     }
 
+    // automode
+    if(mode)
+    {
+        speed_change = aim_twist_speed - current_twist_speed;
+        if(speed_change > 0.25 * pub_rate)
+        {
+            aim_twist_speed = current_twist_speed + 0.25 * pub_rate * ((max_twist_speed - current_twist_speed) / max_twist_speed);
+        }
+        if(speed_change < -0.5 * pub_rate)
+        {
+            aim_twist_speed = current_twist_speed - 0.5 * pub_rate * (0.1 + (max_twist_speed - current_twist_speed) / max_twist_speed);
+        }
+    }
+
+    aim_twist_speed = (aim_twist_speed < max_twist_speed) ? aim_twist_speed : max_twist_speed;
+    aim_twist_speed = (aim_twist_speed > 0.0) ? aim_twist_speed : 0.0;
+
+    twist.linear.x = aim_twist_speed;
     twist.angular.z = in_twist.angular.z;
-    std::cout << "twist=" << twist.linear.x << std::endl;
+    // std::cout << "aim_twist=" << aim_twist_speed << std::endl;
+    // std::cout << "current_twist=" << current_twist_speed << std::endl;
+    // std::cout << "twist=" << twist.linear.x << std::endl;
     pub_yp_cmd.publish(twist);
 }
 
 
-void YpTeleopStudy::twist_callback(const geometry_msgs::TwistStamped &in_msg)
+void YpTeleopStudy::closestObstacleCallback(const swipe_obstacles::closest_obstacle &in_msg)
 {
-    // max_twist_speed = ((max_twist_speed < in_msg.twist.linear.x) ? in_msg.twist.linear.x : max_twist_speed);
+    closest_obstacle_id = in_msg.id;
+}
 
+
+void YpTeleopStudy::twistCallback(const geometry_msgs::TwistStamped &in_msg)
+{
     if(mode)
     {
         in_twist.linear.x = in_msg.twist.linear.x;
         in_twist.angular.z = in_msg.twist.angular.z;
-        // current_twist_speed = twist.linear.x;
     }
 }
 
 
-void YpTeleopStudy::joy_callback(const sensor_msgs::Joy &in_msg)
+void YpTeleopStudy::joyCallback(const sensor_msgs::Joy &in_msg)
 {
     int dash = 0;
     float base_speed = 0.5;
@@ -127,7 +124,6 @@ void YpTeleopStudy::joy_callback(const sensor_msgs::Joy &in_msg)
     if(in_msg.axes[5] == 1.0)
     {
         accel = 0.0;
-        acceleration = 0.0;
     }else
     {
         accel = (1.0 - in_msg.axes[5]) * 0.5;
@@ -136,7 +132,6 @@ void YpTeleopStudy::joy_callback(const sensor_msgs::Joy &in_msg)
     if(in_msg.axes[2] == 1.0)
     {
         brake = 0.0;
-        deceleration = 0.0;
     }else
     {
         brake = (1.0 - in_msg.axes[2]) * 0.5;
@@ -145,7 +140,27 @@ void YpTeleopStudy::joy_callback(const sensor_msgs::Joy &in_msg)
     //A button [0]
     if (in_msg.buttons[0])
     {
-    	sc.playWave("/usr/share/sounds/robot_sounds/jump.wav");
+        if(scenario_runner)
+        {
+            sc.playWave("/usr/share/sounds/robot_sounds/mini_jump.wav");
+        }
+        else
+        {
+            sc.playWave("/usr/share/sounds/robot_sounds/jump.wav");
+        }
+    }
+    // B button [1]
+    if (in_msg.buttons[1])
+    {
+        if(scenario_runner)
+        {
+            scenario_runner = false;
+        }
+        else if(!scenario_runner)
+        {
+            scenario_runner = true;
+            ROS_INFO("scenario mode\n");
+        }
     }
     // X button [2]
     if (in_msg.buttons[2])
@@ -162,6 +177,7 @@ void YpTeleopStudy::joy_callback(const sensor_msgs::Joy &in_msg)
             ROS_INFO("autonomous mode\n");
         }
     }
+
     // Y button [3]
     if (in_msg.buttons[3])
     {
@@ -197,9 +213,10 @@ void YpTeleopStudy::joy_callback(const sensor_msgs::Joy &in_msg)
             rosbag_flag = false;
         }
     }
-    // B button [1]
     // BACK [6]
     // Logicoool [8]
+    // left joy click [9]
+    // right joy click [10]
 
     if(!mode)
     {
@@ -216,7 +233,7 @@ int main(int argc, char **argv) {
 
     ros::init(argc, argv, "yp_teleop_study0");
 	ros::NodeHandle n;
-	YpTeleopStudy ypteleop;
+	YpTeleopStudy yp_teleop;
 
     ros::spin();
     return (0);
