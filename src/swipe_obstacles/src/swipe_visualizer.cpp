@@ -30,7 +30,7 @@ class ObstacleVisualizer
 
 	private:
         void sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs);
-		// void erase_signal_callback(const std_msgs::Int32 &in_msg);
+		void erase_signal_callback(const std_msgs::Int32 &in_msg);
         void shift_feedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
         void make_cube(const swipe_obstacles::detected_obstacle &in_msg);
         int id_vector_manager(const uint32_t &id);
@@ -43,20 +43,20 @@ ObstacleVisualizer::ObstacleVisualizer()
 	ros::NodeHandle n;
 
     sub_obj = n.subscribe("/managed_obstacles", 5, &ObstacleVisualizer::sub_obstacles_callback, this);
-	// sub_erase_signal = n.subscribe("/swipe_erase_signal", 5, &ObstacleVisualizer::erase_signal_callback, this);
+	sub_erase_signal = n.subscribe("/swipe_erase_signal", 5, &ObstacleVisualizer::erase_signal_callback, this);
 	pub_shift = n.advertise<swipe_obstacles::detected_obstacle>("/shifted_info", 5);
 }
 
 
-// void ObstacleVisualizer::erase_signal_callback(const std_msgs::Int32 &in_msg)
-// {
-//     if(in_msg.data)
-//     {
-//         ROS_INFO_STREAM(in_msg.data);
-//         server->clear();
-//         server->applyChanges();
-//     }
-// }
+void ObstacleVisualizer::erase_signal_callback(const std_msgs::Int32 &in_msg)
+{
+    if(in_msg.data)
+    {
+        ROS_INFO_STREAM(in_msg.data);
+        server->clear();
+        server->applyChanges();
+    }
+}
 
 
 void ObstacleVisualizer::sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs)
@@ -137,7 +137,7 @@ visualization_msgs::InteractiveMarkerControl& ObstacleVisualizer::make_box_contr
 	marker.color.g = 1;
 	marker.color.b = 0;
 	marker.color.a = 0.5;
-    marker.lifetime = ros::Duration(2.0);
+    // marker.lifetime = ros::Duration(2.0);
 
 	control.markers.push_back(marker);
 	msg.controls.push_back(control);

@@ -19,6 +19,7 @@ class SwipeDetectorFixed
 	private:
         // pub sub
         ros::Publisher pub_obstacle_pose;
+        ros::Publisher pub_erase_signal;
 // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         // ros::Publisher test_obstacle_pose;
         // ros::Publisher test_transform_origin;
@@ -32,7 +33,8 @@ class SwipeDetectorFixed
 
         // management information
         ros::Timer pub_timer;
-        // int keep_time;
+        int keep_time;
+        ros::Time last_pub_time;
         // const static int appear_dist = 200;
         tf::TransformListener tf_listener;
 
@@ -61,7 +63,7 @@ class SwipeDetectorFixed
 SwipeDetectorFixed::SwipeDetectorFixed(const std::string &file_name): round(1)
 {
     ros::NodeHandle n;
-    // pub_erase_sinal = n.advertise<std_msgs::Int32>("/swipe_erase_signal", 5);
+    pub_erase_sinal = n.advertise<std_msgs::Int32>("/swipe_erase_signal", 5);
     pub_obstacle_pose = n.advertise<swipe_obstacles::detected_obstacle_array>("/detected_obstacles", 5);
 // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // test_transform_origin = n.advertise<geometry_msgs::PoseStamped>("/test_transform_origin", 5);
@@ -157,7 +159,7 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
     geometry_msgs::Pose pose_from_velodyne;
     float distance;
     int flag=0;
-    // std_msgs::Int32 erase_signal;
+    std_msgs::Int32 erase_signal;
     // erase_signal.data = 0;
 
     for(auto i=obstacle_vec.begin(); i!=obstacle_vec.end(); i++)
@@ -213,16 +215,16 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
     if(flag)
     {
         pub_obstacle_pose.publish(out_array);
-        // last_pub_time = ros::Time::now();
+        last_pub_time = ros::Time::now();
     }
-    // else
-    // {
-    //     if(ros::Time::now() - last_pub_time > ros::Duration(keep_time))
-    //     {
-    //         erase_signal.data = 1;
-    //         pub_erase_sinal.publish(erase_signal);
-    //     }
-    // }
+    else
+    {
+        if(ros::Time::now() - last_pub_time > ros::Duration(keep_time))
+        {
+            erase_signal.data = 1;
+            pub_erase_sinal.publish(erase_signal);
+        }
+    }
 }
 
 

@@ -1,2 +1,2 @@
-swipe_obstacles:teleop_study:ypspur_ros
--DCATKIN_DEVEL_PREFIX=/home/kuriatsu/Program/Ros/master_study_ws/devel -DCMAKE_INSTALL_PREFIX=/home/kuriatsu/Program/Ros/master_study_ws/install -G Unix Makefiles
+swipe_obstacles:teleop_study
+-DCATKIN_DEVEL_PREFIX=/home/kuriatsu/Programs/master_study/devel -DCMAKE_INSTALL_PREFIX=/home/kuriatsu/Programs/master_study/install -G Unix Makefiles
