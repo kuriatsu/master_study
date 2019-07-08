@@ -78,7 +78,7 @@ namespace message_traits
 
 
 // BOOLTRAITS {'IsFixedSize': False, 'IsMessage': True, 'HasHeader': True}
-// {'sensor_msgs': ['/opt/ros/kinetic/share/sensor_msgs/cmake/../msg'], 'pcl_msgs': ['/opt/ros/kinetic/share/pcl_msgs/cmake/../msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg'], 'swipe_obstacles': ['/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg'], 'jsk_footstep_msgs': ['/opt/ros/kinetic/share/jsk_footstep_msgs/cmake/../msg'], 'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg'], 'visualization_msgs': ['/opt/ros/kinetic/share/visualization_msgs/cmake/../msg'], 'jsk_recognition_msgs': ['/opt/ros/kinetic/share/jsk_recognition_msgs/cmake/../msg'], 'actionlib_msgs': ['/opt/ros/kinetic/share/actionlib_msgs/cmake/../msg'], 'autoware_msgs': ['/home/kuriatsu/Autoware/ros/src/msgs/autoware_msgs/msg']}
+// {'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg'], 'swipe_obstacles': ['/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg']}
 
 // !!!!!!!!!!! ['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_parsed_fields', 'constants', 'fields', 'full_name', 'has_header', 'header_present', 'names', 'package', 'parsed_fields', 'short_name', 'text', 'types']
 
@@ -121,12 +121,12 @@ struct MD5Sum< ::swipe_obstacles::detected_obstacle_array_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "e900cf0096e79af6967f71da5a89cfd0";
+    return "491a0dff1749fdf46f11f15d92874d1b";
   }
 
   static const char* value(const ::swipe_obstacles::detected_obstacle_array_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0xe900cf0096e79af6ULL;
-  static const uint64_t static_value2 = 0x967f71da5a89cfd0ULL;
+  static const uint64_t static_value1 = 0x491a0dff1749fdf4ULL;
+  static const uint64_t static_value2 = 0x6f11f15d92874d1bULL;
 };
 
 template<class ContainerAllocator>
@@ -178,7 +178,7 @@ geometry_msgs/Pose pose\n\
 \n\
 float32 shift_x\n\
 float32 shift_y\n\
-uint32 visible\n\
+uint32 round\n\
 time detected_time\n\
 \n\
 ================================================================================\n\

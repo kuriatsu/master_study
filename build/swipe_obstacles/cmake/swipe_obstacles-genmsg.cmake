@@ -1,8 +1,8 @@
 # generated from genmsg/cmake/pkg-genmsg.cmake.em
 
-message(STATUS "swipe_obstacles: 2 messages, 0 services")
+message(STATUS "swipe_obstacles: 3 messages, 0 services")
 
-set(MSG_I_FLAGS "-Iswipe_obstacles:/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg;-Iautoware_msgs:/home/kuriatsu/Autoware/ros/src/msgs/autoware_msgs/msg;-Ijsk_recognition_msgs:/opt/ros/kinetic/share/jsk_recognition_msgs/cmake/../msg;-Ipcl_msgs:/opt/ros/kinetic/share/pcl_msgs/cmake/../msg;-Ivisualization_msgs:/opt/ros/kinetic/share/visualization_msgs/cmake/../msg;-Istd_msgs:/opt/ros/kinetic/share/std_msgs/cmake/../msg;-Igeometry_msgs:/opt/ros/kinetic/share/geometry_msgs/cmake/../msg;-Isensor_msgs:/opt/ros/kinetic/share/sensor_msgs/cmake/../msg;-Ijsk_footstep_msgs:/opt/ros/kinetic/share/jsk_footstep_msgs/cmake/../msg;-Iactionlib_msgs:/opt/ros/kinetic/share/actionlib_msgs/cmake/../msg")
+set(MSG_I_FLAGS "-Iswipe_obstacles:/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg;-Istd_msgs:/opt/ros/kinetic/share/std_msgs/cmake/../msg;-Igeometry_msgs:/opt/ros/kinetic/share/geometry_msgs/cmake/../msg")
 
 # Find all generators
 find_package(gencpp REQUIRED)
@@ -27,6 +27,11 @@ add_custom_target(_swipe_obstacles_generate_messages_check_deps_${_filename}
   COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "swipe_obstacles" "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg" "geometry_msgs/Quaternion:swipe_obstacles/detected_obstacle:geometry_msgs/Pose:std_msgs/Header:geometry_msgs/Point"
 )
 
+get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg" NAME_WE)
+add_custom_target(_swipe_obstacles_generate_messages_check_deps_${_filename}
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "swipe_obstacles" "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg" "std_msgs/Header"
+)
+
 #
 #  langs = gencpp;geneus;genlisp;gennodejs;genpy
 #
@@ -43,6 +48,12 @@ _generate_msg_cpp(swipe_obstacles
   "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg"
   "${MSG_I_FLAGS}"
   "/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/kinetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Point.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/swipe_obstacles
+)
+_generate_msg_cpp(swipe_obstacles
+  "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/kinetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/swipe_obstacles
 )
 
@@ -63,6 +74,8 @@ add_dependencies(swipe_obstacles_generate_messages swipe_obstacles_generate_mess
 get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg" NAME_WE)
 add_dependencies(swipe_obstacles_generate_messages_cpp _swipe_obstacles_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg" NAME_WE)
+add_dependencies(swipe_obstacles_generate_messages_cpp _swipe_obstacles_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg" NAME_WE)
 add_dependencies(swipe_obstacles_generate_messages_cpp _swipe_obstacles_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -86,6 +99,12 @@ _generate_msg_eus(swipe_obstacles
   "/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/kinetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/swipe_obstacles
 )
+_generate_msg_eus(swipe_obstacles
+  "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/kinetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/swipe_obstacles
+)
 
 ### Generating Services
 
@@ -104,6 +123,8 @@ add_dependencies(swipe_obstacles_generate_messages swipe_obstacles_generate_mess
 get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg" NAME_WE)
 add_dependencies(swipe_obstacles_generate_messages_eus _swipe_obstacles_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg" NAME_WE)
+add_dependencies(swipe_obstacles_generate_messages_eus _swipe_obstacles_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg" NAME_WE)
 add_dependencies(swipe_obstacles_generate_messages_eus _swipe_obstacles_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -127,6 +148,12 @@ _generate_msg_lisp(swipe_obstacles
   "/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/kinetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/swipe_obstacles
 )
+_generate_msg_lisp(swipe_obstacles
+  "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/kinetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/swipe_obstacles
+)
 
 ### Generating Services
 
@@ -145,6 +172,8 @@ add_dependencies(swipe_obstacles_generate_messages swipe_obstacles_generate_mess
 get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg" NAME_WE)
 add_dependencies(swipe_obstacles_generate_messages_lisp _swipe_obstacles_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg" NAME_WE)
+add_dependencies(swipe_obstacles_generate_messages_lisp _swipe_obstacles_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg" NAME_WE)
 add_dependencies(swipe_obstacles_generate_messages_lisp _swipe_obstacles_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -168,6 +197,12 @@ _generate_msg_nodejs(swipe_obstacles
   "/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/kinetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/swipe_obstacles
 )
+_generate_msg_nodejs(swipe_obstacles
+  "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/kinetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/swipe_obstacles
+)
 
 ### Generating Services
 
@@ -186,6 +221,8 @@ add_dependencies(swipe_obstacles_generate_messages swipe_obstacles_generate_mess
 get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg" NAME_WE)
 add_dependencies(swipe_obstacles_generate_messages_nodejs _swipe_obstacles_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg" NAME_WE)
+add_dependencies(swipe_obstacles_generate_messages_nodejs _swipe_obstacles_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg" NAME_WE)
 add_dependencies(swipe_obstacles_generate_messages_nodejs _swipe_obstacles_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -209,6 +246,12 @@ _generate_msg_py(swipe_obstacles
   "/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/kinetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/kinetic/share/geometry_msgs/cmake/../msg/Point.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/swipe_obstacles
 )
+_generate_msg_py(swipe_obstacles
+  "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/kinetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/swipe_obstacles
+)
 
 ### Generating Services
 
@@ -228,6 +271,8 @@ get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src
 add_dependencies(swipe_obstacles_generate_messages_py _swipe_obstacles_generate_messages_check_deps_${_filename})
 get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg" NAME_WE)
 add_dependencies(swipe_obstacles_generate_messages_py _swipe_obstacles_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg" NAME_WE)
+add_dependencies(swipe_obstacles_generate_messages_py _swipe_obstacles_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(swipe_obstacles_genpy)
@@ -245,20 +290,11 @@ if(gencpp_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/sw
     DESTINATION ${gencpp_INSTALL_DIR}
   )
 endif()
-if(TARGET autoware_msgs_generate_messages_cpp)
-  add_dependencies(swipe_obstacles_generate_messages_cpp autoware_msgs_generate_messages_cpp)
-endif()
-if(TARGET jsk_recognition_msgs_generate_messages_cpp)
-  add_dependencies(swipe_obstacles_generate_messages_cpp jsk_recognition_msgs_generate_messages_cpp)
-endif()
-if(TARGET pcl_msgs_generate_messages_cpp)
-  add_dependencies(swipe_obstacles_generate_messages_cpp pcl_msgs_generate_messages_cpp)
-endif()
-if(TARGET visualization_msgs_generate_messages_cpp)
-  add_dependencies(swipe_obstacles_generate_messages_cpp visualization_msgs_generate_messages_cpp)
-endif()
 if(TARGET std_msgs_generate_messages_cpp)
   add_dependencies(swipe_obstacles_generate_messages_cpp std_msgs_generate_messages_cpp)
+endif()
+if(TARGET geometry_msgs_generate_messages_cpp)
+  add_dependencies(swipe_obstacles_generate_messages_cpp geometry_msgs_generate_messages_cpp)
 endif()
 
 if(geneus_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/swipe_obstacles)
@@ -268,20 +304,11 @@ if(geneus_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/sw
     DESTINATION ${geneus_INSTALL_DIR}
   )
 endif()
-if(TARGET autoware_msgs_generate_messages_eus)
-  add_dependencies(swipe_obstacles_generate_messages_eus autoware_msgs_generate_messages_eus)
-endif()
-if(TARGET jsk_recognition_msgs_generate_messages_eus)
-  add_dependencies(swipe_obstacles_generate_messages_eus jsk_recognition_msgs_generate_messages_eus)
-endif()
-if(TARGET pcl_msgs_generate_messages_eus)
-  add_dependencies(swipe_obstacles_generate_messages_eus pcl_msgs_generate_messages_eus)
-endif()
-if(TARGET visualization_msgs_generate_messages_eus)
-  add_dependencies(swipe_obstacles_generate_messages_eus visualization_msgs_generate_messages_eus)
-endif()
 if(TARGET std_msgs_generate_messages_eus)
   add_dependencies(swipe_obstacles_generate_messages_eus std_msgs_generate_messages_eus)
+endif()
+if(TARGET geometry_msgs_generate_messages_eus)
+  add_dependencies(swipe_obstacles_generate_messages_eus geometry_msgs_generate_messages_eus)
 endif()
 
 if(genlisp_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/swipe_obstacles)
@@ -291,20 +318,11 @@ if(genlisp_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/
     DESTINATION ${genlisp_INSTALL_DIR}
   )
 endif()
-if(TARGET autoware_msgs_generate_messages_lisp)
-  add_dependencies(swipe_obstacles_generate_messages_lisp autoware_msgs_generate_messages_lisp)
-endif()
-if(TARGET jsk_recognition_msgs_generate_messages_lisp)
-  add_dependencies(swipe_obstacles_generate_messages_lisp jsk_recognition_msgs_generate_messages_lisp)
-endif()
-if(TARGET pcl_msgs_generate_messages_lisp)
-  add_dependencies(swipe_obstacles_generate_messages_lisp pcl_msgs_generate_messages_lisp)
-endif()
-if(TARGET visualization_msgs_generate_messages_lisp)
-  add_dependencies(swipe_obstacles_generate_messages_lisp visualization_msgs_generate_messages_lisp)
-endif()
 if(TARGET std_msgs_generate_messages_lisp)
   add_dependencies(swipe_obstacles_generate_messages_lisp std_msgs_generate_messages_lisp)
+endif()
+if(TARGET geometry_msgs_generate_messages_lisp)
+  add_dependencies(swipe_obstacles_generate_messages_lisp geometry_msgs_generate_messages_lisp)
 endif()
 
 if(gennodejs_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/swipe_obstacles)
@@ -314,20 +332,11 @@ if(gennodejs_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_D
     DESTINATION ${gennodejs_INSTALL_DIR}
   )
 endif()
-if(TARGET autoware_msgs_generate_messages_nodejs)
-  add_dependencies(swipe_obstacles_generate_messages_nodejs autoware_msgs_generate_messages_nodejs)
-endif()
-if(TARGET jsk_recognition_msgs_generate_messages_nodejs)
-  add_dependencies(swipe_obstacles_generate_messages_nodejs jsk_recognition_msgs_generate_messages_nodejs)
-endif()
-if(TARGET pcl_msgs_generate_messages_nodejs)
-  add_dependencies(swipe_obstacles_generate_messages_nodejs pcl_msgs_generate_messages_nodejs)
-endif()
-if(TARGET visualization_msgs_generate_messages_nodejs)
-  add_dependencies(swipe_obstacles_generate_messages_nodejs visualization_msgs_generate_messages_nodejs)
-endif()
 if(TARGET std_msgs_generate_messages_nodejs)
   add_dependencies(swipe_obstacles_generate_messages_nodejs std_msgs_generate_messages_nodejs)
+endif()
+if(TARGET geometry_msgs_generate_messages_nodejs)
+  add_dependencies(swipe_obstacles_generate_messages_nodejs geometry_msgs_generate_messages_nodejs)
 endif()
 
 if(genpy_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/swipe_obstacles)
@@ -338,18 +347,9 @@ if(genpy_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/swip
     DESTINATION ${genpy_INSTALL_DIR}
   )
 endif()
-if(TARGET autoware_msgs_generate_messages_py)
-  add_dependencies(swipe_obstacles_generate_messages_py autoware_msgs_generate_messages_py)
-endif()
-if(TARGET jsk_recognition_msgs_generate_messages_py)
-  add_dependencies(swipe_obstacles_generate_messages_py jsk_recognition_msgs_generate_messages_py)
-endif()
-if(TARGET pcl_msgs_generate_messages_py)
-  add_dependencies(swipe_obstacles_generate_messages_py pcl_msgs_generate_messages_py)
-endif()
-if(TARGET visualization_msgs_generate_messages_py)
-  add_dependencies(swipe_obstacles_generate_messages_py visualization_msgs_generate_messages_py)
-endif()
 if(TARGET std_msgs_generate_messages_py)
   add_dependencies(swipe_obstacles_generate_messages_py std_msgs_generate_messages_py)
+endif()
+if(TARGET geometry_msgs_generate_messages_py)
+  add_dependencies(swipe_obstacles_generate_messages_py geometry_msgs_generate_messages_py)
 endif()

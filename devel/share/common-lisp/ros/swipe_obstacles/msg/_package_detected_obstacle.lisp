@@ -15,8 +15,8 @@
           SHIFT_X
           SHIFT_Y-VAL
           SHIFT_Y
-          VISIBLE-VAL
-          VISIBLE
+          ROUND-VAL
+          ROUND
           DETECTED_TIME-VAL
           DETECTED_TIME
 ))

@@ -506,6 +506,9 @@ std_srvs_DIR:PATH=/opt/ros/kinetic/share/std_srvs/cmake
 //Value Computed by CMake
 swipe_obstacles_BINARY_DIR:STATIC=/home/kuriatsu/Program/Ros/master_study_ws/build/swipe_obstacles
 
+//The directory containing a CMake configuration file for swipe_obstacles.
+swipe_obstacles_DIR:PATH=/home/kuriatsu/Program/Ros/master_study_ws/devel/share/swipe_obstacles/cmake
+
 //Value Computed by CMake
 swipe_obstacles_SOURCE_DIR:STATIC=/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles
 

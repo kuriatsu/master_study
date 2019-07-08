@@ -79,7 +79,7 @@ add_message_files(
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
     DEPENDENCIES
-   	autoware_msgs    jsk_recognition_msgs    pcl_msgs    visualization_msgs		std_msgs
+   	std_msgs geometry_msgs
 
 )
 
@@ -114,9 +114,9 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-   LIBRARIES swipe_obstacles
+#  LIBRARIES swipe_obstacles
    CATKIN_DEPENDS std_msgs autoware_msgs interactive_markers jsk_recognition_msgs pcl_conversions pcl_msgs pcl_ros roscpp tf visualization_msgs message_runtime
-   DEPENDS system_lib
+ # DEPENDS system_lib
 )
 
 ###########

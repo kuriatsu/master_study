@@ -11,7 +11,7 @@ import genpy
 import std_msgs.msg
 
 class detected_obstacle_array(genpy.Message):
-  _md5sum = "e900cf0096e79af6967f71da5a89cfd0"
+  _md5sum = "491a0dff1749fdf46f11f15d92874d1b"
   _type = "swipe_obstacles/detected_obstacle_array"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
@@ -47,7 +47,7 @@ geometry_msgs/Pose pose
 
 float32 shift_x
 float32 shift_y
-uint32 visible
+uint32 round
 time detected_time
 
 ================================================================================
@@ -151,7 +151,7 @@ float64 w
         _x = _v5
         buff.write(_get_struct_4d().pack(_x.x, _x.y, _x.z, _x.w))
         _x = val1
-        buff.write(_get_struct_2fI().pack(_x.shift_x, _x.shift_y, _x.visible))
+        buff.write(_get_struct_2fI().pack(_x.shift_x, _x.shift_y, _x.round))
         _v6 = val1.detected_time
         _x = _v6
         buff.write(_get_struct_2I().pack(_x.secs, _x.nsecs))
@@ -236,7 +236,7 @@ float64 w
         _x = val1
         start = end
         end += 12
-        (_x.shift_x, _x.shift_y, _x.visible,) = _get_struct_2fI().unpack(str[start:end])
+        (_x.shift_x, _x.shift_y, _x.round,) = _get_struct_2fI().unpack(str[start:end])
         _v12 = val1.detected_time
         _x = _v12
         start = end
@@ -294,7 +294,7 @@ float64 w
         _x = _v17
         buff.write(_get_struct_4d().pack(_x.x, _x.y, _x.z, _x.w))
         _x = val1
-        buff.write(_get_struct_2fI().pack(_x.shift_x, _x.shift_y, _x.visible))
+        buff.write(_get_struct_2fI().pack(_x.shift_x, _x.shift_y, _x.round))
         _v18 = val1.detected_time
         _x = _v18
         buff.write(_get_struct_2I().pack(_x.secs, _x.nsecs))
@@ -380,7 +380,7 @@ float64 w
         _x = val1
         start = end
         end += 12
-        (_x.shift_x, _x.shift_y, _x.visible,) = _get_struct_2fI().unpack(str[start:end])
+        (_x.shift_x, _x.shift_y, _x.round,) = _get_struct_2fI().unpack(str[start:end])
         _v24 = val1.detected_time
         _x = _v24
         start = end

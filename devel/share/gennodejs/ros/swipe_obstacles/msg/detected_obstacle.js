@@ -28,7 +28,7 @@ class detected_obstacle {
       this.pose = null;
       this.shift_x = null;
       this.shift_y = null;
-      this.visible = null;
+      this.round = null;
       this.detected_time = null;
     }
     else {
@@ -80,11 +80,11 @@ class detected_obstacle {
       else {
         this.shift_y = 0.0;
       }
-      if (initObj.hasOwnProperty('visible')) {
-        this.visible = initObj.visible
+      if (initObj.hasOwnProperty('round')) {
+        this.round = initObj.round
       }
       else {
-        this.visible = 0;
+        this.round = 0;
       }
       if (initObj.hasOwnProperty('detected_time')) {
         this.detected_time = initObj.detected_time
@@ -113,8 +113,8 @@ class detected_obstacle {
     bufferOffset = _serializer.float32(obj.shift_x, buffer, bufferOffset);
     // Serialize message field [shift_y]
     bufferOffset = _serializer.float32(obj.shift_y, buffer, bufferOffset);
-    // Serialize message field [visible]
-    bufferOffset = _serializer.uint32(obj.visible, buffer, bufferOffset);
+    // Serialize message field [round]
+    bufferOffset = _serializer.uint32(obj.round, buffer, bufferOffset);
     // Serialize message field [detected_time]
     bufferOffset = _serializer.time(obj.detected_time, buffer, bufferOffset);
     return bufferOffset;
@@ -140,8 +140,8 @@ class detected_obstacle {
     data.shift_x = _deserializer.float32(buffer, bufferOffset);
     // Deserialize message field [shift_y]
     data.shift_y = _deserializer.float32(buffer, bufferOffset);
-    // Deserialize message field [visible]
-    data.visible = _deserializer.uint32(buffer, bufferOffset);
+    // Deserialize message field [round]
+    data.round = _deserializer.uint32(buffer, bufferOffset);
     // Deserialize message field [detected_time]
     data.detected_time = _deserializer.time(buffer, bufferOffset);
     return data;
@@ -161,7 +161,7 @@ class detected_obstacle {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '41baf25da7882eba333abb4d93085641';
+    return '9978e5bb58ee01f8e45fc2d8376b759a';
   }
 
   static messageDefinition() {
@@ -177,7 +177,7 @@ class detected_obstacle {
     
     float32 shift_x
     float32 shift_y
-    uint32 visible
+    uint32 round
     time detected_time
     
     ================================================================================
@@ -285,11 +285,11 @@ class detected_obstacle {
       resolved.shift_y = 0.0
     }
 
-    if (msg.visible !== undefined) {
-      resolved.visible = msg.visible;
+    if (msg.round !== undefined) {
+      resolved.round = msg.round;
     }
     else {
-      resolved.visible = 0
+      resolved.round = 0
     }
 
     if (msg.detected_time !== undefined) {

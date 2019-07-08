@@ -18,7 +18,7 @@
 
 (defclass swipe_obstacles::detected_obstacle
   :super ros::object
-  :slots (_header _id _managed_id _label _score _pose _shift_x _shift_y _visible _detected_time ))
+  :slots (_header _id _managed_id _label _score _pose _shift_x _shift_y _round _detected_time ))
 
 (defmethod swipe_obstacles::detected_obstacle
   (:init
@@ -31,7 +31,7 @@
     ((:pose __pose) (instance geometry_msgs::Pose :init))
     ((:shift_x __shift_x) 0.0)
     ((:shift_y __shift_y) 0.0)
-    ((:visible __visible) 0)
+    ((:round __round) 0)
     ((:detected_time __detected_time) (instance ros::time :init))
     )
    (send-super :init)
@@ -43,7 +43,7 @@
    (setq _pose __pose)
    (setq _shift_x (float __shift_x))
    (setq _shift_y (float __shift_y))
-   (setq _visible (round __visible))
+   (setq _round (round __round))
    (setq _detected_time __detected_time)
    self)
   (:header
@@ -78,9 +78,9 @@
   (:shift_y
    (&optional __shift_y)
    (if __shift_y (setq _shift_y __shift_y)) _shift_y)
-  (:visible
-   (&optional __visible)
-   (if __visible (setq _visible __visible)) _visible)
+  (:round
+   (&optional __round)
+   (if __round (setq _round __round)) _round)
   (:detected_time
    (&optional __detected_time)
    (if __detected_time (setq _detected_time __detected_time)) _detected_time)
@@ -103,7 +103,7 @@
     4
     ;; float32 _shift_y
     4
-    ;; uint32 _visible
+    ;; uint32 _round
     4
     ;; time _detected_time
     8
@@ -128,8 +128,8 @@
        (sys::poke _shift_x (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
      ;; float32 _shift_y
        (sys::poke _shift_y (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
-     ;; uint32 _visible
-       (write-long _visible s)
+     ;; uint32 _round
+       (write-long _round s)
      ;; time _detected_time
        (write-long (send _detected_time :sec) s) (write-long (send _detected_time :nsec) s)
      ;;
@@ -152,15 +152,15 @@
      (setq _shift_x (sys::peek buf ptr- :float)) (incf ptr- 4)
    ;; float32 _shift_y
      (setq _shift_y (sys::peek buf ptr- :float)) (incf ptr- 4)
-   ;; uint32 _visible
-     (setq _visible (sys::peek buf ptr- :integer)) (incf ptr- 4)
+   ;; uint32 _round
+     (setq _round (sys::peek buf ptr- :integer)) (incf ptr- 4)
    ;; time _detected_time
      (send _detected_time :sec (sys::peek buf ptr- :integer)) (incf ptr- 4)  (send _detected_time :nsec (sys::peek buf ptr- :integer)) (incf ptr- 4)
    ;;
    self)
   )
 
-(setf (get swipe_obstacles::detected_obstacle :md5sum-) "41baf25da7882eba333abb4d93085641")
+(setf (get swipe_obstacles::detected_obstacle :md5sum-) "9978e5bb58ee01f8e45fc2d8376b759a")
 (setf (get swipe_obstacles::detected_obstacle :datatype-) "swipe_obstacles/detected_obstacle")
 (setf (get swipe_obstacles::detected_obstacle :definition-)
       "std_msgs/Header header
@@ -173,7 +173,7 @@ geometry_msgs/Pose pose
 
 float32 shift_x
 float32 shift_y
-uint32 visible
+uint32 round
 time detected_time
 
 ================================================================================
@@ -220,6 +220,6 @@ float64 w
 
 
 
-(provide :swipe_obstacles/detected_obstacle "41baf25da7882eba333abb4d93085641")
+(provide :swipe_obstacles/detected_obstacle "9978e5bb58ee01f8e45fc2d8376b759a")
 
 

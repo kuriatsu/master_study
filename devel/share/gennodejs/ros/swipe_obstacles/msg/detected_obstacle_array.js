@@ -84,7 +84,7 @@ class detected_obstacle_array {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return 'e900cf0096e79af6967f71da5a89cfd0';
+    return '491a0dff1749fdf46f11f15d92874d1b';
   }
 
   static messageDefinition() {
@@ -123,7 +123,7 @@ class detected_obstacle_array {
     
     float32 shift_x
     float32 shift_y
-    uint32 visible
+    uint32 round
     time detected_time
     
     ================================================================================

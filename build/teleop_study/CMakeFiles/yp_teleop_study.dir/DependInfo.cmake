@@ -17,8 +17,24 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "/home/kuriatsu/Program/Ros/master_study_ws/devel/include"
+  "/home/kuriatsu/Autoware/ros/devel/include"
   "/opt/ros/kinetic/include"
   "/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp"
+  "/usr/include/eigen3"
+  "/usr/include/pcl-1.7"
+  "/usr/include/ni"
+  "/usr/include/vtk-6.2"
+  "/usr/include/jsoncpp"
+  "/usr/include/libxml2"
+  "/usr/include/x86_64-linux-gnu"
+  "/usr/include/freetype2"
+  "/usr/include/python2.7"
+  "/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent"
+  "/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include"
+  "/usr/lib/openmpi/include"
+  "/usr/lib/openmpi/include/openmpi"
+  "/usr/include/tcl"
   )
 
 # Targets to which this target links.

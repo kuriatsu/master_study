@@ -36,6 +36,7 @@ if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspeci
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/swipe_obstacles/msg" TYPE FILE FILES
     "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg"
     "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg"
+    "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg"
     )
 endif()
 

@@ -6,6 +6,24 @@
 
 #IncludeRegexTransform: 
 
+/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/closest_obstacle.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+std_msgs/Header.h
+-
+
 /home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h
 string
 -
@@ -57,6 +75,8 @@ swipe_obstacles/detected_obstacle.h
 /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle.h
 swipe_obstacles/detected_obstacle_array.h
 /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle_array.h
+swipe_obstacles/closest_obstacle.h
+/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_obstacles/closest_obstacle.h
 tf/transform_listener.h
 -
 std_msgs/Int32.h

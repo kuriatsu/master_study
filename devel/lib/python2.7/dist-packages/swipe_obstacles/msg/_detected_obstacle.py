@@ -10,7 +10,7 @@ import genpy
 import std_msgs.msg
 
 class detected_obstacle(genpy.Message):
-  _md5sum = "41baf25da7882eba333abb4d93085641"
+  _md5sum = "9978e5bb58ee01f8e45fc2d8376b759a"
   _type = "swipe_obstacles/detected_obstacle"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
@@ -23,7 +23,7 @@ geometry_msgs/Pose pose
 
 float32 shift_x
 float32 shift_y
-uint32 visible
+uint32 round
 time detected_time
 
 ================================================================================
@@ -66,7 +66,7 @@ float64 y
 float64 z
 float64 w
 """
-  __slots__ = ['header','id','managed_id','label','score','pose','shift_x','shift_y','visible','detected_time']
+  __slots__ = ['header','id','managed_id','label','score','pose','shift_x','shift_y','round','detected_time']
   _slot_types = ['std_msgs/Header','uint32','uint32','string','float32','geometry_msgs/Pose','float32','float32','uint32','time']
 
   def __init__(self, *args, **kwds):
@@ -77,7 +77,7 @@ float64 w
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       header,id,managed_id,label,score,pose,shift_x,shift_y,visible,detected_time
+       header,id,managed_id,label,score,pose,shift_x,shift_y,round,detected_time
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -102,8 +102,8 @@ float64 w
         self.shift_x = 0.
       if self.shift_y is None:
         self.shift_y = 0.
-      if self.visible is None:
-        self.visible = 0
+      if self.round is None:
+        self.round = 0
       if self.detected_time is None:
         self.detected_time = genpy.Time()
     else:
@@ -115,7 +115,7 @@ float64 w
       self.pose = geometry_msgs.msg.Pose()
       self.shift_x = 0.
       self.shift_y = 0.
-      self.visible = 0
+      self.round = 0
       self.detected_time = genpy.Time()
 
   def _get_types(self):
@@ -147,7 +147,7 @@ float64 w
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_f7d2f3I().pack(_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.visible, _x.detected_time.secs, _x.detected_time.nsecs))
+      buff.write(_get_struct_f7d2f3I().pack(_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -193,7 +193,7 @@ float64 w
       _x = self
       start = end
       end += 80
-      (_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.visible, _x.detected_time.secs, _x.detected_time.nsecs,) = _get_struct_f7d2f3I().unpack(str[start:end])
+      (_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs,) = _get_struct_f7d2f3I().unpack(str[start:end])
       self.detected_time.canon()
       return self
     except struct.error as e:
@@ -224,7 +224,7 @@ float64 w
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_f7d2f3I().pack(_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.visible, _x.detected_time.secs, _x.detected_time.nsecs))
+      buff.write(_get_struct_f7d2f3I().pack(_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -271,7 +271,7 @@ float64 w
       _x = self
       start = end
       end += 80
-      (_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.visible, _x.detected_time.secs, _x.detected_time.nsecs,) = _get_struct_f7d2f3I().unpack(str[start:end])
+      (_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs,) = _get_struct_f7d2f3I().unpack(str[start:end])
       self.detected_time.canon()
       return self
     except struct.error as e:

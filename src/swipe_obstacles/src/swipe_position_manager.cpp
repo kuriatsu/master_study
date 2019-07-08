@@ -6,14 +6,6 @@
 #include "swipe_obstacles/detected_obstacle_array.h"
 #include "std_msgs/Int32.h"
 
-// struct obstacle_info
-// {
-//     uint32_t id;
-//     uint32_t managed_id;
-//     geometry_msgs::Pose pose;
-//     float shift_x;
-//     float shift_y;
-// }
 
 class PositionManager
 {

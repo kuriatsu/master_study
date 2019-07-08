@@ -34,7 +34,7 @@ struct detected_obstacle_
     , pose()
     , shift_x(0.0)
     , shift_y(0.0)
-    , visible(0)
+    , round(0)
     , detected_time()  {
     }
   detected_obstacle_(const ContainerAllocator& _alloc)
@@ -46,7 +46,7 @@ struct detected_obstacle_
     , pose(_alloc)
     , shift_x(0.0)
     , shift_y(0.0)
-    , visible(0)
+    , round(0)
     , detected_time()  {
   (void)_alloc;
     }
@@ -77,8 +77,8 @@ struct detected_obstacle_
    typedef float _shift_y_type;
   _shift_y_type shift_y;
 
-   typedef uint32_t _visible_type;
-  _visible_type visible;
+   typedef uint32_t _round_type;
+  _round_type round;
 
    typedef ros::Time _detected_time_type;
   _detected_time_type detected_time;
@@ -118,7 +118,7 @@ namespace message_traits
 
 
 // BOOLTRAITS {'IsFixedSize': False, 'IsMessage': True, 'HasHeader': True}
-// {'sensor_msgs': ['/opt/ros/kinetic/share/sensor_msgs/cmake/../msg'], 'pcl_msgs': ['/opt/ros/kinetic/share/pcl_msgs/cmake/../msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg'], 'swipe_obstacles': ['/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg'], 'jsk_footstep_msgs': ['/opt/ros/kinetic/share/jsk_footstep_msgs/cmake/../msg'], 'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg'], 'visualization_msgs': ['/opt/ros/kinetic/share/visualization_msgs/cmake/../msg'], 'jsk_recognition_msgs': ['/opt/ros/kinetic/share/jsk_recognition_msgs/cmake/../msg'], 'actionlib_msgs': ['/opt/ros/kinetic/share/actionlib_msgs/cmake/../msg'], 'autoware_msgs': ['/home/kuriatsu/Autoware/ros/src/msgs/autoware_msgs/msg']}
+// {'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg'], 'swipe_obstacles': ['/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg']}
 
 // !!!!!!!!!!! ['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_parsed_fields', 'constants', 'fields', 'full_name', 'has_header', 'header_present', 'names', 'package', 'parsed_fields', 'short_name', 'text', 'types']
 
@@ -161,12 +161,12 @@ struct MD5Sum< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "41baf25da7882eba333abb4d93085641";
+    return "9978e5bb58ee01f8e45fc2d8376b759a";
   }
 
   static const char* value(const ::swipe_obstacles::detected_obstacle_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x41baf25da7882ebaULL;
-  static const uint64_t static_value2 = 0x333abb4d93085641ULL;
+  static const uint64_t static_value1 = 0x9978e5bb58ee01f8ULL;
+  static const uint64_t static_value2 = 0xe45fc2d8376b759aULL;
 };
 
 template<class ContainerAllocator>
@@ -195,7 +195,7 @@ geometry_msgs/Pose pose\n\
 \n\
 float32 shift_x\n\
 float32 shift_y\n\
-uint32 visible\n\
+uint32 round\n\
 time detected_time\n\
 \n\
 ================================================================================\n\
@@ -263,7 +263,7 @@ namespace serialization
       stream.next(m.pose);
       stream.next(m.shift_x);
       stream.next(m.shift_y);
-      stream.next(m.visible);
+      stream.next(m.round);
       stream.next(m.detected_time);
     }
 
@@ -301,8 +301,8 @@ struct Printer< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
     Printer<float>::stream(s, indent + "  ", v.shift_x);
     s << indent << "shift_y: ";
     Printer<float>::stream(s, indent + "  ", v.shift_y);
-    s << indent << "visible: ";
-    Printer<uint32_t>::stream(s, indent + "  ", v.visible);
+    s << indent << "round: ";
+    Printer<uint32_t>::stream(s, indent + "  ", v.round);
     s << indent << "detected_time: ";
     Printer<ros::Time>::stream(s, indent + "  ", v.detected_time);
   }
