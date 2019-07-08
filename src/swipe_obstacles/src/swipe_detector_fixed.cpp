@@ -130,6 +130,7 @@ void SwipeDetectorFixed::readFile(const std::string &file_name)
         read_obstacle.id = std::stoi(result.at(8));
         read_obstacle.shift_x = std::stof(result.at(9));
         read_obstacle.shift_y = std::stof(result.at(10));
+        read_obstacle.brief_stop = std::stoi(result.at(11));
         read_obstacle.score = 90.0;
         read_obstacle.label = "person";
         read_obstacle.header.frame_id = "map";
@@ -182,6 +183,7 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
                     {
                         closest_obstacle.distance = pose_from_velodyne.position.x;
                         closest_obstacle.id = i->id;
+                        closest_obstacle.brief_stop = i->brief_stop;
                     }
                     flag = 1;
                 }
