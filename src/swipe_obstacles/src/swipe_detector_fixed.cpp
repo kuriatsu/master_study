@@ -271,7 +271,7 @@ int main(int argc, char **argv)
 	ROS_INFO("Initializing detector...");
 	// ros::Duration(0.1).sleep();
     SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose_circle.csv");
-	// SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/");
+	// SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/takeda_lab/obstacle_takeda_lab.csv");
 
 	ROS_INFO("detector ready...");
 

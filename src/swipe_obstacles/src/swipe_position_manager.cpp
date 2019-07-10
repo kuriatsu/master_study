@@ -54,7 +54,7 @@ PositionManager::PositionManager(): keep_time(2)
 
 void PositionManager::subObjCallback(const swipe_obstacles::detected_obstacle_array &in_msgs)
 {
-    ROS_INFO("manager Get obj info");
+    // ROS_INFO("manager Get obj info");
     // データリストに格納
     containerManage(in_msgs);
     obstaclePublish();
@@ -71,9 +71,9 @@ void PositionManager::containerManage(const swipe_obstacles::detected_obstacle_a
     float distance, min_distance;
     int flag=0, id_buf;
     size_t index;
-    uint32_t managed_id = 0;
+    uint32_t inherit_id = 0;
 
-    new_obstacle_vec.resize(in_msgs.obstacles.size());
+    // new_obstacle_vec.resize(in_msgs.obstacles.size());
 
     // 入力された障害物に対してループ
     for(index = 0; index < in_msgs.obstacles.size(); index++)
@@ -88,7 +88,7 @@ void PositionManager::containerManage(const swipe_obstacles::detected_obstacle_a
             // idがすでに存在していたら
             if(obstacle_vec_itr->id == in_msg.id)
             {
-                managed_id = obstacle_vec_itr->id;
+                inherit_id = obstacle_vec_itr->id;
                 break;
             }
             else
@@ -98,23 +98,28 @@ void PositionManager::containerManage(const swipe_obstacles::detected_obstacle_a
                 if (distance < min_distance)
                 {
                     min_distance = distance;
-                    managed_id = obstacle_vec_itr->id;
+                    inherit_id = obstacle_vec_itr->id;
                 }
             }
         }
 
         // 現在の障害物リストに同一の障害物がすでにあったら現在のidを保持,全く新しい障害物だったら検出時のidを採用.
-        if (!managed_id)
-            in_msg.id = managed_id;
+        if (inherit_id != 0)
+        {
+            in_msg.id = inherit_id;
+            in_msg.shift_x = obstacle_vec.at(id_index_map.at(inherit_id)).shift_x;
+            in_msg.shift_y = obstacle_vec.at(id_index_map.at(inherit_id)).shift_y;
+        }
 
+        std::cout << "inherit id:" << inherit_id << " in_msg id:" << in_msg.id << std::endl;
         // 近距離の障害物を同一とみなしてid付けする際に,入力障害物内でidがダブる可能性があるのでcheck
         if(!new_id_index_map.count(in_msg.id))
         {
             // 新しい障害物リストに追加
             new_obstacle_vec.emplace_back(in_msg);
             // 新しいindex検索辞書に追加, indexをそのまま用いると入力障害物がダブった際にずれる
-            new_id_index_map.emplace(in_msg.id, new_obstacle_vec.size());
-            std::cout << "index:" << index << "id:" << in_msg.id << std::endl;
+            new_id_index_map.emplace(in_msg.id, new_obstacle_vec.size()-1);
+            std::cout << "id:" << in_msg.id << " index:" << new_obstacle_vec.size()-1 << std::endl;
         }
     }
 
@@ -125,9 +130,9 @@ void PositionManager::containerManage(const swipe_obstacles::detected_obstacle_a
         if((ros::Time::now() - obstacle_vec_itr->detected_time) < ros::Duration(keep_time) && !new_id_index_map.count(obstacle_vec_itr->id))
         {
             new_obstacle_vec.emplace_back(*obstacle_vec_itr);
-            new_id_index_map.emplace(obstacle_vec_itr->id, index);
-            std::cout << "index:" << index << "id:" << obstacle_vec_itr->id << std::endl;
-            index++;
+            new_id_index_map.emplace(obstacle_vec_itr->id, new_obstacle_vec.size()-1);
+            std::cout << "(extracted) id:" << obstacle_vec_itr->id << "index:" << new_obstacle_vec.size()-1 << std::endl;
+            // index++;
         }
     }
 
@@ -260,7 +265,8 @@ void PositionManager::obstaclePublish()
     for(auto i = obstacle_vec.begin(); i != obstacle_vec.end(); i++)
     {
         out_msgs.obstacles.emplace_back(*i);
-        ROS_INFO_STREAM(*i);
+        std::cout << "published id is " << i->id << std::endl;
+        // ROS_INFO_STREAM(*i);
         flag = 1;
     }
 
@@ -268,7 +274,7 @@ void PositionManager::obstaclePublish()
     if(flag)
     {
         pub_obj.publish(out_msgs);
-        ROS_INFO("published");
+        std::cout << "managed info is published" << std::endl;
         // last_pub_time = ros::Time::now();
     }
     // else if(ros::Time::now() - last_pub_time > ros::Duration(keep_time))
@@ -284,8 +290,8 @@ void PositionManager::subShiftCallback(const swipe_obstacles::detected_obstacle 
 {
     if (id_index_map.count(in_msg.id))
     {
-        obstacle_vec.at(id_index_map.at(in_msg.id)).shift_x = in_msg.pose.position.x - obstacle_vec.at(in_msg.id).pose.position.x;
-        obstacle_vec.at(id_index_map.at(in_msg.id)).shift_y = in_msg.pose.position.y - obstacle_vec.at(in_msg.id).pose.position.y;
+        obstacle_vec.at(id_index_map.at(in_msg.id)).shift_x = in_msg.pose.position.x - obstacle_vec.at(id_index_map.at(in_msg.id)).pose.position.x;
+        obstacle_vec.at(id_index_map.at(in_msg.id)).shift_y = in_msg.pose.position.y - obstacle_vec.at(id_index_map.at(in_msg.id)).pose.position.y;
         obstacle_vec.at(id_index_map.at(in_msg.id)).detected_time = ros::Time::now();
         obstaclePublish();
     }

@@ -99,7 +99,7 @@ void ObstacleVisualizer::make_cube(const swipe_obstacles::detected_obstacle &in_
     swipe_obstacles::detected_obstacle out_obstacle_pose;
     std::stringstream ss;
     ss << in_msg.id;
-
+    std::cout <<"ss id is:" << in_msg.id << std::endl;
 	visualization_msgs::InteractiveMarker int_marker;
     ROS_INFO_STREAM(in_msg);
 	int_marker.header.frame_id = "map";

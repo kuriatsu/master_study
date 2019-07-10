@@ -45,7 +45,7 @@ class YpTeleopStudy
 };
 
 
-YpTeleopStudy::YpTeleopStudy(): mode(false), scenario_runner(false), closest_obstacle_is_new(false), stop_distance(5.0), rosbag_flag(0), pub_rate(0.1), max_twist_speed(1.0)
+YpTeleopStudy::YpTeleopStudy(): mode(false), scenario_runner(false), closest_obstacle_is_new(false), stop_distance(5.0), rosbag_flag(0), pub_rate(0.1), max_twist_speed(1.0), accel(0.0), brake(0.0)
 {
     ros::NodeHandle n;
 
@@ -66,7 +66,6 @@ void YpTeleopStudy::timerCallback(const ros::TimerEvent&)
     float current_twist_speed, aim_twist_speed;
 
     current_twist_speed = twist.linear.x;
-
     if(!accel && !brake)
     {
         aim_twist_speed = in_twist.linear.x;
@@ -76,6 +75,9 @@ void YpTeleopStudy::timerCallback(const ros::TimerEvent&)
         aim_twist_speed = current_twist_speed
         + accel * 0.25 * pub_rate * ((max_twist_speed - current_twist_speed) / max_twist_speed)
         - brake * 0.5 * pub_rate * (0.1 + (max_twist_speed - current_twist_speed) / max_twist_speed);
+
+        aim_twist_speed = (aim_twist_speed < max_twist_speed) ? aim_twist_speed : max_twist_speed;
+        aim_twist_speed = (aim_twist_speed > 0.0) ? aim_twist_speed : 0.0;
     }
 
     // automode
@@ -90,10 +92,13 @@ void YpTeleopStudy::timerCallback(const ros::TimerEvent&)
         {
             aim_twist_speed = current_twist_speed - 0.5 * pub_rate * (0.1 + (max_twist_speed - current_twist_speed) / max_twist_speed);
         }
+
+        aim_twist_speed = (aim_twist_speed < max_twist_speed) ? aim_twist_speed : max_twist_speed;
+        aim_twist_speed = (aim_twist_speed > 0.0) ? aim_twist_speed : 0.0;
     }
 
-    aim_twist_speed = (aim_twist_speed < max_twist_speed) ? aim_twist_speed : max_twist_speed;
-    aim_twist_speed = (aim_twist_speed > 0.0) ? aim_twist_speed : 0.0;
+    // aim_twist_speed = (aim_twist_speed < max_twist_speed) ? aim_twist_speed : max_twist_speed;
+    // aim_twist_speed = (aim_twist_speed > 0.0) ? aim_twist_speed : 0.0;
 
     twist.linear.x = aim_twist_speed;
     twist.angular.z = in_twist.angular.z;
@@ -106,6 +111,7 @@ void YpTeleopStudy::timerCallback(const ros::TimerEvent&)
 
 void YpTeleopStudy::closestObstacleCallback(const swipe_obstacles::closest_obstacle &in_msg)
 {
+    // if closest_obstacle id is updated
     if(closest_obstacle.id != in_msg.id)
     {
         closest_obstacle_is_new = true;
@@ -124,17 +130,26 @@ void YpTeleopStudy::twistCallback(const geometry_msgs::TwistStamped &in_msg)
 
         if(scenario_runner)
         {
+            std::cout << "brief_stop " << closest_obstacle.brief_stop
+            << "  distance:" << closest_obstacle.distance << stop_distance
+            << "  is new:" << closest_obstacle_is_new << std::endl;
+
             if(closest_obstacle.brief_stop && closest_obstacle.distance < stop_distance && closest_obstacle_is_new)
             {
-                stoped_time == ros::Time::now();
+                stoped_time = ros::Time::now();
+                std::cout << "timer start: " << stoped_time << std::endl;
                 closest_obstacle_is_new = false;
             }
 
             if(ros::Time::now() - stoped_time < ros::Duration(closest_obstacle.stop_time))
             {
-                // ROS_INFO_STREAM(ros::Time::now() - stoped_time);
-                // std::cout << "stopping" << std::endl;
+                std::cout << "stopping time: " << ros::Time::now() - stoped_time << std::endl;
                 in_twist.linear.x = 0.0;
+            }
+            else
+            {
+                std::cout << stoped_time << std::endl;
+                std::cout << "stop_time is over time is:" << ros::Time::now() - stoped_time << std::endl;
             }
         }
     }
@@ -143,7 +158,7 @@ void YpTeleopStudy::twistCallback(const geometry_msgs::TwistStamped &in_msg)
 
 void YpTeleopStudy::joyCallback(const sensor_msgs::Joy &in_msg)
 {
-    int dash = 0;
+    float dash = 0;
     float base_speed = 0.5;
     double sec_interval;
 
