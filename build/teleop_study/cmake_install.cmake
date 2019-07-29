@@ -33,6 +33,22 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include/teleop_study" TYPE FILE FILES "/home/kuriatsu/Program/Ros/master_study_ws/devel/include/teleop_study/teleop_studyConfig.h")
+endif()
+
+if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python2.7/dist-packages/teleop_study" TYPE FILE FILES "/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/teleop_study/__init__.py")
+endif()
+
+if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+  execute_process(COMMAND "/usr/bin/python" -m compileall "/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/teleop_study/cfg")
+endif()
+
+if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python2.7/dist-packages/teleop_study" TYPE DIRECTORY FILES "/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/teleop_study/cfg")
+endif()
+
+if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/kuriatsu/Program/Ros/master_study_ws/build/teleop_study/catkin_generated/installspace/teleop_study.pc")
 endif()
 

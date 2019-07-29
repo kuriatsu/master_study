@@ -1817,6 +1817,19 @@ topic_tools_generate_messages_lisp/fast:
 .PHONY : topic_tools_generate_messages_lisp/fast
 
 #=============================================================================
+# Target rules for targets named yp_teleop_study
+
+# Build rule for target.
+yp_teleop_study: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 yp_teleop_study
+.PHONY : yp_teleop_study
+
+# fast build rule for target.
+yp_teleop_study/fast:
+	$(MAKE) -f teleop_study/CMakeFiles/yp_teleop_study.dir/build.make teleop_study/CMakeFiles/yp_teleop_study.dir/build
+.PHONY : yp_teleop_study/fast
+
+#=============================================================================
 # Target rules for targets named yp_teleop_study0
 
 # Build rule for target.
@@ -1947,19 +1960,6 @@ sound_play_generate_messages_nodejs/fast:
 .PHONY : sound_play_generate_messages_nodejs/fast
 
 #=============================================================================
-# Target rules for targets named yp_teleop_study
-
-# Build rule for target.
-yp_teleop_study: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 yp_teleop_study
-.PHONY : yp_teleop_study
-
-# fast build rule for target.
-yp_teleop_study/fast:
-	$(MAKE) -f teleop_study/CMakeFiles/yp_teleop_study.dir/build.make teleop_study/CMakeFiles/yp_teleop_study.dir/build
-.PHONY : yp_teleop_study/fast
-
-#=============================================================================
 # Target rules for targets named sound_play_generate_messages_py
 
 # Build rule for target.
@@ -1971,6 +1971,19 @@ sound_play_generate_messages_py: cmake_check_build_system
 sound_play_generate_messages_py/fast:
 	$(MAKE) -f teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/build.make teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/build
 .PHONY : sound_play_generate_messages_py/fast
+
+#=============================================================================
+# Target rules for targets named teleop_study_gencfg
+
+# Build rule for target.
+teleop_study_gencfg: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 teleop_study_gencfg
+.PHONY : teleop_study_gencfg
+
+# fast build rule for target.
+teleop_study_gencfg/fast:
+	$(MAKE) -f teleop_study/CMakeFiles/teleop_study_gencfg.dir/build.make teleop_study/CMakeFiles/teleop_study_gencfg.dir/build
+.PHONY : teleop_study_gencfg/fast
 
 #=============================================================================
 # Target rules for targets named _run_tests_ypspur_ros_roslint_package
@@ -2593,6 +2606,7 @@ help:
 	@echo "... pcl_msgs_generate_messages_cpp"
 	@echo "... std_srvs_generate_messages_cpp"
 	@echo "... topic_tools_generate_messages_lisp"
+	@echo "... yp_teleop_study"
 	@echo "... yp_teleop_study0"
 	@echo "... diagnostic_msgs_generate_messages_py"
 	@echo "... diagnostic_msgs_generate_messages_nodejs"
@@ -2603,8 +2617,8 @@ help:
 	@echo "... diagnostic_msgs_generate_messages_lisp"
 	@echo "... sound_play_generate_messages_lisp"
 	@echo "... sound_play_generate_messages_nodejs"
-	@echo "... yp_teleop_study"
 	@echo "... sound_play_generate_messages_py"
+	@echo "... teleop_study_gencfg"
 	@echo "... _run_tests_ypspur_ros_roslint_package"
 	@echo "... run_tests_ypspur_ros_roslint"
 	@echo "... _run_tests_ypspur_ros"

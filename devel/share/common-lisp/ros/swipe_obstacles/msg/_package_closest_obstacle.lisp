@@ -9,4 +9,6 @@
           BRIEF_STOP
           STOP_TIME-VAL
           STOP_TIME
+          STOP_DISTANCE-VAL
+          STOP_DISTANCE
 ))

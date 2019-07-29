@@ -24,6 +24,7 @@ class closest_obstacle {
       this.distance = null;
       this.brief_stop = null;
       this.stop_time = null;
+      this.stop_distance = null;
     }
     else {
       if (initObj.hasOwnProperty('header')) {
@@ -56,6 +57,12 @@ class closest_obstacle {
       else {
         this.stop_time = 0.0;
       }
+      if (initObj.hasOwnProperty('stop_distance')) {
+        this.stop_distance = initObj.stop_distance
+      }
+      else {
+        this.stop_distance = 0.0;
+      }
     }
   }
 
@@ -71,6 +78,8 @@ class closest_obstacle {
     bufferOffset = _serializer.uint32(obj.brief_stop, buffer, bufferOffset);
     // Serialize message field [stop_time]
     bufferOffset = _serializer.float32(obj.stop_time, buffer, bufferOffset);
+    // Serialize message field [stop_distance]
+    bufferOffset = _serializer.float32(obj.stop_distance, buffer, bufferOffset);
     return bufferOffset;
   }
 
@@ -88,13 +97,15 @@ class closest_obstacle {
     data.brief_stop = _deserializer.uint32(buffer, bufferOffset);
     // Deserialize message field [stop_time]
     data.stop_time = _deserializer.float32(buffer, bufferOffset);
+    // Deserialize message field [stop_distance]
+    data.stop_distance = _deserializer.float32(buffer, bufferOffset);
     return data;
   }
 
   static getMessageSize(object) {
     let length = 0;
     length += std_msgs.msg.Header.getMessageSize(object.header);
-    return length + 16;
+    return length + 20;
   }
 
   static datatype() {
@@ -104,7 +115,7 @@ class closest_obstacle {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '70db3acc59acd012b3791a69840cb05c';
+    return 'f82492c5a8a267aeb81808dbb76fd96b';
   }
 
   static messageDefinition() {
@@ -116,6 +127,7 @@ class closest_obstacle {
     float32 distance
     uint32 brief_stop
     float32 stop_time
+    float32 stop_distance
     
     ================================================================================
     MSG: std_msgs/Header
@@ -177,6 +189,13 @@ class closest_obstacle {
     }
     else {
       resolved.stop_time = 0.0
+    }
+
+    if (msg.stop_distance !== undefined) {
+      resolved.stop_distance = msg.stop_distance;
+    }
+    else {
+      resolved.stop_distance = 0.0
     }
 
     return resolved;

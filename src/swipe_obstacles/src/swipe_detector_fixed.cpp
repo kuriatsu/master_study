@@ -50,7 +50,7 @@ class SwipeDetectorFixed
         uint32_t next_waypoint_flag;
 
 	public:
-		SwipeDetectorFixed(const std::string &file_name);
+		SwipeDetectorFixed();
 
 	private:
 		void readFile(const std::string &file_name);
@@ -61,21 +61,27 @@ class SwipeDetectorFixed
 };
 
 
-SwipeDetectorFixed::SwipeDetectorFixed(const std::string &file_name): round(1)
+SwipeDetectorFixed::SwipeDetectorFixed()
 {
+    std::string file_name;
+
     ros::NodeHandle n;
     pub_obstacle_pose = n.advertise<swipe_obstacles::detected_obstacle_array>("/detected_obstacles", 5);
     pub_closest_obstacle = n.advertise<swipe_obstacles::closest_obstacle>("/closest_obstacle", 5);
     pub_erase_signal = n.advertise<std_msgs::Int32>("/swipe_erase_signal", 5);
+    sub_waypoint_callback = n.subscribe("/closest_waypoint", 5, &SwipeDetectorFixed::waypointCallback, this);
 // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // test_transform_origin = n.advertise<geometry_msgs::PoseStamped>("/test_transform_origin", 5);
     // test_obstacle_pose = n.advertise<geometry_msgs::PoseStamped>("/test_obstacle_pose", 5);
 // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	sub_waypoint_callback = n.subscribe("/closest_waypoint", 5, &SwipeDetectorFixed::waypointCallback, this);
 
+    n.getParam("/detector_fixed_node/file_name", file_name);
+    n.getParam("/detector_fixed_node/start_round", round);
+    n.getParam("/detector_fixed_node/keep_time", keep_time);
+
+    std::cout << file_name << std::endl;
     read_obstacle_vec.reserve(vector_size);
-	readFile(file_name);
-
+    readFile(file_name);
 	ros::Duration(1).sleep();
 	pub_timer = n.createTimer(ros::Duration(0.5), &SwipeDetectorFixed::pubTimerCallback, this);
 }
@@ -144,6 +150,7 @@ void SwipeDetectorFixed::readFile(const std::string &file_name)
         read_obstacle.closest_obstacle.id = std::stoi(result.at(0));
         read_obstacle.closest_obstacle.brief_stop = std::stoi(result.at(14));
         read_obstacle.closest_obstacle.stop_time = std::stof(result.at(15));
+        read_obstacle.closest_obstacle.stop_distance = std::stof(result.at(16));
 
         read_obstacle_vec.push_back(read_obstacle);
 		// ROS_INFO_STREAM(read_obstacle);
@@ -181,6 +188,7 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
 
             if(0.0 < pose_from_velodyne.position.x && pose_from_velodyne.position.x < 10.0)
             {
+                ROS_INFO_STREAM(pose_from_velodyne.position);
                 if(-5.0 < pose_from_velodyne.position.y && pose_from_velodyne.position.y < 5.0)
                 {
                     // add obstacle to array
@@ -212,14 +220,15 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
         // ROS_INFO_STREAM(closest_obstacle);
         last_pub_time = ros::Time::now();
     }
-    else
-    {
+    // else
+    // {
+        ROS_INFO_STREAM(ros::Time::now() - last_pub_time);
         if(ros::Time::now() - last_pub_time > ros::Duration(keep_time))
         {
             erase_signal.data = 1;
             pub_erase_signal.publish(erase_signal);
         }
-    }
+    // }
 }
 
 
@@ -270,8 +279,11 @@ int main(int argc, char **argv)
 
 	ROS_INFO("Initializing detector...");
 	// ros::Duration(0.1).sleep();
-    SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_center_circle.csv");
+    SwipeDetectorFixed swipe_detector_fixed;
+    // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_center_circle.csv");
     // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_right_circle.csv");
+    // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_right_circle2.csv");
+    // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_right_circle3.csv");
     // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_left_circle.csv");
 	// SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/takeda_lab/obstacle_takeda_lab.csv");
 

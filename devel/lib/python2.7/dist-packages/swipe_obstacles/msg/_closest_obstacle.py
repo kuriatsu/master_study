@@ -8,7 +8,7 @@ import struct
 import std_msgs.msg
 
 class closest_obstacle(genpy.Message):
-  _md5sum = "70db3acc59acd012b3791a69840cb05c"
+  _md5sum = "f82492c5a8a267aeb81808dbb76fd96b"
   _type = "swipe_obstacles/closest_obstacle"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
@@ -17,6 +17,7 @@ uint32 id
 float32 distance
 uint32 brief_stop
 float32 stop_time
+float32 stop_distance
 
 ================================================================================
 MSG: std_msgs/Header
@@ -36,8 +37,8 @@ time stamp
 # 1: global frame
 string frame_id
 """
-  __slots__ = ['header','id','distance','brief_stop','stop_time']
-  _slot_types = ['std_msgs/Header','uint32','float32','uint32','float32']
+  __slots__ = ['header','id','distance','brief_stop','stop_time','stop_distance']
+  _slot_types = ['std_msgs/Header','uint32','float32','uint32','float32','float32']
 
   def __init__(self, *args, **kwds):
     """
@@ -47,7 +48,7 @@ string frame_id
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       header,id,distance,brief_stop,stop_time
+       header,id,distance,brief_stop,stop_time,stop_distance
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -66,12 +67,15 @@ string frame_id
         self.brief_stop = 0
       if self.stop_time is None:
         self.stop_time = 0.
+      if self.stop_distance is None:
+        self.stop_distance = 0.
     else:
       self.header = std_msgs.msg.Header()
       self.id = 0
       self.distance = 0.
       self.brief_stop = 0
       self.stop_time = 0.
+      self.stop_distance = 0.
 
   def _get_types(self):
     """
@@ -94,7 +98,7 @@ string frame_id
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_IfIf().pack(_x.id, _x.distance, _x.brief_stop, _x.stop_time))
+      buff.write(_get_struct_IfI2f().pack(_x.id, _x.distance, _x.brief_stop, _x.stop_time, _x.stop_distance))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -122,8 +126,8 @@ string frame_id
         self.header.frame_id = str[start:end]
       _x = self
       start = end
-      end += 16
-      (_x.id, _x.distance, _x.brief_stop, _x.stop_time,) = _get_struct_IfIf().unpack(str[start:end])
+      end += 20
+      (_x.id, _x.distance, _x.brief_stop, _x.stop_time, _x.stop_distance,) = _get_struct_IfI2f().unpack(str[start:end])
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill
@@ -145,7 +149,7 @@ string frame_id
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_IfIf().pack(_x.id, _x.distance, _x.brief_stop, _x.stop_time))
+      buff.write(_get_struct_IfI2f().pack(_x.id, _x.distance, _x.brief_stop, _x.stop_time, _x.stop_distance))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -174,8 +178,8 @@ string frame_id
         self.header.frame_id = str[start:end]
       _x = self
       start = end
-      end += 16
-      (_x.id, _x.distance, _x.brief_stop, _x.stop_time,) = _get_struct_IfIf().unpack(str[start:end])
+      end += 20
+      (_x.id, _x.distance, _x.brief_stop, _x.stop_time, _x.stop_distance,) = _get_struct_IfI2f().unpack(str[start:end])
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill
@@ -184,15 +188,15 @@ _struct_I = genpy.struct_I
 def _get_struct_I():
     global _struct_I
     return _struct_I
-_struct_IfIf = None
-def _get_struct_IfIf():
-    global _struct_IfIf
-    if _struct_IfIf is None:
-        _struct_IfIf = struct.Struct("<IfIf")
-    return _struct_IfIf
 _struct_3I = None
 def _get_struct_3I():
     global _struct_3I
     if _struct_3I is None:
         _struct_3I = struct.Struct("<3I")
     return _struct_3I
+_struct_IfI2f = None
+def _get_struct_IfI2f():
+    global _struct_IfI2f
+    if _struct_IfI2f is None:
+        _struct_IfI2f = struct.Struct("<IfI2f")
+    return _struct_IfI2f

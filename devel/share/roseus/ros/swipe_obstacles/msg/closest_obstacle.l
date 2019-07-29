@@ -16,7 +16,7 @@
 
 (defclass swipe_obstacles::closest_obstacle
   :super ros::object
-  :slots (_header _id _distance _brief_stop _stop_time ))
+  :slots (_header _id _distance _brief_stop _stop_time _stop_distance ))
 
 (defmethod swipe_obstacles::closest_obstacle
   (:init
@@ -26,6 +26,7 @@
     ((:distance __distance) 0.0)
     ((:brief_stop __brief_stop) 0)
     ((:stop_time __stop_time) 0.0)
+    ((:stop_distance __stop_distance) 0.0)
     )
    (send-super :init)
    (setq _header __header)
@@ -33,6 +34,7 @@
    (setq _distance (float __distance))
    (setq _brief_stop (round __brief_stop))
    (setq _stop_time (float __stop_time))
+   (setq _stop_distance (float __stop_distance))
    self)
   (:header
    (&rest __header)
@@ -53,6 +55,9 @@
   (:stop_time
    (&optional __stop_time)
    (if __stop_time (setq _stop_time __stop_time)) _stop_time)
+  (:stop_distance
+   (&optional __stop_distance)
+   (if __stop_distance (setq _stop_distance __stop_distance)) _stop_distance)
   (:serialization-length
    ()
    (+
@@ -65,6 +70,8 @@
     ;; uint32 _brief_stop
     4
     ;; float32 _stop_time
+    4
+    ;; float32 _stop_distance
     4
     ))
   (:serialize
@@ -81,6 +88,8 @@
        (write-long _brief_stop s)
      ;; float32 _stop_time
        (sys::poke _stop_time (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
+     ;; float32 _stop_distance
+       (sys::poke _stop_distance (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
      ;;
      (if (null strm) (get-output-stream-string s))))
   (:deserialize
@@ -95,11 +104,13 @@
      (setq _brief_stop (sys::peek buf ptr- :integer)) (incf ptr- 4)
    ;; float32 _stop_time
      (setq _stop_time (sys::peek buf ptr- :float)) (incf ptr- 4)
+   ;; float32 _stop_distance
+     (setq _stop_distance (sys::peek buf ptr- :float)) (incf ptr- 4)
    ;;
    self)
   )
 
-(setf (get swipe_obstacles::closest_obstacle :md5sum-) "70db3acc59acd012b3791a69840cb05c")
+(setf (get swipe_obstacles::closest_obstacle :md5sum-) "f82492c5a8a267aeb81808dbb76fd96b")
 (setf (get swipe_obstacles::closest_obstacle :datatype-) "swipe_obstacles/closest_obstacle")
 (setf (get swipe_obstacles::closest_obstacle :definition-)
       "std_msgs/Header header
@@ -108,6 +119,7 @@ uint32 id
 float32 distance
 uint32 brief_stop
 float32 stop_time
+float32 stop_distance
 
 ================================================================================
 MSG: std_msgs/Header
@@ -131,6 +143,6 @@ string frame_id
 
 
 
-(provide :swipe_obstacles/closest_obstacle "70db3acc59acd012b3791a69840cb05c")
+(provide :swipe_obstacles/closest_obstacle "f82492c5a8a267aeb81808dbb76fd96b")
 
 

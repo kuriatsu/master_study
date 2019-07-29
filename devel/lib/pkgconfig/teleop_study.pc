@@ -3,6 +3,6 @@ prefix=/home/kuriatsu/Program/Ros/master_study_ws/devel
 Name: teleop_study
 Description: Description of teleop_study
 Version: 0.0.0
-Cflags: 
+Cflags: -I/home/kuriatsu/Program/Ros/master_study_ws/devel/include
 Libs: -L/home/kuriatsu/Program/Ros/master_study_ws/devel/lib 
 Requires: 

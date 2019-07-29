@@ -91,16 +91,16 @@ void PositionManager::containerManage(const swipe_obstacles::detected_obstacle_a
                 inherit_id = obstacle_vec_itr->id;
                 break;
             }
-            else
-            {
-                // 既に近距離に検出されていた場合も同一障害物とみなす
-                distance = std::pow(obstacle_vec_itr->pose.position.x - in_msg.pose.position.x, 2) + std::pow(obstacle_vec_itr->pose.position.y - in_msg.pose.position.y, 2);
-                if (distance < min_distance)
-                {
-                    min_distance = distance;
-                    inherit_id = obstacle_vec_itr->id;
-                }
-            }
+            // else
+            // {
+            //     // 既に近距離に検出されていた場合も同一障害物とみなす
+            //     distance = std::pow(obstacle_vec_itr->pose.position.x - in_msg.pose.position.x, 2) + std::pow(obstacle_vec_itr->pose.position.y - in_msg.pose.position.y, 2);
+            //     if (distance < min_distance && )
+            //     {
+            //         min_distance = distance;
+            //         inherit_id = obstacle_vec_itr->id;
+            //     }
+            // }
         }
 
         // 現在の障害物リストに同一の障害物がすでにあったら現在のidを保持,全く新しい障害物だったら検出時のidを採用.

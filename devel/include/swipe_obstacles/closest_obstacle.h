@@ -29,14 +29,16 @@ struct closest_obstacle_
     , id(0)
     , distance(0.0)
     , brief_stop(0)
-    , stop_time(0.0)  {
+    , stop_time(0.0)
+    , stop_distance(0.0)  {
     }
   closest_obstacle_(const ContainerAllocator& _alloc)
     : header(_alloc)
     , id(0)
     , distance(0.0)
     , brief_stop(0)
-    , stop_time(0.0)  {
+    , stop_time(0.0)
+    , stop_distance(0.0)  {
   (void)_alloc;
     }
 
@@ -56,6 +58,9 @@ struct closest_obstacle_
 
    typedef float _stop_time_type;
   _stop_time_type stop_time;
+
+   typedef float _stop_distance_type;
+  _stop_distance_type stop_distance;
 
 
 
@@ -135,12 +140,12 @@ struct MD5Sum< ::swipe_obstacles::closest_obstacle_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "70db3acc59acd012b3791a69840cb05c";
+    return "f82492c5a8a267aeb81808dbb76fd96b";
   }
 
   static const char* value(const ::swipe_obstacles::closest_obstacle_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x70db3acc59acd012ULL;
-  static const uint64_t static_value2 = 0xb3791a69840cb05cULL;
+  static const uint64_t static_value1 = 0xf82492c5a8a267aeULL;
+  static const uint64_t static_value2 = 0xb81808dbb76fd96bULL;
 };
 
 template<class ContainerAllocator>
@@ -165,6 +170,7 @@ uint32 id\n\
 float32 distance\n\
 uint32 brief_stop\n\
 float32 stop_time\n\
+float32 stop_distance\n\
 \n\
 ================================================================================\n\
 MSG: std_msgs/Header\n\
@@ -206,6 +212,7 @@ namespace serialization
       stream.next(m.distance);
       stream.next(m.brief_stop);
       stream.next(m.stop_time);
+      stream.next(m.stop_distance);
     }
 
     ROS_DECLARE_ALLINONE_SERIALIZER
@@ -235,6 +242,8 @@ struct Printer< ::swipe_obstacles::closest_obstacle_<ContainerAllocator> >
     Printer<uint32_t>::stream(s, indent + "  ", v.brief_stop);
     s << indent << "stop_time: ";
     Printer<float>::stream(s, indent + "  ", v.stop_time);
+    s << indent << "stop_distance: ";
+    Printer<float>::stream(s, indent + "  ", v.stop_distance);
   }
 };
 
