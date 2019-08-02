@@ -455,7 +455,7 @@ teleop_studyConfig::GroupDescription<teleop_studyConfig::DEFAULT, teleop_studyCo
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       __max__.deceleration_limit = 1.0;
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.deceleration_limit = 0.5;
+      __default__.deceleration_limit = 0.33;
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       Default.abstract_parameters.push_back(teleop_studyConfig::AbstractParamDescriptionConstPtr(new teleop_studyConfig::ParamDescription<double>("deceleration_limit", "double", 0, "decelerarion limit m/s^2", "", &teleop_studyConfig::deceleration_limit)));
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
