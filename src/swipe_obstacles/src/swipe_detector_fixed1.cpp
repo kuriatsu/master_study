@@ -18,7 +18,10 @@
 struct read_obstacle
 {
     swipe_obstacles::detected_obstacle detected_obstacle;
-    swipe_obstacles::closest_obstacle closest_obstacle;
+    // swipe_obstacles::closest_obstacle closest_obstacle;
+    bool auto_move;
+    float stop_time;
+    float move_dist;
 };
 
 class SwipeDetectorFixed
@@ -53,8 +56,9 @@ private:
     uint32_t next_waypoint_flag;
 
     ros::Time stoped_time;
-    swipe_obstacles::closest_obstacle closest_obstacle;
-    bool closest_obstacle_is_new;
+    int closest_obj_id;
+    bool closest_obj_is_new = false;
+    bool auto_move;
 
 public:
     SwipeDetectorFixed();
@@ -66,6 +70,7 @@ private:
     void twistCallback(const geometry_msgs::TwistStamped &in_msg);
 
     geometry_msgs::Pose tfTransformer(const geometry_msgs::Pose &in_pose, const std::string &current_frame_id, const std::string &target_frame_id);
+    double quatToRpy(const geometry_msgs::Quaternion &quat);
 
 };
 
@@ -111,7 +116,7 @@ void SwipeDetectorFixed::waypointCallback(const std_msgs::Int32 &in_msg)
     {
         next_waypoint_flag = 0;
         round++;
-        ROS_INFO_STREAM(round);
+        std::cout << "round : " << round << std::endl;
     }
 }
 
@@ -157,10 +162,11 @@ void SwipeDetectorFixed::readFile(const std::string &file_name)
         read_obstacle.detected_obstacle.score = std::stof(result.at(12));
         read_obstacle.detected_obstacle.header.frame_id = result.at(13);
 
-        read_obstacle.closest_obstacle.id = std::stoi(result.at(0));
-        read_obstacle.closest_obstacle.brief_stop = std::stoi(result.at(14));
-        read_obstacle.closest_obstacle.stop_time = std::stof(result.at(15));
-        read_obstacle.closest_obstacle.stop_distance = std::stof(result.at(16));
+        // read_obstacle.closest_obstacle.id = std::stoi(result.at(0));
+        // read_obstacle.closest_obstacle.brief_stop = std::stoi(result.at(14));
+        read_obstacle.auto_move = std::stoi(result.at(14));
+        read_obstacle.stop_time = std::stof(result.at(15));
+        read_obstacle.move_dist = std::stof(result.at(16));
 
         read_obstacle_vec.push_back(read_obstacle);
         // ROS_INFO_STREAM(read_obstacle);
@@ -171,47 +177,37 @@ void SwipeDetectorFixed::readFile(const std::string &file_name)
 void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
 {
     swipe_obstacles::detected_obstacle_array out_array;
-    swipe_obstacles::closest_obstacle search_closest_obstacle;
-    search_closest_obstacle.distance = 100.0;
-
     geometry_msgs::Pose pose_from_velodyne;
+
+    int search_closest_obj_array_idx, search_closest_obj_vec_idx;
+    float search_closest_obj_dist = 100.0;
+    ros::Duration stop_time, stopping_time;
+
     int pub_flag=0;
     std_msgs::Int32 erase_signal;
-    ros::Duration stopping_time;
-    // erase_signal.data = 0;
+
+    double yaw;
+    swipe_obstacles::detected_obstacle move_obj;
 
     for(auto i=read_obstacle_vec.begin(); i!=read_obstacle_vec.end(); i++)
     {
         if(i->detected_obstacle.round == round)
         {
             pose_from_velodyne = tfTransformer(i->detected_obstacle.pose, i->detected_obstacle.header.frame_id, "/velodyne");
-
-            // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            // std::cout << i->header.frame_id << "to" << "velodyne" << std::endl;
-            // ROS_INFO_STREAM(i->pose);
-            // ROS_INFO("obstacle on velodyne");
-            // ROS_INFO_STREAM(pose_from_velodyne);
-            // geometry_msgs::PoseStamped pose_from_velodyne_stamp;
-            // pose_from_velodyne_stamp.header.stamp = ros::Time::now();
-            // pose_from_velodyne_stamp.header.frame_id = "velodyne";
-            // pose_from_velodyne_stamp.pose = pose_from_velodyne;
-            // test_obstacle_pose.publish(pose_from_velodyne_stamp);
-            // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
             if(0.0 < pose_from_velodyne.position.x && pose_from_velodyne.position.x < 10.0)
             {
-                ROS_INFO_STREAM(pose_from_velodyne.position);
+                // ROS_INFO_STREAM(pose_from_velodyne.position);
                 if(-5.0 < pose_from_velodyne.position.y && pose_from_velodyne.position.y < 5.0)
                 {
                     // add obstacle to array
                     i->detected_obstacle.detected_time = ros::Time::now();
-                    std::cout << "published id:" << i->detected_obstacle.id << std::endl;
                     out_array.obstacles.push_back(i->detected_obstacle);
                     // find closest obstacle
-                    if(pose_from_velodyne.position.x < search_closest_obstacle.distance)
+                    if(pose_from_velodyne.position.x < search_closest_obj_dist)
                     {
-                        search_closest_obstacle = i->closest_obstacle;
-                        search_closest_obstacle.distance = pose_from_velodyne.position.x;
+                        search_closest_obj_array_idx = out_array.obstacles.size() - 1;
+                        search_closest_obj_vec_idx = std::distance(read_obstacle_vec.begin(), i);
+                        search_closest_obj_dist = pose_from_velodyne.position.x;
                     }
                     pub_flag = 1;
                 }
@@ -221,45 +217,53 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
 
     if(pub_flag)
     {
-        stopping_time = ros::Time::now() - stoped_time;
-        if(ros::Duration(closest_obstacle.stop_time) < stopping_time && stopping_time < ros::Duration(closest_obstacle.stop_time + 2.0))
+        // check new closest obj info
+        if (closest_obj_id != read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.id)
         {
-            std::cout << "swiping: " << ros::Time::now() - stoped_time << std::endl;
-            for(auto i=read_obstacle_vec.begin(); i!=read_obstacle_vec.end(); i++)
-            {
-                if (i->closest_obstacle.id == closest_obstacle.id)
-                {
-                    i->detected_obstacle.shift_x = (stopping_time.toSec() - closest_obstacle.stop_time) * 0.5 * 4.0;
-                }
-            }
+            closest_obj_is_new = true;
+            closest_obj_id = read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.id;
+            auto_move = read_obstacle_vec.at(search_closest_obj_vec_idx).auto_move;
+        }
+
+        // auto shifting
+        stop_time = ros::Duration(read_obstacle_vec.at(search_closest_obj_vec_idx).stop_time);
+        stopping_time = ros::Time::now() - stoped_time;
+        std::cout << "stopping_time : " << stopping_time << std::endl;
+
+        if(stop_time < stopping_time && stopping_time < stop_time + ros::Duration(2.0))
+        {
+            yaw = quatToRpy(read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.orientation);
+            // out_array.obstacles.at(search_closest_obj_array_idx).pose.position.x += ((stopping_time - stop_time).toSec() * 0.5 * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist) * sin(2*M_PI+yaw);
+            // out_array.obstacles.at(search_closest_obj_array_idx).pose.position.y += ((stopping_time - stop_time).toSec() * 0.5 * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist) * cos(2*M_PI+yaw);
+            read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position.x += ((stopping_time - stop_time).toSec() * 0.5 * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist) * sin(2*M_PI-yaw);
+            read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position.y += ((stopping_time - stop_time).toSec() * 0.5 * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist) * cos(2*M_PI-yaw);
+            // ROS_INFO_STREAM(out_array);
+
         }
 
         // publish array
         out_array.header.frame_id = "map";
         out_array.header.stamp = ros::Time::now();
         pub_obstacle_pose.publish(out_array);
-        //check closest obstacle
-        if (search_closest_obstacle.id != closest_obstacle.id)
-        {
-            closest_obstacle_is_new = true;
-        }
-        closest_obstacle = search_closest_obstacle;
-        //publish closest obstacle
-        // closest_obstacle.header.frame_id = "velodyne";
-        // closest_obstacle.header.stamp = ros::Time::now();
-        // pub_closest_obstacle.publish(closest_obstacle);
-        // ROS_INFO_STREAM(closest_obstacle);
+
         last_pub_time = ros::Time::now();
     }
-    // else
-    // {
-    // ROS_INFO_STREAM(ros::Time::now() - last_pub_time);
+
     if(ros::Time::now() - last_pub_time > ros::Duration(keep_time))
     {
         erase_signal.data = 1;
         pub_erase_signal.publish(erase_signal);
     }
-    // }
+}
+
+
+double SwipeDetectorFixed::quatToRpy(const geometry_msgs::Quaternion &quat)
+{
+    tf::Quaternion tf_quat;
+    double roll, pitch, yaw;
+    quaternionMsgToTF(quat, tf_quat);
+    tf::Matrix3x3(tf_quat).getRPY(roll, pitch, yaw);
+    return yaw;
 }
 
 
@@ -281,21 +285,6 @@ geometry_msgs::Pose SwipeDetectorFixed::tfTransformer(const geometry_msgs::Pose 
         //ros::Duration(1.0).sleep();
     }
 
-
-    // tf_check%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    // // getorigin は変換後の座標における変換前の座標の原点frame_id=target_frame_idにするとgetoriginは変換前のフレームの原点にoriginがあることがわかる
-    // transform_origin.header.stamp = ros::Time::now();
-    // transform_origin.header.frame_id = "velodyne";
-    // transform_origin.pose.position.x = transform.getOrigin().x();
-    // transform_origin.pose.position.y = transform.getOrigin().y();
-    // transform_origin.pose.position.z = transform.getOrigin().z();
-    // transform_origin.pose.orientation.x = transform.getRotation().x();
-    // transform_origin.pose.orientation.y = transform.getRotation().y();
-    // transform_origin.pose.orientation.z = transform.getRotation().z();
-    // transform_origin.pose.orientation.w = transform.getRotation().w();
-    // test_transform_origin.publish(transform_origin);
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
     tf::poseMsgToTF(current_pose, current_tf);
     transformed_tf = transform * current_tf;
     tf::poseTFToMsg(transformed_tf, transformed_pose);
@@ -306,18 +295,13 @@ geometry_msgs::Pose SwipeDetectorFixed::tfTransformer(const geometry_msgs::Pose 
 
 void SwipeDetectorFixed::twistCallback(const geometry_msgs::TwistStamped &in_msg)
 {
-    if(closest_obstacle.brief_stop && closest_obstacle_is_new && in_msg.twist.linear.x == 0.0)
+    // if(closest_obj_is_new)
+    if(auto_move && closest_obj_is_new && in_msg.twist.linear.x == 0.0)
     {
         stoped_time = ros::Time::now();
         std::cout << "timer start: " << stoped_time << std::endl;
-        closest_obstacle_is_new = false;
+        closest_obj_is_new = false;
     }
-
-    // else
-    // {
-    //     std::cout << stoped_time << std::endl;
-    //     std::cout << "stop_time is over time is:" << ros::Time::now() - stoped_time << std::endl;
-    // }
 }
 
 
@@ -328,12 +312,6 @@ int main(int argc, char **argv)
     ROS_INFO("Initializing detector...");
     // ros::Duration(0.1).sleep();
     SwipeDetectorFixed swipe_detector_fixed;
-    // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_center_circle.csv");
-    // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_right_circle.csv");
-    // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_right_circle2.csv");
-    // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_right_circle3.csv");
-    // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/nu_garden/obstacle_pose/obstacle_pose_left_circle.csv");
-    // SwipeDetectorFixed swipe_detector_fixed("/home/kuriatsu/MAP/takeda_lab/obstacle_takeda_lab.csv");
 
     ROS_INFO("detector ready...");
 

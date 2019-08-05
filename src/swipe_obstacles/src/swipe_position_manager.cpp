@@ -103,15 +103,16 @@ void PositionManager::containerManage(const swipe_obstacles::detected_obstacle_a
             // }
         }
 
-        // 現在の障害物リストに同一の障害物がすでにあったら現在のidを保持,全く新しい障害物だったら検出時のidを採用.
+        // 現在の障害物リストに同一の障害物がすでにあったら最新のidに更新,全く新しい障害物だったら検出時のidを採用.
         if (inherit_id != 0)
         {
-            in_msg.id = inherit_id;
+            // in_msg.id = inherit_id; //軽くトラッキングする場合は必要?
             in_msg.shift_x = obstacle_vec.at(id_index_map.at(inherit_id)).shift_x;
             in_msg.shift_y = obstacle_vec.at(id_index_map.at(inherit_id)).shift_y;
         }
 
         std::cout << "inherit id:" << inherit_id << " in_msg id:" << in_msg.id << std::endl;
+        std::cout << "shift_x : " << in_msg.shift_x << std::endl;
         // 近距離の障害物を同一とみなしてid付けする際に,入力障害物内でidがダブる可能性があるのでcheck
         if(!new_id_index_map.count(in_msg.id))
         {
