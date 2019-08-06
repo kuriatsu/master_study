@@ -236,6 +236,8 @@ class DEFAULT
         boost::any val;
         (*_i)->getValue(config, val);
 
+        if("start_waypoint"==(*_i)->name){start_waypoint = boost::any_cast<std::string>(val);}
+        if("final_waypoint"==(*_i)->name){final_waypoint = boost::any_cast<std::string>(val);}
         if("base_speed"==(*_i)->name){base_speed = boost::any_cast<double>(val);}
         if("dash"==(*_i)->name){dash = boost::any_cast<double>(val);}
         if("max_twist_speed"==(*_i)->name){max_twist_speed = boost::any_cast<double>(val);}
@@ -245,7 +247,9 @@ class DEFAULT
       }
     }
 
-    double base_speed;
+    std::string start_waypoint;
+std::string final_waypoint;
+double base_speed;
 double dash;
 double max_twist_speed;
 double acceleration_limit;
@@ -260,6 +264,10 @@ double pub_rate;
 
 
 
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      std::string start_waypoint;
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      std::string final_waypoint;
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       double base_speed;
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
@@ -410,6 +418,26 @@ double pub_rate;
     teleop_studyConfigStatics()
     {
 teleop_studyConfig::GroupDescription<teleop_studyConfig::DEFAULT, teleop_studyConfig> Default("Default", "", 0, 0, true, &teleop_studyConfig::groups);
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.start_waypoint = "";
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.start_waypoint = "";
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.start_waypoint = "0";
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(teleop_studyConfig::AbstractParamDescriptionConstPtr(new teleop_studyConfig::ParamDescription<std::string>("start_waypoint", "str", 0, "waipoint of start", "", &teleop_studyConfig::start_waypoint)));
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(teleop_studyConfig::AbstractParamDescriptionConstPtr(new teleop_studyConfig::ParamDescription<std::string>("start_waypoint", "str", 0, "waipoint of start", "", &teleop_studyConfig::start_waypoint)));
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.final_waypoint = "";
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.final_waypoint = "";
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.final_waypoint = "305";
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(teleop_studyConfig::AbstractParamDescriptionConstPtr(new teleop_studyConfig::ParamDescription<std::string>("final_waypoint", "str", 0, "waipoint of goal", "", &teleop_studyConfig::final_waypoint)));
+//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(teleop_studyConfig::AbstractParamDescriptionConstPtr(new teleop_studyConfig::ParamDescription<std::string>("final_waypoint", "str", 0, "waipoint of goal", "", &teleop_studyConfig::final_waypoint)));
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       __min__.base_speed = 0.0;
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"

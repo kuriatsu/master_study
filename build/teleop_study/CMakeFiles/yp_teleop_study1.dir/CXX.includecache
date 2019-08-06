@@ -59,6 +59,8 @@ dynamic_reconfigure/server.h
 -
 teleop_study/teleop_studyConfig.h
 -
+std_msgs/Int32.h
+/home/kuriatsu/Program/Ros/master_study_ws/src/teleop_study/src/std_msgs/Int32.h
 cmath
 -
 
@@ -1045,6 +1047,22 @@ boost/thread.hpp
 -
 
 /opt/ros/kinetic/include/std_msgs/Header.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+
+/opt/ros/kinetic/include/std_msgs/Int32.h
 string
 -
 vector

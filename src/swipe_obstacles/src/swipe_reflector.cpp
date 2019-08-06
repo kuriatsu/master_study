@@ -69,7 +69,7 @@ void ObstacleReflector::eraseSignalCallback(const std_msgs::Int32 &in_msg)
         empty_scan.header.frame_id = "velodyne";
         pub_pointcloud.publish(empty_scan);
     }
-};
+}
 
 
 void ObstacleReflector::subObstaclesCallback(const swipe_obstacles::detected_obstacle_array &in_msgs)

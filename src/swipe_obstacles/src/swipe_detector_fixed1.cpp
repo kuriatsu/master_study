@@ -29,7 +29,7 @@ class SwipeDetectorFixed
 private:
     // pub sub
     ros::Publisher pub_obstacle_pose;
-    ros::Publisher pub_closest_obstacle;
+    // ros::Publisher pub_closest_obstacle;
     ros::Publisher pub_erase_signal;
 
     ros::Subscriber sub_twist;
@@ -47,6 +47,7 @@ private:
 
     // management information
     ros::Timer pub_timer;
+    float pub_rate;
     int keep_time;
     ros::Time last_pub_time;
     tf::TransformListener tf_listener;
@@ -81,7 +82,7 @@ SwipeDetectorFixed::SwipeDetectorFixed()
 
     ros::NodeHandle n;
     pub_obstacle_pose = n.advertise<swipe_obstacles::detected_obstacle_array>("/detected_obstacles", 5);
-    pub_closest_obstacle = n.advertise<swipe_obstacles::closest_obstacle>("/closest_obstacle", 5);
+    // pub_closest_obstacle = n.advertise<swipe_obstacles::closest_obstacle>("/closest_obstacle", 5);
     pub_erase_signal = n.advertise<std_msgs::Int32>("/swipe_erase_signal", 5);
     sub_twist = n.subscribe("/twist_cmd", 1, &SwipeDetectorFixed::twistCallback, this);
     sub_waypoint_callback = n.subscribe("/closest_waypoint", 5, &SwipeDetectorFixed::waypointCallback, this);
@@ -93,12 +94,13 @@ SwipeDetectorFixed::SwipeDetectorFixed()
     n.getParam("/detector_fixed_node/file_name", file_name);
     n.getParam("/detector_fixed_node/start_round", round);
     n.getParam("/detector_fixed_node/keep_time", keep_time);
+    n.getParam("/detector_fixed_node/pub_rate", pub_rate);
 
     std::cout << file_name << std::endl;
     read_obstacle_vec.reserve(vector_size);
     readFile(file_name);
     ros::Duration(1).sleep();
-    pub_timer = n.createTimer(ros::Duration(0.5), &SwipeDetectorFixed::pubTimerCallback, this);
+    pub_timer = n.createTimer(ros::Duration(pub_rate), &SwipeDetectorFixed::pubTimerCallback, this);
 }
 
 
@@ -230,14 +232,14 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
         stopping_time = ros::Time::now() - stoped_time;
         std::cout << "stopping_time : " << stopping_time << std::endl;
 
-        if(stop_time < stopping_time && stopping_time < stop_time + ros::Duration(2.0))
+        if(stop_time < stopping_time)
         {
             yaw = quatToRpy(read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.orientation);
             // out_array.obstacles.at(search_closest_obj_array_idx).pose.position.x += ((stopping_time - stop_time).toSec() * 0.5 * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist) * sin(2*M_PI+yaw);
             // out_array.obstacles.at(search_closest_obj_array_idx).pose.position.y += ((stopping_time - stop_time).toSec() * 0.5 * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist) * cos(2*M_PI+yaw);
-            read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position.x += ((stopping_time - stop_time).toSec() * 0.5 * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist) * sin(2*M_PI-yaw);
-            read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position.y += ((stopping_time - stop_time).toSec() * 0.5 * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist) * cos(2*M_PI-yaw);
-            // ROS_INFO_STREAM(out_array);
+            read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position.x = (stopping_time - stop_time).toSec() * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist * sin(M_PI-yaw) * pub_rate;
+            read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position.y = read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist * cos(M_PI-yaw) * pub_rate;
+            ROS_INFO_STREAM(read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position);
 
         }
 
@@ -295,8 +297,8 @@ geometry_msgs::Pose SwipeDetectorFixed::tfTransformer(const geometry_msgs::Pose 
 
 void SwipeDetectorFixed::twistCallback(const geometry_msgs::TwistStamped &in_msg)
 {
-    // if(closest_obj_is_new)
-    if(auto_move && closest_obj_is_new && in_msg.twist.linear.x == 0.0)
+    // if(auto_move && closest_obj_is_new && in_msg.twist.linear.x == 0.0)
+    if(closest_obj_is_new)
     {
         stoped_time = ros::Time::now();
         std::cout << "timer start: " << stoped_time << std::endl;

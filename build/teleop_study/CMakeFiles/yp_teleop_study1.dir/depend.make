@@ -82,6 +82,7 @@ teleop_study/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.o: /opt/ros/k
 teleop_study/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.o: /opt/ros/kinetic/include/sound_play/SoundRequest.h
 teleop_study/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.o: /opt/ros/kinetic/include/sound_play/sound_play.h
 teleop_study/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.o: /opt/ros/kinetic/include/std_msgs/Header.h
+teleop_study/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.o: /opt/ros/kinetic/include/std_msgs/Int32.h
 teleop_study/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.o: /opt/ros/kinetic/include/xmlrpcpp/XmlRpcDecl.h
 teleop_study/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.o: /opt/ros/kinetic/include/xmlrpcpp/XmlRpcValue.h
 teleop_study/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.o: /usr/include/x86_64-linux-gnu/bits/select.h
