@@ -118,6 +118,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/kuriatsu/Program/Ros/master_study_ws/build/gtest/cmake_install.cmake")
   include("/home/kuriatsu/Program/Ros/master_study_ws/build/swipe_obstacles/cmake_install.cmake")
+  include("/home/kuriatsu/Program/Ros/master_study_ws/build/data_logger/cmake_install.cmake")
   include("/home/kuriatsu/Program/Ros/master_study_ws/build/teleop_study/cmake_install.cmake")
   include("/home/kuriatsu/Program/Ros/master_study_ws/build/ypspur_ros/cmake_install.cmake")
 

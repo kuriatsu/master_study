@@ -56,6 +56,18 @@ CMAKE_BINARY_DIR = /home/kuriatsu/Program/Ros/master_study_ws/build
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -89,29 +101,6 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: install/local
-
-.PHONY : install/local/fast
-
-# Special rule for the target install
-install: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install
-
-# Special rule for the target install
-install/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install/fast
-
 # Special rule for the target list_install_components
 list_install_components:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
@@ -132,6 +121,17 @@ install/strip: preinstall
 install/strip/fast: install/strip
 
 .PHONY : install/strip/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: install/local
+
+.PHONY : install/local/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -166,19 +166,19 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-teleop_study/CMakeFiles/yp_teleop_study.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/yp_teleop_study.dir/rule
-.PHONY : teleop_study/CMakeFiles/yp_teleop_study.dir/rule
+teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/rule:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/rule
+.PHONY : teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/rule
 
 # Convenience name for target.
-yp_teleop_study: teleop_study/CMakeFiles/yp_teleop_study.dir/rule
+sound_play_generate_messages_py: teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/rule
 
-.PHONY : yp_teleop_study
+.PHONY : sound_play_generate_messages_py
 
 # fast build rule for target.
-yp_teleop_study/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/yp_teleop_study.dir/build.make teleop_study/CMakeFiles/yp_teleop_study.dir/build
-.PHONY : yp_teleop_study/fast
+sound_play_generate_messages_py/fast:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/build.make teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/build
+.PHONY : sound_play_generate_messages_py/fast
 
 # Convenience name for target.
 teleop_study/CMakeFiles/yp_teleop_study0.dir/rule:
@@ -196,94 +196,34 @@ yp_teleop_study0/fast:
 .PHONY : yp_teleop_study0/fast
 
 # Convenience name for target.
-teleop_study/CMakeFiles/yp_teleop_study1.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/yp_teleop_study1.dir/rule
-.PHONY : teleop_study/CMakeFiles/yp_teleop_study1.dir/rule
+teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule
+.PHONY : teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule
 
 # Convenience name for target.
-yp_teleop_study1: teleop_study/CMakeFiles/yp_teleop_study1.dir/rule
+sound_play_generate_messages_nodejs: teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule
 
-.PHONY : yp_teleop_study1
+.PHONY : sound_play_generate_messages_nodejs
 
 # fast build rule for target.
-yp_teleop_study1/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/yp_teleop_study1.dir/build.make teleop_study/CMakeFiles/yp_teleop_study1.dir/build
-.PHONY : yp_teleop_study1/fast
+sound_play_generate_messages_nodejs/fast:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/build.make teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/build
+.PHONY : sound_play_generate_messages_nodejs/fast
 
 # Convenience name for target.
-teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_py.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_py.dir/rule
-.PHONY : teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_py.dir/rule
+teleop_study/CMakeFiles/yp_teleop_study.dir/rule:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/yp_teleop_study.dir/rule
+.PHONY : teleop_study/CMakeFiles/yp_teleop_study.dir/rule
 
 # Convenience name for target.
-diagnostic_msgs_generate_messages_py: teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_py.dir/rule
+yp_teleop_study: teleop_study/CMakeFiles/yp_teleop_study.dir/rule
 
-.PHONY : diagnostic_msgs_generate_messages_py
+.PHONY : yp_teleop_study
 
 # fast build rule for target.
-diagnostic_msgs_generate_messages_py/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_py.dir/build.make teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_py.dir/build
-.PHONY : diagnostic_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_nodejs.dir/rule
-.PHONY : teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-diagnostic_msgs_generate_messages_nodejs: teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : diagnostic_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-diagnostic_msgs_generate_messages_nodejs/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_nodejs.dir/build.make teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_nodejs.dir/build
-.PHONY : diagnostic_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/rule
-.PHONY : teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-sound_play_generate_messages_eus: teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/rule
-
-.PHONY : sound_play_generate_messages_eus
-
-# fast build rule for target.
-sound_play_generate_messages_eus/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/build.make teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/build
-.PHONY : sound_play_generate_messages_eus/fast
-
-# Convenience name for target.
-teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_cpp.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_cpp.dir/rule
-.PHONY : teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-diagnostic_msgs_generate_messages_cpp: teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : diagnostic_msgs_generate_messages_cpp
-
-# fast build rule for target.
-diagnostic_msgs_generate_messages_cpp/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_cpp.dir/build.make teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_cpp.dir/build
-.PHONY : diagnostic_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_eus.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_eus.dir/rule
-.PHONY : teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-diagnostic_msgs_generate_messages_eus: teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_eus.dir/rule
-
-.PHONY : diagnostic_msgs_generate_messages_eus
-
-# fast build rule for target.
-diagnostic_msgs_generate_messages_eus/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_eus.dir/build.make teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_eus.dir/build
-.PHONY : diagnostic_msgs_generate_messages_eus/fast
+yp_teleop_study/fast:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/yp_teleop_study.dir/build.make teleop_study/CMakeFiles/yp_teleop_study.dir/build
+.PHONY : yp_teleop_study/fast
 
 # Convenience name for target.
 teleop_study/CMakeFiles/sound_play_generate_messages_cpp.dir/rule:
@@ -301,19 +241,34 @@ sound_play_generate_messages_cpp/fast:
 .PHONY : sound_play_generate_messages_cpp/fast
 
 # Convenience name for target.
-teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_lisp.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_lisp.dir/rule
-.PHONY : teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_lisp.dir/rule
+teleop_study/CMakeFiles/teleop_study_gencfg.dir/rule:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/teleop_study_gencfg.dir/rule
+.PHONY : teleop_study/CMakeFiles/teleop_study_gencfg.dir/rule
 
 # Convenience name for target.
-diagnostic_msgs_generate_messages_lisp: teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_lisp.dir/rule
+teleop_study_gencfg: teleop_study/CMakeFiles/teleop_study_gencfg.dir/rule
 
-.PHONY : diagnostic_msgs_generate_messages_lisp
+.PHONY : teleop_study_gencfg
 
 # fast build rule for target.
-diagnostic_msgs_generate_messages_lisp/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_lisp.dir/build.make teleop_study/CMakeFiles/diagnostic_msgs_generate_messages_lisp.dir/build
-.PHONY : diagnostic_msgs_generate_messages_lisp/fast
+teleop_study_gencfg/fast:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/teleop_study_gencfg.dir/build.make teleop_study/CMakeFiles/teleop_study_gencfg.dir/build
+.PHONY : teleop_study_gencfg/fast
+
+# Convenience name for target.
+teleop_study/CMakeFiles/yp_teleop_study1.dir/rule:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/yp_teleop_study1.dir/rule
+.PHONY : teleop_study/CMakeFiles/yp_teleop_study1.dir/rule
+
+# Convenience name for target.
+yp_teleop_study1: teleop_study/CMakeFiles/yp_teleop_study1.dir/rule
+
+.PHONY : yp_teleop_study1
+
+# fast build rule for target.
+yp_teleop_study1/fast:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/yp_teleop_study1.dir/build.make teleop_study/CMakeFiles/yp_teleop_study1.dir/build
+.PHONY : yp_teleop_study1/fast
 
 # Convenience name for target.
 teleop_study/CMakeFiles/sound_play_generate_messages_lisp.dir/rule:
@@ -331,49 +286,19 @@ sound_play_generate_messages_lisp/fast:
 .PHONY : sound_play_generate_messages_lisp/fast
 
 # Convenience name for target.
-teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule
-.PHONY : teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule
+teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/rule:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/rule
+.PHONY : teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/rule
 
 # Convenience name for target.
-sound_play_generate_messages_nodejs: teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule
+sound_play_generate_messages_eus: teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/rule
 
-.PHONY : sound_play_generate_messages_nodejs
+.PHONY : sound_play_generate_messages_eus
 
 # fast build rule for target.
-sound_play_generate_messages_nodejs/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/build.make teleop_study/CMakeFiles/sound_play_generate_messages_nodejs.dir/build
-.PHONY : sound_play_generate_messages_nodejs/fast
-
-# Convenience name for target.
-teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/rule
-.PHONY : teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/rule
-
-# Convenience name for target.
-sound_play_generate_messages_py: teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/rule
-
-.PHONY : sound_play_generate_messages_py
-
-# fast build rule for target.
-sound_play_generate_messages_py/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/build.make teleop_study/CMakeFiles/sound_play_generate_messages_py.dir/build
-.PHONY : sound_play_generate_messages_py/fast
-
-# Convenience name for target.
-teleop_study/CMakeFiles/teleop_study_gencfg.dir/rule:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_study/CMakeFiles/teleop_study_gencfg.dir/rule
-.PHONY : teleop_study/CMakeFiles/teleop_study_gencfg.dir/rule
-
-# Convenience name for target.
-teleop_study_gencfg: teleop_study/CMakeFiles/teleop_study_gencfg.dir/rule
-
-.PHONY : teleop_study_gencfg
-
-# fast build rule for target.
-teleop_study_gencfg/fast:
-	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/teleop_study_gencfg.dir/build.make teleop_study/CMakeFiles/teleop_study_gencfg.dir/build
-.PHONY : teleop_study_gencfg/fast
+sound_play_generate_messages_eus/fast:
+	cd /home/kuriatsu/Program/Ros/master_study_ws/build && $(MAKE) -f teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/build.make teleop_study/CMakeFiles/sound_play_generate_messages_eus.dir/build
+.PHONY : sound_play_generate_messages_eus/fast
 
 src/teleop_study.o: src/teleop_study.cpp.o
 
@@ -462,27 +387,22 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... install"
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... edit_cache"
-	@echo "... yp_teleop_study"
-	@echo "... yp_teleop_study0"
-	@echo "... yp_teleop_study1"
-	@echo "... diagnostic_msgs_generate_messages_py"
-	@echo "... diagnostic_msgs_generate_messages_nodejs"
-	@echo "... install/local"
-	@echo "... sound_play_generate_messages_eus"
-	@echo "... install"
-	@echo "... diagnostic_msgs_generate_messages_cpp"
-	@echo "... diagnostic_msgs_generate_messages_eus"
-	@echo "... sound_play_generate_messages_cpp"
-	@echo "... list_install_components"
-	@echo "... install/strip"
-	@echo "... diagnostic_msgs_generate_messages_lisp"
-	@echo "... sound_play_generate_messages_lisp"
-	@echo "... sound_play_generate_messages_nodejs"
 	@echo "... sound_play_generate_messages_py"
+	@echo "... yp_teleop_study0"
+	@echo "... sound_play_generate_messages_nodejs"
+	@echo "... yp_teleop_study"
+	@echo "... sound_play_generate_messages_cpp"
 	@echo "... teleop_study_gencfg"
+	@echo "... yp_teleop_study1"
+	@echo "... list_install_components"
+	@echo "... sound_play_generate_messages_lisp"
+	@echo "... install/strip"
+	@echo "... sound_play_generate_messages_eus"
+	@echo "... install/local"
 	@echo "... src/teleop_study.o"
 	@echo "... src/teleop_study.i"
 	@echo "... src/teleop_study.s"

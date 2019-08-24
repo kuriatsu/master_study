@@ -7,4 +7,4 @@ detector_fixed_node:
 
     start_round: 1
     keep_time: 2
-    pub_rate: 0.1
+    pub_rate: 0.2

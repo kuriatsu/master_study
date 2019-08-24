@@ -119,7 +119,7 @@ void ObstacleReflector::pubPointcloudNhz(const ros::TimerEvent&)
         }
         pcl::toROSMsg(in_cloud, in_scan);
         pcl_ros::transformPointCloud("velodyne", in_scan, out_scan, tf_listener);
-        std::cout << "points published" << std::endl;
+        // std::cout << "points published" << std::endl;
         out_scan.header.frame_id = "velodyne";
         out_scan.header.stamp = ros::Time::now();
         pub_pointcloud.publish(out_scan);

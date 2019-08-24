@@ -96,7 +96,7 @@ SwipeDetectorFixed::SwipeDetectorFixed()
     n.getParam("/detector_fixed_node/keep_time", keep_time);
     n.getParam("/detector_fixed_node/pub_rate", pub_rate);
 
-    std::cout << file_name << std::endl;
+    // std::cout << file_name << std::endl;
     read_obstacle_vec.reserve(vector_size);
     readFile(file_name);
     ros::Duration(1).sleep();
@@ -232,14 +232,15 @@ void SwipeDetectorFixed::pubTimerCallback(const ros::TimerEvent&)
         stopping_time = ros::Time::now() - stoped_time;
         std::cout << "stopping_time : " << stopping_time << std::endl;
 
-        if(stop_time < stopping_time)
+        // if(stop_time + ros::Duration(5.0) <= stopping_time && stopping_time <= stop_time + ros::Duration(8.0)) // for test
+        if(stop_time <= stopping_time && stopping_time <= stop_time + ros::Duration(3.0))
         {
             yaw = quatToRpy(read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.orientation);
             // out_array.obstacles.at(search_closest_obj_array_idx).pose.position.x += ((stopping_time - stop_time).toSec() * 0.5 * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist) * sin(2*M_PI+yaw);
             // out_array.obstacles.at(search_closest_obj_array_idx).pose.position.y += ((stopping_time - stop_time).toSec() * 0.5 * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist) * cos(2*M_PI+yaw);
-            read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position.x = (stopping_time - stop_time).toSec() * read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist * sin(M_PI-yaw) * pub_rate;
-            read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position.y = read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist * cos(M_PI-yaw) * pub_rate;
-            ROS_INFO_STREAM(read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position);
+            read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position.x += (read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist / 3.0) * sin(M_PI-yaw) * pub_rate;
+            read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position.y += (read_obstacle_vec.at(search_closest_obj_vec_idx).move_dist / 3.0) * cos(M_PI-yaw) * pub_rate;
+            // ROS_INFO_STREAM(read_obstacle_vec.at(search_closest_obj_vec_idx).detected_obstacle.pose.position);
 
         }
 
@@ -297,11 +298,11 @@ geometry_msgs::Pose SwipeDetectorFixed::tfTransformer(const geometry_msgs::Pose 
 
 void SwipeDetectorFixed::twistCallback(const geometry_msgs::TwistStamped &in_msg)
 {
-    // if(auto_move && closest_obj_is_new && in_msg.twist.linear.x == 0.0)
-    if(closest_obj_is_new)
+    // if(closest_obj_is_new) // for test
+    if(auto_move && closest_obj_is_new && in_msg.twist.linear.x == 0.0)
     {
         stoped_time = ros::Time::now();
-        std::cout << "timer start: " << stoped_time << std::endl;
+        // std::cout << "timer start: " << stoped_time << std::endl;
         closest_obj_is_new = false;
     }
 }

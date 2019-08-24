@@ -52,7 +52,7 @@ void ObstacleVisualizer::erase_signal_callback(const std_msgs::Int32 &in_msg)
 {
     if(in_msg.data)
     {
-        ROS_INFO_STREAM(in_msg.data);
+        // ROS_INFO_STREAM(in_msg.data);
         server->clear();
         server->applyChanges();
     }
@@ -62,7 +62,7 @@ void ObstacleVisualizer::erase_signal_callback(const std_msgs::Int32 &in_msg)
 void ObstacleVisualizer::sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs)
 {
     server->clear();
-    ROS_INFO("visualezer subscribed");
+    // ROS_INFO("visualezer subscribed");
 
     for (size_t i=0; i< in_msgs.obstacles.size(); i++)
     {
@@ -101,7 +101,7 @@ void ObstacleVisualizer::make_cube(const swipe_obstacles::detected_obstacle &in_
     ss << in_msg.id;
     std::cout <<"ss id is:" << in_msg.id << std::endl;
 	visualization_msgs::InteractiveMarker int_marker;
-    ROS_INFO_STREAM(in_msg);
+    // ROS_INFO_STREAM(in_msg);
 	int_marker.header.frame_id = "map";
 	int_marker.name = ss.str();
 	int_marker.scale = 1.0;

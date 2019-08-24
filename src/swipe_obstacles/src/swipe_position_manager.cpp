@@ -111,8 +111,8 @@ void PositionManager::containerManage(const swipe_obstacles::detected_obstacle_a
             in_msg.shift_y = obstacle_vec.at(id_index_map.at(inherit_id)).shift_y;
         }
 
-        std::cout << "inherit id:" << inherit_id << " in_msg id:" << in_msg.id << std::endl;
-        std::cout << "shift_x : " << in_msg.shift_x << std::endl;
+        // std::cout << "inherit id:" << inherit_id << " in_msg id:" << in_msg.id << std::endl;
+        // std::cout << "shift_x : " << in_msg.shift_x << std::endl;
         // 近距離の障害物を同一とみなしてid付けする際に,入力障害物内でidがダブる可能性があるのでcheck
         if(!new_id_index_map.count(in_msg.id))
         {
@@ -120,7 +120,7 @@ void PositionManager::containerManage(const swipe_obstacles::detected_obstacle_a
             new_obstacle_vec.emplace_back(in_msg);
             // 新しいindex検索辞書に追加, indexをそのまま用いると入力障害物がダブった際にずれる
             new_id_index_map.emplace(in_msg.id, new_obstacle_vec.size()-1);
-            std::cout << "id:" << in_msg.id << " index:" << new_obstacle_vec.size()-1 << std::endl;
+            // std::cout << "id:" << in_msg.id << " index:" << new_obstacle_vec.size()-1 << std::endl;
         }
     }
 
@@ -132,7 +132,7 @@ void PositionManager::containerManage(const swipe_obstacles::detected_obstacle_a
         {
             new_obstacle_vec.emplace_back(*obstacle_vec_itr);
             new_id_index_map.emplace(obstacle_vec_itr->id, new_obstacle_vec.size()-1);
-            std::cout << "(extracted) id:" << obstacle_vec_itr->id << "index:" << new_obstacle_vec.size()-1 << std::endl;
+            // std::cout << "(extracted) id:" << obstacle_vec_itr->id << "index:" << new_obstacle_vec.size()-1 << std::endl;
             // index++;
         }
     }
@@ -266,7 +266,7 @@ void PositionManager::obstaclePublish()
     for(auto i = obstacle_vec.begin(); i != obstacle_vec.end(); i++)
     {
         out_msgs.obstacles.emplace_back(*i);
-        std::cout << "published id is " << i->id << std::endl;
+        // std::cout << "published id is " << i->id << std::endl;
         // ROS_INFO_STREAM(*i);
         flag = 1;
     }
@@ -275,7 +275,7 @@ void PositionManager::obstaclePublish()
     if(flag)
     {
         pub_obj.publish(out_msgs);
-        std::cout << "managed info is published" << std::endl;
+        // std::cout << "managed info is published" << std::endl;
         // last_pub_time = ros::Time::now();
     }
     // else if(ros::Time::now() - last_pub_time > ros::Duration(keep_time))

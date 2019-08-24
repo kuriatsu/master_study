@@ -140,7 +140,7 @@ void YpTeleopStudy::twistCallback(const geometry_msgs::TwistStamped &in_msg)
     {
         in_twist.linear.x = in_msg.twist.linear.x;
         in_twist.angular.z = in_msg.twist.angular.z;
-        std::cout << in_twist.linear.x << std::endl;
+        // std::cout << in_twist.linear.x << std::endl;
         if (closest_waypoint > final_waypoint-5 /*&& in_twist.linear.x < base_speed*/)
         {
             in_twist.linear.x = max_twist_speed;
@@ -172,8 +172,8 @@ void YpTeleopStudy::joyCallback(const sensor_msgs::Joy &in_msg)
         brake = (1.0 + in_msg.axes[2]) * 0.5;
     }
 
-    ROS_INFO("accel %f", accel);
-    ROS_INFO("brake %f", brake);
+    // ROS_INFO("accel %f", accel);
+    // ROS_INFO("brake %f", brake);
 
     //A button [0]
     if (in_msg.buttons[0])
@@ -224,13 +224,15 @@ void YpTeleopStudy::joyCallback(const sensor_msgs::Joy &in_msg)
     }
 
     // START [7]
-    if (in_msg.buttons[7])
+    if (in_msg.buttons[7] && in_msg.axes[2] == -1.0 && in_msg.axes[5] == -1)
     {
         if(!rosbag_flag)
         {
             ROS_INFO("bag_record_on");
             sc.playWave("/usr/share/sounds/robot_sounds/new_world.wav");
             system("bash ~/Program/Ros/master_study_ws/src/teleop_study/src/bag_recorder.sh &");
+            ros::Duration(2).sleep();
+            system("bash ~/Program/Ros/master_study_ws/src/teleop_study/src/bag_checker.sh &");
             rosbag_flag = true;
         }
         else if(rosbag_flag)
@@ -245,7 +247,7 @@ void YpTeleopStudy::joyCallback(const sensor_msgs::Joy &in_msg)
     // Logicoool [8]
     // left joy click [9]
     // right joy click [10]
-    ROS_INFO("joy_in_twist %f", in_twist.linear.x);
+    // ROS_INFO("joy_in_twist %f", in_twist.linear.x);
 }
 
 

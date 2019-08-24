@@ -3,7 +3,7 @@
     <rosparam command="load" file="$(find swipe_obstacles)/cfg/swipe_obstacles.yaml"/>
 
     <group ns="swipe_obstalces">
-        <!-- <node pkg="swipe_obstacles" type="swipe_detector_fixed1_node" name="detector_fixed_node"/> -->
+        <node pkg="swipe_obstacles" type="swipe_detector_fixed1_node" name="detector_fixed_node"/>
         <node pkg="swipe_obstacles" type="swipe_position_manager_node" name="manager_node"/>
         <!-- <node pkg="swipe_obstacles" type="swipe_visualizer_node" name="visualizer_node"/> -->
         <node pkg="swipe_obstacles" type="swipe_reflector_node" name="reflector_node"/>
