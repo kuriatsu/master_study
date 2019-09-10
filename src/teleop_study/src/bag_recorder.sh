@@ -2,7 +2,7 @@
 
 today=`date +'%Y_%m_%d'`
 time=`date +'%H_%M_%S'`
-dir=/mnt/SamsungKURI/master_study_bag/$today
+dir=/media/kuriatsu/SamsungKURI/master_study_bag/$today
 
 if [ -e $dir ]; then
 	echo "file found"
