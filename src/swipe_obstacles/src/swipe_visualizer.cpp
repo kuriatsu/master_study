@@ -151,8 +151,8 @@ void ObstacleVisualizer::setMarkerToMarkerControl(visualization_msgs::Interactiv
         marker.scale.y = marker_scale*obstacle_info.distance;
         marker.scale.z = marker_scale*1.0;
         marker.color.r = 0;
-        marker.color.g = 0;
-        marker.color.b = 1;
+        marker.color.g = 1;
+        marker.color.b = 0;
         marker.color.a = 0.7;
     }
     
@@ -162,15 +162,15 @@ void ObstacleVisualizer::setMarkerToMarkerControl(visualization_msgs::Interactiv
         marker.scale.x = marker_scale*15;
         marker.scale.y = marker_scale*15;
         marker.scale.z = marker_scale*1.4;
-        marker.color.r = 0;
-        marker.color.g = 1;
+        marker.color.r = 1;
+        marker.color.g = 0;
         marker.color.b = 0;
         marker.color.a = 0.7;
     }
     else if (obstacle_info.label == "car")
     {
         marker.type = visualization_msgs::Marker::CUBE;
-        marker.scale.x = marker_scale*15;
+        marker.scale.x = marker_scale*40;
         marker.scale.y = marker_scale*4.0;
         marker.scale.z = marker_scale*1.7;
         marker.color.r = 1;
