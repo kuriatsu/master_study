@@ -27,9 +27,14 @@
     :initarg :odom
     :type geometry_msgs-msg:Pose
     :initform (cl:make-instance 'geometry_msgs-msg:Pose))
-   (twist
-    :reader twist
-    :initarg :twist
+   (autoware_twist
+    :reader autoware_twist
+    :initarg :autoware_twist
+    :type geometry_msgs-msg:Twist
+    :initform (cl:make-instance 'geometry_msgs-msg:Twist))
+   (ypspur_twist
+    :reader ypspur_twist
+    :initarg :ypspur_twist
     :type geometry_msgs-msg:Twist
     :initform (cl:make-instance 'geometry_msgs-msg:Twist))
    (brake
@@ -45,8 +50,8 @@
    (shift
     :reader shift
     :initarg :shift
-    :type cl:float
-    :initform 0.0)
+    :type cl:integer
+    :initform 0)
    (obstacle_id
     :reader obstacle_id
     :initarg :obstacle_id
@@ -92,10 +97,15 @@
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader data_logger-msg:odom-val is deprecated.  Use data_logger-msg:odom instead.")
   (odom m))
 
-(cl:ensure-generic-function 'twist-val :lambda-list '(m))
-(cl:defmethod twist-val ((m <swipe_obstacles_log>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader data_logger-msg:twist-val is deprecated.  Use data_logger-msg:twist instead.")
-  (twist m))
+(cl:ensure-generic-function 'autoware_twist-val :lambda-list '(m))
+(cl:defmethod autoware_twist-val ((m <swipe_obstacles_log>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader data_logger-msg:autoware_twist-val is deprecated.  Use data_logger-msg:autoware_twist instead.")
+  (autoware_twist m))
+
+(cl:ensure-generic-function 'ypspur_twist-val :lambda-list '(m))
+(cl:defmethod ypspur_twist-val ((m <swipe_obstacles_log>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader data_logger-msg:ypspur_twist-val is deprecated.  Use data_logger-msg:ypspur_twist instead.")
+  (ypspur_twist m))
 
 (cl:ensure-generic-function 'brake-val :lambda-list '(m))
 (cl:defmethod brake-val ((m <swipe_obstacles_log>))
@@ -135,7 +145,8 @@
   (cl:write-byte (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'round)) ostream)
   (roslisp-msg-protocol:serialize (cl:slot-value msg 'pose) ostream)
   (roslisp-msg-protocol:serialize (cl:slot-value msg 'odom) ostream)
-  (roslisp-msg-protocol:serialize (cl:slot-value msg 'twist) ostream)
+  (roslisp-msg-protocol:serialize (cl:slot-value msg 'autoware_twist) ostream)
+  (roslisp-msg-protocol:serialize (cl:slot-value msg 'ypspur_twist) ostream)
   (cl:let ((bits (roslisp-utils:encode-single-float-bits (cl:slot-value msg 'brake))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
@@ -146,11 +157,10 @@
     (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream))
-  (cl:let ((bits (roslisp-utils:encode-single-float-bits (cl:slot-value msg 'shift))))
-    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
-    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
-    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
-    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream))
+  (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'shift)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'shift)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'shift)) ostream)
+  (cl:write-byte (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'shift)) ostream)
   (cl:write-byte (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'obstacle_id)) ostream)
   (cl:write-byte (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'obstacle_id)) ostream)
   (cl:write-byte (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'obstacle_id)) ostream)
@@ -173,7 +183,8 @@
     (cl:setf (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'round)) (cl:read-byte istream))
   (roslisp-msg-protocol:deserialize (cl:slot-value msg 'pose) istream)
   (roslisp-msg-protocol:deserialize (cl:slot-value msg 'odom) istream)
-  (roslisp-msg-protocol:deserialize (cl:slot-value msg 'twist) istream)
+  (roslisp-msg-protocol:deserialize (cl:slot-value msg 'autoware_twist) istream)
+  (roslisp-msg-protocol:deserialize (cl:slot-value msg 'ypspur_twist) istream)
     (cl:let ((bits 0))
       (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
@@ -186,12 +197,10 @@
       (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
       (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
     (cl:setf (cl:slot-value msg 'accel) (roslisp-utils:decode-single-float-bits bits)))
-    (cl:let ((bits 0))
-      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
-      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
-      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
-      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
-    (cl:setf (cl:slot-value msg 'shift) (roslisp-utils:decode-single-float-bits bits)))
+    (cl:setf (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'shift)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'shift)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'shift)) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 24) (cl:slot-value msg 'shift)) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 0) (cl:slot-value msg 'obstacle_id)) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 8) (cl:slot-value msg 'obstacle_id)) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 16) (cl:slot-value msg 'obstacle_id)) (cl:read-byte istream))
@@ -214,23 +223,24 @@
   "data_logger/swipe_obstacles_log")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<swipe_obstacles_log>)))
   "Returns md5sum for a message object of type '<swipe_obstacles_log>"
-  "9986bce81c59a09d6f4ebd3feb2a8ca7")
+  "40f7308363d60b6e3d831771732fa8bd")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'swipe_obstacles_log)))
   "Returns md5sum for a message object of type 'swipe_obstacles_log"
-  "9986bce81c59a09d6f4ebd3feb2a8ca7")
+  "40f7308363d60b6e3d831771732fa8bd")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<swipe_obstacles_log>)))
   "Returns full string definition for message of type '<swipe_obstacles_log>"
-  (cl:format cl:nil "std_msgs/Header header~%~%uint32 round~%geometry_msgs/Pose pose~%geometry_msgs/Pose odom~%geometry_msgs/Twist twist~%float32 brake~%float32 accel~%float32 shift~%uint32 obstacle_id~%uint32 detected_flag~%uint32 pedestrian_flag~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Pose~%# A representation of pose in free space, composed of position and orientation. ~%Point position~%Quaternion orientation~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%================================================================================~%MSG: geometry_msgs/Twist~%# This expresses velocity in free space broken into its linear and angular parts.~%Vector3  linear~%Vector3  angular~%~%================================================================================~%MSG: geometry_msgs/Vector3~%# This represents a vector in free space. ~%# It is only meant to represent a direction. Therefore, it does not~%# make sense to apply a translation to it (e.g., when applying a ~%# generic rigid transformation to a Vector3, tf2 will only apply the~%# rotation). If you want your data to be translatable too, use the~%# geometry_msgs/Point message instead.~%~%float64 x~%float64 y~%float64 z~%~%"))
+  (cl:format cl:nil "std_msgs/Header header~%~%uint32 round~%geometry_msgs/Pose pose~%geometry_msgs/Pose odom~%geometry_msgs/Twist autoware_twist~%geometry_msgs/Twist ypspur_twist~%float32 brake~%float32 accel~%uint32 shift~%uint32 obstacle_id~%uint32 detected_flag~%uint32 pedestrian_flag~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Pose~%# A representation of pose in free space, composed of position and orientation. ~%Point position~%Quaternion orientation~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%================================================================================~%MSG: geometry_msgs/Twist~%# This expresses velocity in free space broken into its linear and angular parts.~%Vector3  linear~%Vector3  angular~%~%================================================================================~%MSG: geometry_msgs/Vector3~%# This represents a vector in free space. ~%# It is only meant to represent a direction. Therefore, it does not~%# make sense to apply a translation to it (e.g., when applying a ~%# generic rigid transformation to a Vector3, tf2 will only apply the~%# rotation). If you want your data to be translatable too, use the~%# geometry_msgs/Point message instead.~%~%float64 x~%float64 y~%float64 z~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'swipe_obstacles_log)))
   "Returns full string definition for message of type 'swipe_obstacles_log"
-  (cl:format cl:nil "std_msgs/Header header~%~%uint32 round~%geometry_msgs/Pose pose~%geometry_msgs/Pose odom~%geometry_msgs/Twist twist~%float32 brake~%float32 accel~%float32 shift~%uint32 obstacle_id~%uint32 detected_flag~%uint32 pedestrian_flag~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Pose~%# A representation of pose in free space, composed of position and orientation. ~%Point position~%Quaternion orientation~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%================================================================================~%MSG: geometry_msgs/Twist~%# This expresses velocity in free space broken into its linear and angular parts.~%Vector3  linear~%Vector3  angular~%~%================================================================================~%MSG: geometry_msgs/Vector3~%# This represents a vector in free space. ~%# It is only meant to represent a direction. Therefore, it does not~%# make sense to apply a translation to it (e.g., when applying a ~%# generic rigid transformation to a Vector3, tf2 will only apply the~%# rotation). If you want your data to be translatable too, use the~%# geometry_msgs/Point message instead.~%~%float64 x~%float64 y~%float64 z~%~%"))
+  (cl:format cl:nil "std_msgs/Header header~%~%uint32 round~%geometry_msgs/Pose pose~%geometry_msgs/Pose odom~%geometry_msgs/Twist autoware_twist~%geometry_msgs/Twist ypspur_twist~%float32 brake~%float32 accel~%uint32 shift~%uint32 obstacle_id~%uint32 detected_flag~%uint32 pedestrian_flag~%~%================================================================================~%MSG: std_msgs/Header~%# Standard metadata for higher-level stamped data types.~%# This is generally used to communicate timestamped data ~%# in a particular coordinate frame.~%# ~%# sequence ID: consecutively increasing ID ~%uint32 seq~%#Two-integer timestamp that is expressed as:~%# * stamp.sec: seconds (stamp_secs) since epoch (in Python the variable is called 'secs')~%# * stamp.nsec: nanoseconds since stamp_secs (in Python the variable is called 'nsecs')~%# time-handling sugar is provided by the client library~%time stamp~%#Frame this data is associated with~%# 0: no frame~%# 1: global frame~%string frame_id~%~%================================================================================~%MSG: geometry_msgs/Pose~%# A representation of pose in free space, composed of position and orientation. ~%Point position~%Quaternion orientation~%~%================================================================================~%MSG: geometry_msgs/Point~%# This contains the position of a point in free space~%float64 x~%float64 y~%float64 z~%~%================================================================================~%MSG: geometry_msgs/Quaternion~%# This represents an orientation in free space in quaternion form.~%~%float64 x~%float64 y~%float64 z~%float64 w~%~%================================================================================~%MSG: geometry_msgs/Twist~%# This expresses velocity in free space broken into its linear and angular parts.~%Vector3  linear~%Vector3  angular~%~%================================================================================~%MSG: geometry_msgs/Vector3~%# This represents a vector in free space. ~%# It is only meant to represent a direction. Therefore, it does not~%# make sense to apply a translation to it (e.g., when applying a ~%# generic rigid transformation to a Vector3, tf2 will only apply the~%# rotation). If you want your data to be translatable too, use the~%# geometry_msgs/Point message instead.~%~%float64 x~%float64 y~%float64 z~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <swipe_obstacles_log>))
   (cl:+ 0
      (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'header))
      4
      (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'pose))
      (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'odom))
-     (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'twist))
+     (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'autoware_twist))
+     (roslisp-msg-protocol:serialization-length (cl:slot-value msg 'ypspur_twist))
      4
      4
      4
@@ -245,7 +255,8 @@
     (cl:cons ':round (round msg))
     (cl:cons ':pose (pose msg))
     (cl:cons ':odom (odom msg))
-    (cl:cons ':twist (twist msg))
+    (cl:cons ':autoware_twist (autoware_twist msg))
+    (cl:cons ':ypspur_twist (ypspur_twist msg))
     (cl:cons ':brake (brake msg))
     (cl:cons ':accel (accel msg))
     (cl:cons ':shift (shift msg))

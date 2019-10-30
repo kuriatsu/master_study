@@ -31,6 +31,7 @@ struct detected_obstacle_
     , managed_id(0)
     , label()
     , score(0.0)
+    , distance(0.0)
     , pose()
     , shift_x(0.0)
     , shift_y(0.0)
@@ -43,6 +44,7 @@ struct detected_obstacle_
     , managed_id(0)
     , label(_alloc)
     , score(0.0)
+    , distance(0.0)
     , pose(_alloc)
     , shift_x(0.0)
     , shift_y(0.0)
@@ -67,6 +69,9 @@ struct detected_obstacle_
 
    typedef float _score_type;
   _score_type score;
+
+   typedef float _distance_type;
+  _distance_type distance;
 
    typedef  ::geometry_msgs::Pose_<ContainerAllocator>  _pose_type;
   _pose_type pose;
@@ -118,7 +123,7 @@ namespace message_traits
 
 
 // BOOLTRAITS {'IsFixedSize': False, 'IsMessage': True, 'HasHeader': True}
-// {'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg'], 'swipe_obstacles': ['/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg']}
+// {'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg'], 'swipe_obstacles': ['/home/mad-autoware/catkin_ws/src/swipe_obstacles/msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg']}
 
 // !!!!!!!!!!! ['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_parsed_fields', 'constants', 'fields', 'full_name', 'has_header', 'header_present', 'names', 'package', 'parsed_fields', 'short_name', 'text', 'types']
 
@@ -161,12 +166,12 @@ struct MD5Sum< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "9978e5bb58ee01f8e45fc2d8376b759a";
+    return "ded6fe15314248041bfd81694d77c110";
   }
 
   static const char* value(const ::swipe_obstacles::detected_obstacle_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x9978e5bb58ee01f8ULL;
-  static const uint64_t static_value2 = 0xe45fc2d8376b759aULL;
+  static const uint64_t static_value1 = 0xded6fe1531424804ULL;
+  static const uint64_t static_value2 = 0x1bfd81694d77c110ULL;
 };
 
 template<class ContainerAllocator>
@@ -191,6 +196,7 @@ uint32 id\n\
 uint32 managed_id\n\
 string label\n\
 float32 score\n\
+float32 distance\n\
 geometry_msgs/Pose pose\n\
 \n\
 float32 shift_x\n\
@@ -260,6 +266,7 @@ namespace serialization
       stream.next(m.managed_id);
       stream.next(m.label);
       stream.next(m.score);
+      stream.next(m.distance);
       stream.next(m.pose);
       stream.next(m.shift_x);
       stream.next(m.shift_y);
@@ -294,6 +301,8 @@ struct Printer< ::swipe_obstacles::detected_obstacle_<ContainerAllocator> >
     Printer<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > >::stream(s, indent + "  ", v.label);
     s << indent << "score: ";
     Printer<float>::stream(s, indent + "  ", v.score);
+    s << indent << "distance: ";
+    Printer<float>::stream(s, indent + "  ", v.distance);
     s << indent << "pose: ";
     s << std::endl;
     Printer< ::geometry_msgs::Pose_<ContainerAllocator> >::stream(s, indent + "  ", v.pose);

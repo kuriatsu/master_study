@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/swipe_obstacles_generate_messages_lisp"
-  "/home/kuriatsu/Program/Ros/master_study_ws/devel/share/common-lisp/ros/swipe_obstacles/msg/detected_obstacle_array.lisp"
-  "/home/kuriatsu/Program/Ros/master_study_ws/devel/share/common-lisp/ros/swipe_obstacles/msg/detected_obstacle.lisp"
-  "/home/kuriatsu/Program/Ros/master_study_ws/devel/share/common-lisp/ros/swipe_obstacles/msg/closest_obstacle.lisp"
+  "/home/mad-autoware/catkin_ws/devel/share/common-lisp/ros/swipe_obstacles/msg/detected_obstacle.lisp"
+  "/home/mad-autoware/catkin_ws/devel/share/common-lisp/ros/swipe_obstacles/msg/closest_obstacle.lisp"
+  "/home/mad-autoware/catkin_ws/devel/share/common-lisp/ros/swipe_obstacles/msg/detected_obstacle_array.lisp"
 )
 
 # Per-language clean rules from dependency scanning.

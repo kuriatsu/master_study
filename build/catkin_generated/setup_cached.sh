@@ -7,4 +7,5 @@
 # new environment variables
 
 # modified environment variables
-export PWD="/home/kuriatsu/Program/Ros/master_study_ws/build"
+export PATH="/opt/ros/kinetic/bin:/home/mad-autoware/bin:/home/mad-autoware/.local/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+export PWD="/home/mad-autoware/catkin_ws/build"

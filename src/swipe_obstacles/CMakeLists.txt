@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
   message_generation
   std_msgs
+  derived_object_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -146,6 +147,7 @@ include_directories(
 add_executable(swipe_detector_fixed_node src/swipe_detector_fixed.cpp)
 add_executable(swipe_detector_fixed1_node src/swipe_detector_fixed1.cpp)
 add_executable(swipe_detector_yolo_node src/swipe_detector_yolo.cpp)
+add_executable(swipe_detector_carla_node src/swipe_detector_carla.cpp)
 add_executable(swipe_position_manager_node src/swipe_position_manager.cpp)
 add_executable(swipe_visualizer_node src/swipe_visualizer.cpp)
 add_executable(swipe_reflector_node src/swipe_reflector.cpp)
@@ -161,6 +163,7 @@ add_executable(swipe_reflector_node src/swipe_reflector.cpp)
 add_dependencies(swipe_detector_fixed_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(swipe_detector_fixed1_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(swipe_detector_yolo_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(swipe_detector_carla_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(swipe_position_manager_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(swipe_visualizer_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(swipe_reflector_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -169,6 +172,7 @@ add_dependencies(swipe_reflector_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catk
 target_link_libraries(swipe_detector_fixed_node ${catkin_LIBRARIES})
 target_link_libraries(swipe_detector_fixed1_node ${catkin_LIBRARIES})
 target_link_libraries(swipe_detector_yolo_node ${catkin_LIBRARIES})
+target_link_libraries(swipe_detector_carla_node ${catkin_LIBRARIES})
 target_link_libraries(swipe_position_manager_node ${catkin_LIBRARIES})
 target_link_libraries(swipe_visualizer_node ${catkin_LIBRARIES})
 target_link_libraries(swipe_reflector_node ${catkin_LIBRARIES})

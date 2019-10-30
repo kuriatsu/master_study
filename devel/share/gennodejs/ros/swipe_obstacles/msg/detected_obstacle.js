@@ -25,6 +25,7 @@ class detected_obstacle {
       this.managed_id = null;
       this.label = null;
       this.score = null;
+      this.distance = null;
       this.pose = null;
       this.shift_x = null;
       this.shift_y = null;
@@ -61,6 +62,12 @@ class detected_obstacle {
       }
       else {
         this.score = 0.0;
+      }
+      if (initObj.hasOwnProperty('distance')) {
+        this.distance = initObj.distance
+      }
+      else {
+        this.distance = 0.0;
       }
       if (initObj.hasOwnProperty('pose')) {
         this.pose = initObj.pose
@@ -107,6 +114,8 @@ class detected_obstacle {
     bufferOffset = _serializer.string(obj.label, buffer, bufferOffset);
     // Serialize message field [score]
     bufferOffset = _serializer.float32(obj.score, buffer, bufferOffset);
+    // Serialize message field [distance]
+    bufferOffset = _serializer.float32(obj.distance, buffer, bufferOffset);
     // Serialize message field [pose]
     bufferOffset = geometry_msgs.msg.Pose.serialize(obj.pose, buffer, bufferOffset);
     // Serialize message field [shift_x]
@@ -134,6 +143,8 @@ class detected_obstacle {
     data.label = _deserializer.string(buffer, bufferOffset);
     // Deserialize message field [score]
     data.score = _deserializer.float32(buffer, bufferOffset);
+    // Deserialize message field [distance]
+    data.distance = _deserializer.float32(buffer, bufferOffset);
     // Deserialize message field [pose]
     data.pose = geometry_msgs.msg.Pose.deserialize(buffer, bufferOffset);
     // Deserialize message field [shift_x]
@@ -151,7 +162,7 @@ class detected_obstacle {
     let length = 0;
     length += std_msgs.msg.Header.getMessageSize(object.header);
     length += object.label.length;
-    return length + 92;
+    return length + 96;
   }
 
   static datatype() {
@@ -161,7 +172,7 @@ class detected_obstacle {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '9978e5bb58ee01f8e45fc2d8376b759a';
+    return 'ded6fe15314248041bfd81694d77c110';
   }
 
   static messageDefinition() {
@@ -173,6 +184,7 @@ class detected_obstacle {
     uint32 managed_id
     string label
     float32 score
+    float32 distance
     geometry_msgs/Pose pose
     
     float32 shift_x
@@ -262,6 +274,13 @@ class detected_obstacle {
     }
     else {
       resolved.score = 0.0
+    }
+
+    if (msg.distance !== undefined) {
+      resolved.distance = msg.distance;
+    }
+    else {
+      resolved.distance = 0.0
     }
 
     if (msg.pose !== undefined) {

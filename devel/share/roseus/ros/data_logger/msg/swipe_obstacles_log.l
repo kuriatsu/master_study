@@ -18,7 +18,7 @@
 
 (defclass data_logger::swipe_obstacles_log
   :super ros::object
-  :slots (_header _round _pose _odom _twist _brake _accel _shift _obstacle_id _detected_flag _pedestrian_flag ))
+  :slots (_header _round _pose _odom _autoware_twist _ypspur_twist _brake _accel _shift _obstacle_id _detected_flag _pedestrian_flag ))
 
 (defmethod data_logger::swipe_obstacles_log
   (:init
@@ -27,10 +27,11 @@
     ((:round __round) 0)
     ((:pose __pose) (instance geometry_msgs::Pose :init))
     ((:odom __odom) (instance geometry_msgs::Pose :init))
-    ((:twist __twist) (instance geometry_msgs::Twist :init))
+    ((:autoware_twist __autoware_twist) (instance geometry_msgs::Twist :init))
+    ((:ypspur_twist __ypspur_twist) (instance geometry_msgs::Twist :init))
     ((:brake __brake) 0.0)
     ((:accel __accel) 0.0)
-    ((:shift __shift) 0.0)
+    ((:shift __shift) 0)
     ((:obstacle_id __obstacle_id) 0)
     ((:detected_flag __detected_flag) 0)
     ((:pedestrian_flag __pedestrian_flag) 0)
@@ -40,10 +41,11 @@
    (setq _round (round __round))
    (setq _pose __pose)
    (setq _odom __odom)
-   (setq _twist __twist)
+   (setq _autoware_twist __autoware_twist)
+   (setq _ypspur_twist __ypspur_twist)
    (setq _brake (float __brake))
    (setq _accel (float __accel))
-   (setq _shift (float __shift))
+   (setq _shift (round __shift))
    (setq _obstacle_id (round __obstacle_id))
    (setq _detected_flag (round __detected_flag))
    (setq _pedestrian_flag (round __pedestrian_flag))
@@ -72,13 +74,20 @@
      (progn
        (if __odom (setq _odom (car __odom)))
        _odom)))
-  (:twist
-   (&rest __twist)
-   (if (keywordp (car __twist))
-       (send* _twist __twist)
+  (:autoware_twist
+   (&rest __autoware_twist)
+   (if (keywordp (car __autoware_twist))
+       (send* _autoware_twist __autoware_twist)
      (progn
-       (if __twist (setq _twist (car __twist)))
-       _twist)))
+       (if __autoware_twist (setq _autoware_twist (car __autoware_twist)))
+       _autoware_twist)))
+  (:ypspur_twist
+   (&rest __ypspur_twist)
+   (if (keywordp (car __ypspur_twist))
+       (send* _ypspur_twist __ypspur_twist)
+     (progn
+       (if __ypspur_twist (setq _ypspur_twist (car __ypspur_twist)))
+       _ypspur_twist)))
   (:brake
    (&optional __brake)
    (if __brake (setq _brake __brake)) _brake)
@@ -108,13 +117,15 @@
     (send _pose :serialization-length)
     ;; geometry_msgs/Pose _odom
     (send _odom :serialization-length)
-    ;; geometry_msgs/Twist _twist
-    (send _twist :serialization-length)
+    ;; geometry_msgs/Twist _autoware_twist
+    (send _autoware_twist :serialization-length)
+    ;; geometry_msgs/Twist _ypspur_twist
+    (send _ypspur_twist :serialization-length)
     ;; float32 _brake
     4
     ;; float32 _accel
     4
-    ;; float32 _shift
+    ;; uint32 _shift
     4
     ;; uint32 _obstacle_id
     4
@@ -135,14 +146,16 @@
        (send _pose :serialize s)
      ;; geometry_msgs/Pose _odom
        (send _odom :serialize s)
-     ;; geometry_msgs/Twist _twist
-       (send _twist :serialize s)
+     ;; geometry_msgs/Twist _autoware_twist
+       (send _autoware_twist :serialize s)
+     ;; geometry_msgs/Twist _ypspur_twist
+       (send _ypspur_twist :serialize s)
      ;; float32 _brake
        (sys::poke _brake (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
      ;; float32 _accel
        (sys::poke _accel (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
-     ;; float32 _shift
-       (sys::poke _shift (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
+     ;; uint32 _shift
+       (write-long _shift s)
      ;; uint32 _obstacle_id
        (write-long _obstacle_id s)
      ;; uint32 _detected_flag
@@ -161,14 +174,16 @@
      (send _pose :deserialize buf ptr-) (incf ptr- (send _pose :serialization-length))
    ;; geometry_msgs/Pose _odom
      (send _odom :deserialize buf ptr-) (incf ptr- (send _odom :serialization-length))
-   ;; geometry_msgs/Twist _twist
-     (send _twist :deserialize buf ptr-) (incf ptr- (send _twist :serialization-length))
+   ;; geometry_msgs/Twist _autoware_twist
+     (send _autoware_twist :deserialize buf ptr-) (incf ptr- (send _autoware_twist :serialization-length))
+   ;; geometry_msgs/Twist _ypspur_twist
+     (send _ypspur_twist :deserialize buf ptr-) (incf ptr- (send _ypspur_twist :serialization-length))
    ;; float32 _brake
      (setq _brake (sys::peek buf ptr- :float)) (incf ptr- 4)
    ;; float32 _accel
      (setq _accel (sys::peek buf ptr- :float)) (incf ptr- 4)
-   ;; float32 _shift
-     (setq _shift (sys::peek buf ptr- :float)) (incf ptr- 4)
+   ;; uint32 _shift
+     (setq _shift (sys::peek buf ptr- :integer)) (incf ptr- 4)
    ;; uint32 _obstacle_id
      (setq _obstacle_id (sys::peek buf ptr- :integer)) (incf ptr- 4)
    ;; uint32 _detected_flag
@@ -179,7 +194,7 @@
    self)
   )
 
-(setf (get data_logger::swipe_obstacles_log :md5sum-) "9986bce81c59a09d6f4ebd3feb2a8ca7")
+(setf (get data_logger::swipe_obstacles_log :md5sum-) "40f7308363d60b6e3d831771732fa8bd")
 (setf (get data_logger::swipe_obstacles_log :datatype-) "data_logger/swipe_obstacles_log")
 (setf (get data_logger::swipe_obstacles_log :definition-)
       "std_msgs/Header header
@@ -187,10 +202,11 @@
 uint32 round
 geometry_msgs/Pose pose
 geometry_msgs/Pose odom
-geometry_msgs/Twist twist
+geometry_msgs/Twist autoware_twist
+geometry_msgs/Twist ypspur_twist
 float32 brake
 float32 accel
-float32 shift
+uint32 shift
 uint32 obstacle_id
 uint32 detected_flag
 uint32 pedestrian_flag
@@ -257,6 +273,6 @@ float64 z
 
 
 
-(provide :data_logger/swipe_obstacles_log "9986bce81c59a09d6f4ebd3feb2a8ca7")
+(provide :data_logger/swipe_obstacles_log "40f7308363d60b6e3d831771732fa8bd")
 
 

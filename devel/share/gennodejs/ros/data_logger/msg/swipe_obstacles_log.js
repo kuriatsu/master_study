@@ -24,7 +24,8 @@ class swipe_obstacles_log {
       this.round = null;
       this.pose = null;
       this.odom = null;
-      this.twist = null;
+      this.autoware_twist = null;
+      this.ypspur_twist = null;
       this.brake = null;
       this.accel = null;
       this.shift = null;
@@ -57,11 +58,17 @@ class swipe_obstacles_log {
       else {
         this.odom = new geometry_msgs.msg.Pose();
       }
-      if (initObj.hasOwnProperty('twist')) {
-        this.twist = initObj.twist
+      if (initObj.hasOwnProperty('autoware_twist')) {
+        this.autoware_twist = initObj.autoware_twist
       }
       else {
-        this.twist = new geometry_msgs.msg.Twist();
+        this.autoware_twist = new geometry_msgs.msg.Twist();
+      }
+      if (initObj.hasOwnProperty('ypspur_twist')) {
+        this.ypspur_twist = initObj.ypspur_twist
+      }
+      else {
+        this.ypspur_twist = new geometry_msgs.msg.Twist();
       }
       if (initObj.hasOwnProperty('brake')) {
         this.brake = initObj.brake
@@ -79,7 +86,7 @@ class swipe_obstacles_log {
         this.shift = initObj.shift
       }
       else {
-        this.shift = 0.0;
+        this.shift = 0;
       }
       if (initObj.hasOwnProperty('obstacle_id')) {
         this.obstacle_id = initObj.obstacle_id
@@ -112,14 +119,16 @@ class swipe_obstacles_log {
     bufferOffset = geometry_msgs.msg.Pose.serialize(obj.pose, buffer, bufferOffset);
     // Serialize message field [odom]
     bufferOffset = geometry_msgs.msg.Pose.serialize(obj.odom, buffer, bufferOffset);
-    // Serialize message field [twist]
-    bufferOffset = geometry_msgs.msg.Twist.serialize(obj.twist, buffer, bufferOffset);
+    // Serialize message field [autoware_twist]
+    bufferOffset = geometry_msgs.msg.Twist.serialize(obj.autoware_twist, buffer, bufferOffset);
+    // Serialize message field [ypspur_twist]
+    bufferOffset = geometry_msgs.msg.Twist.serialize(obj.ypspur_twist, buffer, bufferOffset);
     // Serialize message field [brake]
     bufferOffset = _serializer.float32(obj.brake, buffer, bufferOffset);
     // Serialize message field [accel]
     bufferOffset = _serializer.float32(obj.accel, buffer, bufferOffset);
     // Serialize message field [shift]
-    bufferOffset = _serializer.float32(obj.shift, buffer, bufferOffset);
+    bufferOffset = _serializer.uint32(obj.shift, buffer, bufferOffset);
     // Serialize message field [obstacle_id]
     bufferOffset = _serializer.uint32(obj.obstacle_id, buffer, bufferOffset);
     // Serialize message field [detected_flag]
@@ -141,14 +150,16 @@ class swipe_obstacles_log {
     data.pose = geometry_msgs.msg.Pose.deserialize(buffer, bufferOffset);
     // Deserialize message field [odom]
     data.odom = geometry_msgs.msg.Pose.deserialize(buffer, bufferOffset);
-    // Deserialize message field [twist]
-    data.twist = geometry_msgs.msg.Twist.deserialize(buffer, bufferOffset);
+    // Deserialize message field [autoware_twist]
+    data.autoware_twist = geometry_msgs.msg.Twist.deserialize(buffer, bufferOffset);
+    // Deserialize message field [ypspur_twist]
+    data.ypspur_twist = geometry_msgs.msg.Twist.deserialize(buffer, bufferOffset);
     // Deserialize message field [brake]
     data.brake = _deserializer.float32(buffer, bufferOffset);
     // Deserialize message field [accel]
     data.accel = _deserializer.float32(buffer, bufferOffset);
     // Deserialize message field [shift]
-    data.shift = _deserializer.float32(buffer, bufferOffset);
+    data.shift = _deserializer.uint32(buffer, bufferOffset);
     // Deserialize message field [obstacle_id]
     data.obstacle_id = _deserializer.uint32(buffer, bufferOffset);
     // Deserialize message field [detected_flag]
@@ -161,7 +172,7 @@ class swipe_obstacles_log {
   static getMessageSize(object) {
     let length = 0;
     length += std_msgs.msg.Header.getMessageSize(object.header);
-    return length + 188;
+    return length + 236;
   }
 
   static datatype() {
@@ -171,7 +182,7 @@ class swipe_obstacles_log {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '9986bce81c59a09d6f4ebd3feb2a8ca7';
+    return '40f7308363d60b6e3d831771732fa8bd';
   }
 
   static messageDefinition() {
@@ -182,10 +193,11 @@ class swipe_obstacles_log {
     uint32 round
     geometry_msgs/Pose pose
     geometry_msgs/Pose odom
-    geometry_msgs/Twist twist
+    geometry_msgs/Twist autoware_twist
+    geometry_msgs/Twist ypspur_twist
     float32 brake
     float32 accel
-    float32 shift
+    uint32 shift
     uint32 obstacle_id
     uint32 detected_flag
     uint32 pedestrian_flag
@@ -285,11 +297,18 @@ class swipe_obstacles_log {
       resolved.odom = new geometry_msgs.msg.Pose()
     }
 
-    if (msg.twist !== undefined) {
-      resolved.twist = geometry_msgs.msg.Twist.Resolve(msg.twist)
+    if (msg.autoware_twist !== undefined) {
+      resolved.autoware_twist = geometry_msgs.msg.Twist.Resolve(msg.autoware_twist)
     }
     else {
-      resolved.twist = new geometry_msgs.msg.Twist()
+      resolved.autoware_twist = new geometry_msgs.msg.Twist()
+    }
+
+    if (msg.ypspur_twist !== undefined) {
+      resolved.ypspur_twist = geometry_msgs.msg.Twist.Resolve(msg.ypspur_twist)
+    }
+    else {
+      resolved.ypspur_twist = new geometry_msgs.msg.Twist()
     }
 
     if (msg.brake !== undefined) {
@@ -310,7 +329,7 @@ class swipe_obstacles_log {
       resolved.shift = msg.shift;
     }
     else {
-      resolved.shift = 0.0
+      resolved.shift = 0
     }
 
     if (msg.obstacle_id !== undefined) {

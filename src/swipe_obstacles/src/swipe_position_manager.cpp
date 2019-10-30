@@ -54,7 +54,7 @@ PositionManager::PositionManager(): keep_time(2)
 
 void PositionManager::subObjCallback(const swipe_obstacles::detected_obstacle_array &in_msgs)
 {
-    // ROS_INFO("manager Get obj info");
+    ROS_INFO("manager Get obj info");
     // データリストに格納
     containerManage(in_msgs);
     obstaclePublish();

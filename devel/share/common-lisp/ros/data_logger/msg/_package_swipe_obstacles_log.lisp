@@ -7,8 +7,10 @@
           POSE
           ODOM-VAL
           ODOM
-          TWIST-VAL
-          TWIST
+          AUTOWARE_TWIST-VAL
+          AUTOWARE_TWIST
+          YPSPUR_TWIST-VAL
+          YPSPUR_TWIST
           BRAKE-VAL
           BRAKE
           ACCEL-VAL

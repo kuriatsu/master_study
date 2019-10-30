@@ -1,8 +1,8 @@
-# Install script for directory: /home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles
+# Install script for directory: /home/mad-autoware/catkin_ws/src/swipe_obstacles
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/kuriatsu/Program/Ros/master_study_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/mad-autoware/catkin_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,56 +34,56 @@ endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/swipe_obstacles/msg" TYPE FILE FILES
-    "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle.msg"
-    "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg"
-    "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg/closest_obstacle.msg"
+    "/home/mad-autoware/catkin_ws/src/swipe_obstacles/msg/detected_obstacle.msg"
+    "/home/mad-autoware/catkin_ws/src/swipe_obstacles/msg/detected_obstacle_array.msg"
+    "/home/mad-autoware/catkin_ws/src/swipe_obstacles/msg/closest_obstacle.msg"
     )
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/swipe_obstacles/cmake" TYPE FILE FILES "/home/kuriatsu/Program/Ros/master_study_ws/build/swipe_obstacles/catkin_generated/installspace/swipe_obstacles-msg-paths.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/swipe_obstacles/cmake" TYPE FILE FILES "/home/mad-autoware/catkin_ws/build/swipe_obstacles/catkin_generated/installspace/swipe_obstacles-msg-paths.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/roseus/ros" TYPE DIRECTORY FILES "/home/kuriatsu/Program/Ros/master_study_ws/devel/share/roseus/ros/swipe_obstacles")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/roseus/ros" TYPE DIRECTORY FILES "/home/mad-autoware/catkin_ws/devel/share/roseus/ros/swipe_obstacles")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/common-lisp/ros" TYPE DIRECTORY FILES "/home/kuriatsu/Program/Ros/master_study_ws/devel/share/common-lisp/ros/swipe_obstacles")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/common-lisp/ros" TYPE DIRECTORY FILES "/home/mad-autoware/catkin_ws/devel/share/common-lisp/ros/swipe_obstacles")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/gennodejs/ros" TYPE DIRECTORY FILES "/home/kuriatsu/Program/Ros/master_study_ws/devel/share/gennodejs/ros/swipe_obstacles")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/gennodejs/ros" TYPE DIRECTORY FILES "/home/mad-autoware/catkin_ws/devel/share/gennodejs/ros/swipe_obstacles")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  execute_process(COMMAND "/usr/bin/python" -m compileall "/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles")
+  execute_process(COMMAND "/usr/bin/python" -m compileall "/home/mad-autoware/catkin_ws/devel/lib/python2.7/dist-packages/swipe_obstacles")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python2.7/dist-packages" TYPE DIRECTORY FILES "/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/python2.7/dist-packages/swipe_obstacles")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python2.7/dist-packages" TYPE DIRECTORY FILES "/home/mad-autoware/catkin_ws/devel/lib/python2.7/dist-packages/swipe_obstacles")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/kuriatsu/Program/Ros/master_study_ws/build/swipe_obstacles/catkin_generated/installspace/swipe_obstacles.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/mad-autoware/catkin_ws/build/swipe_obstacles/catkin_generated/installspace/swipe_obstacles.pc")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/swipe_obstacles/cmake" TYPE FILE FILES "/home/kuriatsu/Program/Ros/master_study_ws/build/swipe_obstacles/catkin_generated/installspace/swipe_obstacles-msg-extras.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/swipe_obstacles/cmake" TYPE FILE FILES "/home/mad-autoware/catkin_ws/build/swipe_obstacles/catkin_generated/installspace/swipe_obstacles-msg-extras.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/swipe_obstacles/cmake" TYPE FILE FILES
-    "/home/kuriatsu/Program/Ros/master_study_ws/build/swipe_obstacles/catkin_generated/installspace/swipe_obstaclesConfig.cmake"
-    "/home/kuriatsu/Program/Ros/master_study_ws/build/swipe_obstacles/catkin_generated/installspace/swipe_obstaclesConfig-version.cmake"
+    "/home/mad-autoware/catkin_ws/build/swipe_obstacles/catkin_generated/installspace/swipe_obstaclesConfig.cmake"
+    "/home/mad-autoware/catkin_ws/build/swipe_obstacles/catkin_generated/installspace/swipe_obstaclesConfig-version.cmake"
     )
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/swipe_obstacles" TYPE FILE FILES "/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/swipe_obstacles" TYPE FILE FILES "/home/mad-autoware/catkin_ws/src/swipe_obstacles/package.xml")
 endif()
 

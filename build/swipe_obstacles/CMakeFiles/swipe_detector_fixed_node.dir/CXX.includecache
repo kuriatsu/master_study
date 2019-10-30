@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/closest_obstacle.h
+/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/closest_obstacle.h
 string
 -
 vector
@@ -24,7 +24,7 @@ ros/message_operations.h
 std_msgs/Header.h
 -
 
-/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h
+/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/detected_obstacle.h
 string
 -
 vector
@@ -44,7 +44,7 @@ std_msgs/Header.h
 geometry_msgs/Pose.h
 -
 
-/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle_array.h
+/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/detected_obstacle_array.h
 string
 -
 vector
@@ -64,7 +64,7 @@ std_msgs/Header.h
 swipe_obstacles/detected_obstacle.h
 -
 
-/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_detector_fixed.cpp
+/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_detector_fixed.cpp
 ros/ros.h
 -
 geometry_msgs/Pose.h
@@ -72,15 +72,15 @@ geometry_msgs/Pose.h
 geometry_msgs/PoseStamped.h
 -
 swipe_obstacles/detected_obstacle.h
-/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle.h
+/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle.h
 swipe_obstacles/detected_obstacle_array.h
-/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle_array.h
+/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle_array.h
 swipe_obstacles/closest_obstacle.h
-/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_obstacles/closest_obstacle.h
+/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/closest_obstacle.h
 tf/transform_listener.h
 -
 std_msgs/Int32.h
-/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/std_msgs/Int32.h
+/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/std_msgs/Int32.h
 fstream
 -
 string

@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/swipe_detector_fixed1_node.dir/src/swipe_detector_fixed1.cpp.o"
-  "/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/swipe_obstacles/swipe_detector_fixed1_node.pdb"
-  "/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/swipe_obstacles/swipe_detector_fixed1_node"
+  "/home/mad-autoware/catkin_ws/devel/lib/swipe_obstacles/swipe_detector_fixed1_node.pdb"
+  "/home/mad-autoware/catkin_ws/devel/lib/swipe_obstacles/swipe_detector_fixed1_node"
 )
 
 # Per-language clean rules from dependency scanning.

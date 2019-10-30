@@ -24,6 +24,8 @@ class ObstacleVisualizer
 		ros::Publisher pub_shift;
         std::vector<uint32_t> id_vec;
 
+        float marker_scale;
+
 	public:
 		ObstacleVisualizer();
 		void sync_jsk_box();
@@ -32,13 +34,14 @@ class ObstacleVisualizer
         void sub_obstacles_callback(const swipe_obstacles::detected_obstacle_array &in_msgs);
 		void erase_signal_callback(const std_msgs::Int32 &in_msg);
         void shift_feedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
-        void make_cube(const swipe_obstacles::detected_obstacle &in_msg);
+        void createInteractiveMarker(const swipe_obstacles::detected_obstacle &in_msg);
+        void setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, const swipe_obstacles::detected_obstacle &obstacle_info);
+        void setMarkerToMarkerControl(visualization_msgs::InteractiveMarkerControl &control, const swipe_obstacles::detected_obstacle &obstacle_info);
         int id_vector_manager(const uint32_t &id);
-		visualization_msgs::InteractiveMarkerControl& make_box_control( visualization_msgs::InteractiveMarker &msg);
 };
 
 
-ObstacleVisualizer::ObstacleVisualizer()
+ObstacleVisualizer::ObstacleVisualizer(): marker_scale(1.0)
 {
 	ros::NodeHandle n;
 
@@ -66,7 +69,7 @@ void ObstacleVisualizer::sub_obstacles_callback(const swipe_obstacles::detected_
 
     for (size_t i=0; i< in_msgs.obstacles.size(); i++)
     {
-        make_cube(in_msgs.obstacles[i]);
+        createInteractiveMarker(in_msgs.obstacles[i]);
     }
 	// for (size_t i=0; i< in_msgs.obstacles.size(); i++)
     // {
@@ -94,55 +97,90 @@ void ObstacleVisualizer::sub_obstacles_callback(const swipe_obstacles::detected_
 }
 
 
-void ObstacleVisualizer::make_cube(const swipe_obstacles::detected_obstacle &in_msg)
+void ObstacleVisualizer::createInteractiveMarker(const swipe_obstacles::detected_obstacle &obstacle_info)
 {
-    swipe_obstacles::detected_obstacle out_obstacle_pose;
+    // for debag
+    // std::cout <<"ss id is:" << obstacle_info.id << std::endl;
     std::stringstream ss;
-    ss << in_msg.id;
-    std::cout <<"ss id is:" << in_msg.id << std::endl;
+    ss << obstacle_info.id;
+
 	visualization_msgs::InteractiveMarker int_marker;
-    // ROS_INFO_STREAM(in_msg);
+    // ROS_INFO_STREAM(obstacle_info);
 	int_marker.header.frame_id = "map";
 	int_marker.name = ss.str();
-	int_marker.scale = 1.0;
-    int_marker.pose = in_msg.pose;
-    int_marker.pose.position.x = in_msg.pose.position.x + in_msg.shift_x;
-	int_marker.pose.position.y = in_msg.pose.position.y + in_msg.shift_y;
+	int_marker.scale = marker_scale;
+    int_marker.pose = obstacle_info.pose;
+    int_marker.pose.position.x = obstacle_info.pose.position.x + obstacle_info.shift_x;
+	int_marker.pose.position.y = obstacle_info.pose.position.y + obstacle_info.shift_y;
 
-	make_box_control(int_marker);
+    setMarkerControl(int_marker, obstacle_info);
 
 	server->insert(int_marker);
 	server->setCallback(int_marker.name, boost::bind(&ObstacleVisualizer::shift_feedback, this, _1));
 }
 
 
-visualization_msgs::InteractiveMarkerControl& ObstacleVisualizer::make_box_control(visualization_msgs::InteractiveMarker &msg)
+void ObstacleVisualizer::setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, const swipe_obstacles::detected_obstacle &obstacle_info)
 {
 	visualization_msgs::InteractiveMarkerControl control;
+
 	control.always_visible  = true;
-	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
+	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_PLANE;
 	control.orientation.x = 0;
-	control.orientation.y = 0;
-	control.orientation.z = 1;
+	control.orientation.y = 1;
+	control.orientation.z = 0;
 	control.orientation.w = 1;
 
-	visualization_msgs::Marker marker;
-    marker.type = visualization_msgs::Marker::CUBE;
+    setMarkerToMarkerControl(control, obstacle_info);
+	// control.markers.push_back(setMarkerToMarkerControl(obstacle_info));
+    int_marker.controls.push_back(control);
+}
+
+
+void ObstacleVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMarkerControl &control, const swipe_obstacles::detected_obstacle &obstacle_info)
+{
+    visualization_msgs::Marker marker;
+
     marker.ns = "swipe_obstacles";
-	marker.id = 0;
-	marker.scale.x = msg.scale;
-	marker.scale.y = msg.scale*6;
-	marker.scale.z = msg.scale*1.7;
-	marker.color.r = 0;
-	marker.color.g = 1;
-	marker.color.b = 0;
-	marker.color.a = 0.5;
+    marker.id = obstacle_info.id;
+
+    if (obstacle_info.label == "person")
+    {
+        marker.type = visualization_msgs::Marker::CYLINDER;
+        marker.scale.x = marker_scale*obstacle_info.distance;
+        marker.scale.y = marker_scale*obstacle_info.distance;
+        marker.scale.z = marker_scale*1.0;
+        marker.color.r = 0;
+        marker.color.g = 0;
+        marker.color.b = 1;
+        marker.color.a = 0.7;
+    }
+    
+    else if (obstacle_info.label == "bicycle")
+    {
+        marker.type = visualization_msgs::Marker::ARROW;
+        marker.scale.x = marker_scale*15;
+        marker.scale.y = marker_scale*15;
+        marker.scale.z = marker_scale*1.4;
+        marker.color.r = 0;
+        marker.color.g = 1;
+        marker.color.b = 0;
+        marker.color.a = 0.7;
+    }
+    else if (obstacle_info.label == "car")
+    {
+        marker.type = visualization_msgs::Marker::CUBE;
+        marker.scale.x = marker_scale*15;
+        marker.scale.y = marker_scale*4.0;
+        marker.scale.z = marker_scale*1.7;
+        marker.color.r = 1;
+        marker.color.g = 0;
+        marker.color.b = 0;
+        marker.color.a = 0.7;
+    }
     // marker.lifetime = ros::Duration(2.0);
 
-	control.markers.push_back(marker);
-	msg.controls.push_back(control);
-
-	return msg.controls.back();
+    control.markers.push_back(marker);
 }
 
 

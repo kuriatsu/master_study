@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/closest_obstacle.h
+/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/closest_obstacle.h
 string
 -
 vector
@@ -24,7 +24,7 @@ ros/message_operations.h
 std_msgs/Header.h
 -
 
-/home/kuriatsu/Program/Ros/master_study_ws/devel/include/teleop_study/teleop_studyConfig.h
+/home/mad-autoware/catkin_ws/devel/include/teleop_study/teleop_studyConfig.h
 dynamic_reconfigure/config_tools.h
 -
 limits
@@ -42,7 +42,7 @@ dynamic_reconfigure/config_init_mutex.h
 boost/any.hpp
 -
 
-/home/kuriatsu/Program/Ros/master_study_ws/src/teleop_study/src/teleop_study1.cpp
+/home/mad-autoware/catkin_ws/src/teleop_study/src/teleop_study1.cpp
 ros/ros.h
 -
 sensor_msgs/Joy.h
@@ -54,13 +54,13 @@ geometry_msgs/TwistStamped.h
 sound_play/sound_play.h
 -
 swipe_obstacles/closest_obstacle.h
-/home/kuriatsu/Program/Ros/master_study_ws/src/teleop_study/src/swipe_obstacles/closest_obstacle.h
+/home/mad-autoware/catkin_ws/src/teleop_study/src/swipe_obstacles/closest_obstacle.h
 dynamic_reconfigure/server.h
 -
 teleop_study/teleop_studyConfig.h
 -
 std_msgs/Int32.h
-/home/kuriatsu/Program/Ros/master_study_ws/src/teleop_study/src/std_msgs/Int32.h
+/home/mad-autoware/catkin_ws/src/teleop_study/src/std_msgs/Int32.h
 cmath
 -
 

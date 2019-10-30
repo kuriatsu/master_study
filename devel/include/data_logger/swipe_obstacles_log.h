@@ -19,6 +19,7 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Twist.h>
 
 namespace data_logger
 {
@@ -32,10 +33,11 @@ struct swipe_obstacles_log_
     , round(0)
     , pose()
     , odom()
-    , twist()
+    , autoware_twist()
+    , ypspur_twist()
     , brake(0.0)
     , accel(0.0)
-    , shift(0.0)
+    , shift(0)
     , obstacle_id(0)
     , detected_flag(0)
     , pedestrian_flag(0)  {
@@ -45,10 +47,11 @@ struct swipe_obstacles_log_
     , round(0)
     , pose(_alloc)
     , odom(_alloc)
-    , twist(_alloc)
+    , autoware_twist(_alloc)
+    , ypspur_twist(_alloc)
     , brake(0.0)
     , accel(0.0)
-    , shift(0.0)
+    , shift(0)
     , obstacle_id(0)
     , detected_flag(0)
     , pedestrian_flag(0)  {
@@ -69,8 +72,11 @@ struct swipe_obstacles_log_
    typedef  ::geometry_msgs::Pose_<ContainerAllocator>  _odom_type;
   _odom_type odom;
 
-   typedef  ::geometry_msgs::Twist_<ContainerAllocator>  _twist_type;
-  _twist_type twist;
+   typedef  ::geometry_msgs::Twist_<ContainerAllocator>  _autoware_twist_type;
+  _autoware_twist_type autoware_twist;
+
+   typedef  ::geometry_msgs::Twist_<ContainerAllocator>  _ypspur_twist_type;
+  _ypspur_twist_type ypspur_twist;
 
    typedef float _brake_type;
   _brake_type brake;
@@ -78,7 +84,7 @@ struct swipe_obstacles_log_
    typedef float _accel_type;
   _accel_type accel;
 
-   typedef float _shift_type;
+   typedef uint32_t _shift_type;
   _shift_type shift;
 
    typedef uint32_t _obstacle_id_type;
@@ -125,7 +131,7 @@ namespace message_traits
 
 
 // BOOLTRAITS {'IsFixedSize': False, 'IsMessage': True, 'HasHeader': True}
-// {'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg'], 'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg'], 'data_logger': ['/home/kuriatsu/Program/Ros/master_study_ws/src/data_logger/msg']}
+// {'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg'], 'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg'], 'data_logger': ['/home/mad-autoware/catkin_ws/src/data_logger/msg']}
 
 // !!!!!!!!!!! ['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_parsed_fields', 'constants', 'fields', 'full_name', 'has_header', 'header_present', 'names', 'package', 'parsed_fields', 'short_name', 'text', 'types']
 
@@ -168,12 +174,12 @@ struct MD5Sum< ::data_logger::swipe_obstacles_log_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "9986bce81c59a09d6f4ebd3feb2a8ca7";
+    return "40f7308363d60b6e3d831771732fa8bd";
   }
 
   static const char* value(const ::data_logger::swipe_obstacles_log_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x9986bce81c59a09dULL;
-  static const uint64_t static_value2 = 0x6f4ebd3feb2a8ca7ULL;
+  static const uint64_t static_value1 = 0x40f7308363d60b6eULL;
+  static const uint64_t static_value2 = 0x3d831771732fa8bdULL;
 };
 
 template<class ContainerAllocator>
@@ -197,10 +203,11 @@ struct Definition< ::data_logger::swipe_obstacles_log_<ContainerAllocator> >
 uint32 round\n\
 geometry_msgs/Pose pose\n\
 geometry_msgs/Pose odom\n\
-geometry_msgs/Twist twist\n\
+geometry_msgs/Twist autoware_twist\n\
+geometry_msgs/Twist ypspur_twist\n\
 float32 brake\n\
 float32 accel\n\
-float32 shift\n\
+uint32 shift\n\
 uint32 obstacle_id\n\
 uint32 detected_flag\n\
 uint32 pedestrian_flag\n\
@@ -285,7 +292,8 @@ namespace serialization
       stream.next(m.round);
       stream.next(m.pose);
       stream.next(m.odom);
-      stream.next(m.twist);
+      stream.next(m.autoware_twist);
+      stream.next(m.ypspur_twist);
       stream.next(m.brake);
       stream.next(m.accel);
       stream.next(m.shift);
@@ -321,15 +329,18 @@ struct Printer< ::data_logger::swipe_obstacles_log_<ContainerAllocator> >
     s << indent << "odom: ";
     s << std::endl;
     Printer< ::geometry_msgs::Pose_<ContainerAllocator> >::stream(s, indent + "  ", v.odom);
-    s << indent << "twist: ";
+    s << indent << "autoware_twist: ";
     s << std::endl;
-    Printer< ::geometry_msgs::Twist_<ContainerAllocator> >::stream(s, indent + "  ", v.twist);
+    Printer< ::geometry_msgs::Twist_<ContainerAllocator> >::stream(s, indent + "  ", v.autoware_twist);
+    s << indent << "ypspur_twist: ";
+    s << std::endl;
+    Printer< ::geometry_msgs::Twist_<ContainerAllocator> >::stream(s, indent + "  ", v.ypspur_twist);
     s << indent << "brake: ";
     Printer<float>::stream(s, indent + "  ", v.brake);
     s << indent << "accel: ";
     Printer<float>::stream(s, indent + "  ", v.accel);
     s << indent << "shift: ";
-    Printer<float>::stream(s, indent + "  ", v.shift);
+    Printer<uint32_t>::stream(s, indent + "  ", v.shift);
     s << indent << "obstacle_id: ";
     Printer<uint32_t>::stream(s, indent + "  ", v.obstacle_id);
     s << indent << "detected_flag: ";

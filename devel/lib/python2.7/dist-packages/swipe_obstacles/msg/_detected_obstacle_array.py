@@ -11,7 +11,7 @@ import genpy
 import std_msgs.msg
 
 class detected_obstacle_array(genpy.Message):
-  _md5sum = "491a0dff1749fdf46f11f15d92874d1b"
+  _md5sum = "5f29e1c8c0e978810d330de5a6998a5d"
   _type = "swipe_obstacles/detected_obstacle_array"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
@@ -43,6 +43,7 @@ uint32 id
 uint32 managed_id
 string label
 float32 score
+float32 distance
 geometry_msgs/Pose pose
 
 float32 shift_x
@@ -142,7 +143,8 @@ float64 w
           _x = _x.encode('utf-8')
           length = len(_x)
         buff.write(struct.pack('<I%ss'%length, length, _x))
-        buff.write(_get_struct_f().pack(val1.score))
+        _x = val1
+        buff.write(_get_struct_2f().pack(_x.score, _x.distance))
         _v3 = val1.pose
         _v4 = _v3.position
         _x = _v4
@@ -219,9 +221,10 @@ float64 w
           val1.label = str[start:end].decode('utf-8')
         else:
           val1.label = str[start:end]
+        _x = val1
         start = end
-        end += 4
-        (val1.score,) = _get_struct_f().unpack(str[start:end])
+        end += 8
+        (_x.score, _x.distance,) = _get_struct_2f().unpack(str[start:end])
         _v9 = val1.pose
         _v10 = _v9.position
         _x = _v10
@@ -285,7 +288,8 @@ float64 w
           _x = _x.encode('utf-8')
           length = len(_x)
         buff.write(struct.pack('<I%ss'%length, length, _x))
-        buff.write(_get_struct_f().pack(val1.score))
+        _x = val1
+        buff.write(_get_struct_2f().pack(_x.score, _x.distance))
         _v15 = val1.pose
         _v16 = _v15.position
         _x = _v16
@@ -363,9 +367,10 @@ float64 w
           val1.label = str[start:end].decode('utf-8')
         else:
           val1.label = str[start:end]
+        _x = val1
         start = end
-        end += 4
-        (val1.score,) = _get_struct_f().unpack(str[start:end])
+        end += 8
+        (_x.score, _x.distance,) = _get_struct_2f().unpack(str[start:end])
         _v21 = val1.pose
         _v22 = _v21.position
         _x = _v22
@@ -395,18 +400,18 @@ _struct_I = genpy.struct_I
 def _get_struct_I():
     global _struct_I
     return _struct_I
-_struct_f = None
-def _get_struct_f():
-    global _struct_f
-    if _struct_f is None:
-        _struct_f = struct.Struct("<f")
-    return _struct_f
 _struct_2fI = None
 def _get_struct_2fI():
     global _struct_2fI
     if _struct_2fI is None:
         _struct_2fI = struct.Struct("<2fI")
     return _struct_2fI
+_struct_2f = None
+def _get_struct_2f():
+    global _struct_2f
+    if _struct_2f is None:
+        _struct_2f = struct.Struct("<2f")
+    return _struct_2f
 _struct_3I = None
 def _get_struct_3I():
     global _struct_3I

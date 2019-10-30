@@ -78,7 +78,7 @@ namespace message_traits
 
 
 // BOOLTRAITS {'IsFixedSize': False, 'IsMessage': True, 'HasHeader': True}
-// {'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg'], 'swipe_obstacles': ['/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg']}
+// {'geometry_msgs': ['/opt/ros/kinetic/share/geometry_msgs/cmake/../msg'], 'swipe_obstacles': ['/home/mad-autoware/catkin_ws/src/swipe_obstacles/msg'], 'std_msgs': ['/opt/ros/kinetic/share/std_msgs/cmake/../msg']}
 
 // !!!!!!!!!!! ['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_parsed_fields', 'constants', 'fields', 'full_name', 'has_header', 'header_present', 'names', 'package', 'parsed_fields', 'short_name', 'text', 'types']
 
@@ -121,12 +121,12 @@ struct MD5Sum< ::swipe_obstacles::detected_obstacle_array_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "491a0dff1749fdf46f11f15d92874d1b";
+    return "5f29e1c8c0e978810d330de5a6998a5d";
   }
 
   static const char* value(const ::swipe_obstacles::detected_obstacle_array_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x491a0dff1749fdf4ULL;
-  static const uint64_t static_value2 = 0x6f11f15d92874d1bULL;
+  static const uint64_t static_value1 = 0x5f29e1c8c0e97881ULL;
+  static const uint64_t static_value2 = 0x0d330de5a6998a5dULL;
 };
 
 template<class ContainerAllocator>
@@ -174,6 +174,7 @@ uint32 id\n\
 uint32 managed_id\n\
 string label\n\
 float32 score\n\
+float32 distance\n\
 geometry_msgs/Pose pose\n\
 \n\
 float32 shift_x\n\

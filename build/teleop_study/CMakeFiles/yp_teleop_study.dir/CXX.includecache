@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/kuriatsu/Program/Ros/master_study_ws/src/teleop_study/src/teleop_study.cpp
+/home/mad-autoware/catkin_ws/src/teleop_study/src/teleop_study.cpp
 ros/ros.h
 -
 sensor_msgs/Joy.h

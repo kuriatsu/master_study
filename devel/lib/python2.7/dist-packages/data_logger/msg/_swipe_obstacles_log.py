@@ -9,7 +9,7 @@ import geometry_msgs.msg
 import std_msgs.msg
 
 class swipe_obstacles_log(genpy.Message):
-  _md5sum = "9986bce81c59a09d6f4ebd3feb2a8ca7"
+  _md5sum = "40f7308363d60b6e3d831771732fa8bd"
   _type = "data_logger/swipe_obstacles_log"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
@@ -17,10 +17,11 @@ class swipe_obstacles_log(genpy.Message):
 uint32 round
 geometry_msgs/Pose pose
 geometry_msgs/Pose odom
-geometry_msgs/Twist twist
+geometry_msgs/Twist autoware_twist
+geometry_msgs/Twist ypspur_twist
 float32 brake
 float32 accel
-float32 shift
+uint32 shift
 uint32 obstacle_id
 uint32 detected_flag
 uint32 pedestrian_flag
@@ -83,8 +84,8 @@ MSG: geometry_msgs/Vector3
 float64 x
 float64 y
 float64 z"""
-  __slots__ = ['header','round','pose','odom','twist','brake','accel','shift','obstacle_id','detected_flag','pedestrian_flag']
-  _slot_types = ['std_msgs/Header','uint32','geometry_msgs/Pose','geometry_msgs/Pose','geometry_msgs/Twist','float32','float32','float32','uint32','uint32','uint32']
+  __slots__ = ['header','round','pose','odom','autoware_twist','ypspur_twist','brake','accel','shift','obstacle_id','detected_flag','pedestrian_flag']
+  _slot_types = ['std_msgs/Header','uint32','geometry_msgs/Pose','geometry_msgs/Pose','geometry_msgs/Twist','geometry_msgs/Twist','float32','float32','uint32','uint32','uint32','uint32']
 
   def __init__(self, *args, **kwds):
     """
@@ -94,7 +95,7 @@ float64 z"""
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       header,round,pose,odom,twist,brake,accel,shift,obstacle_id,detected_flag,pedestrian_flag
+       header,round,pose,odom,autoware_twist,ypspur_twist,brake,accel,shift,obstacle_id,detected_flag,pedestrian_flag
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -111,14 +112,16 @@ float64 z"""
         self.pose = geometry_msgs.msg.Pose()
       if self.odom is None:
         self.odom = geometry_msgs.msg.Pose()
-      if self.twist is None:
-        self.twist = geometry_msgs.msg.Twist()
+      if self.autoware_twist is None:
+        self.autoware_twist = geometry_msgs.msg.Twist()
+      if self.ypspur_twist is None:
+        self.ypspur_twist = geometry_msgs.msg.Twist()
       if self.brake is None:
         self.brake = 0.
       if self.accel is None:
         self.accel = 0.
       if self.shift is None:
-        self.shift = 0.
+        self.shift = 0
       if self.obstacle_id is None:
         self.obstacle_id = 0
       if self.detected_flag is None:
@@ -130,10 +133,11 @@ float64 z"""
       self.round = 0
       self.pose = geometry_msgs.msg.Pose()
       self.odom = geometry_msgs.msg.Pose()
-      self.twist = geometry_msgs.msg.Twist()
+      self.autoware_twist = geometry_msgs.msg.Twist()
+      self.ypspur_twist = geometry_msgs.msg.Twist()
       self.brake = 0.
       self.accel = 0.
-      self.shift = 0.
+      self.shift = 0
       self.obstacle_id = 0
       self.detected_flag = 0
       self.pedestrian_flag = 0
@@ -159,7 +163,7 @@ float64 z"""
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_I20d3f3I().pack(_x.round, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.odom.position.x, _x.odom.position.y, _x.odom.position.z, _x.odom.orientation.x, _x.odom.orientation.y, _x.odom.orientation.z, _x.odom.orientation.w, _x.twist.linear.x, _x.twist.linear.y, _x.twist.linear.z, _x.twist.angular.x, _x.twist.angular.y, _x.twist.angular.z, _x.brake, _x.accel, _x.shift, _x.obstacle_id, _x.detected_flag, _x.pedestrian_flag))
+      buff.write(_get_struct_I26d2f4I().pack(_x.round, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.odom.position.x, _x.odom.position.y, _x.odom.position.z, _x.odom.orientation.x, _x.odom.orientation.y, _x.odom.orientation.z, _x.odom.orientation.w, _x.autoware_twist.linear.x, _x.autoware_twist.linear.y, _x.autoware_twist.linear.z, _x.autoware_twist.angular.x, _x.autoware_twist.angular.y, _x.autoware_twist.angular.z, _x.ypspur_twist.linear.x, _x.ypspur_twist.linear.y, _x.ypspur_twist.linear.z, _x.ypspur_twist.angular.x, _x.ypspur_twist.angular.y, _x.ypspur_twist.angular.z, _x.brake, _x.accel, _x.shift, _x.obstacle_id, _x.detected_flag, _x.pedestrian_flag))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -175,8 +179,10 @@ float64 z"""
         self.pose = geometry_msgs.msg.Pose()
       if self.odom is None:
         self.odom = geometry_msgs.msg.Pose()
-      if self.twist is None:
-        self.twist = geometry_msgs.msg.Twist()
+      if self.autoware_twist is None:
+        self.autoware_twist = geometry_msgs.msg.Twist()
+      if self.ypspur_twist is None:
+        self.ypspur_twist = geometry_msgs.msg.Twist()
       end = 0
       _x = self
       start = end
@@ -193,8 +199,8 @@ float64 z"""
         self.header.frame_id = str[start:end]
       _x = self
       start = end
-      end += 188
-      (_x.round, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.odom.position.x, _x.odom.position.y, _x.odom.position.z, _x.odom.orientation.x, _x.odom.orientation.y, _x.odom.orientation.z, _x.odom.orientation.w, _x.twist.linear.x, _x.twist.linear.y, _x.twist.linear.z, _x.twist.angular.x, _x.twist.angular.y, _x.twist.angular.z, _x.brake, _x.accel, _x.shift, _x.obstacle_id, _x.detected_flag, _x.pedestrian_flag,) = _get_struct_I20d3f3I().unpack(str[start:end])
+      end += 236
+      (_x.round, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.odom.position.x, _x.odom.position.y, _x.odom.position.z, _x.odom.orientation.x, _x.odom.orientation.y, _x.odom.orientation.z, _x.odom.orientation.w, _x.autoware_twist.linear.x, _x.autoware_twist.linear.y, _x.autoware_twist.linear.z, _x.autoware_twist.angular.x, _x.autoware_twist.angular.y, _x.autoware_twist.angular.z, _x.ypspur_twist.linear.x, _x.ypspur_twist.linear.y, _x.ypspur_twist.linear.z, _x.ypspur_twist.angular.x, _x.ypspur_twist.angular.y, _x.ypspur_twist.angular.z, _x.brake, _x.accel, _x.shift, _x.obstacle_id, _x.detected_flag, _x.pedestrian_flag,) = _get_struct_I26d2f4I().unpack(str[start:end])
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill
@@ -216,7 +222,7 @@ float64 z"""
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_I20d3f3I().pack(_x.round, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.odom.position.x, _x.odom.position.y, _x.odom.position.z, _x.odom.orientation.x, _x.odom.orientation.y, _x.odom.orientation.z, _x.odom.orientation.w, _x.twist.linear.x, _x.twist.linear.y, _x.twist.linear.z, _x.twist.angular.x, _x.twist.angular.y, _x.twist.angular.z, _x.brake, _x.accel, _x.shift, _x.obstacle_id, _x.detected_flag, _x.pedestrian_flag))
+      buff.write(_get_struct_I26d2f4I().pack(_x.round, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.odom.position.x, _x.odom.position.y, _x.odom.position.z, _x.odom.orientation.x, _x.odom.orientation.y, _x.odom.orientation.z, _x.odom.orientation.w, _x.autoware_twist.linear.x, _x.autoware_twist.linear.y, _x.autoware_twist.linear.z, _x.autoware_twist.angular.x, _x.autoware_twist.angular.y, _x.autoware_twist.angular.z, _x.ypspur_twist.linear.x, _x.ypspur_twist.linear.y, _x.ypspur_twist.linear.z, _x.ypspur_twist.angular.x, _x.ypspur_twist.angular.y, _x.ypspur_twist.angular.z, _x.brake, _x.accel, _x.shift, _x.obstacle_id, _x.detected_flag, _x.pedestrian_flag))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -233,8 +239,10 @@ float64 z"""
         self.pose = geometry_msgs.msg.Pose()
       if self.odom is None:
         self.odom = geometry_msgs.msg.Pose()
-      if self.twist is None:
-        self.twist = geometry_msgs.msg.Twist()
+      if self.autoware_twist is None:
+        self.autoware_twist = geometry_msgs.msg.Twist()
+      if self.ypspur_twist is None:
+        self.ypspur_twist = geometry_msgs.msg.Twist()
       end = 0
       _x = self
       start = end
@@ -251,8 +259,8 @@ float64 z"""
         self.header.frame_id = str[start:end]
       _x = self
       start = end
-      end += 188
-      (_x.round, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.odom.position.x, _x.odom.position.y, _x.odom.position.z, _x.odom.orientation.x, _x.odom.orientation.y, _x.odom.orientation.z, _x.odom.orientation.w, _x.twist.linear.x, _x.twist.linear.y, _x.twist.linear.z, _x.twist.angular.x, _x.twist.angular.y, _x.twist.angular.z, _x.brake, _x.accel, _x.shift, _x.obstacle_id, _x.detected_flag, _x.pedestrian_flag,) = _get_struct_I20d3f3I().unpack(str[start:end])
+      end += 236
+      (_x.round, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.odom.position.x, _x.odom.position.y, _x.odom.position.z, _x.odom.orientation.x, _x.odom.orientation.y, _x.odom.orientation.z, _x.odom.orientation.w, _x.autoware_twist.linear.x, _x.autoware_twist.linear.y, _x.autoware_twist.linear.z, _x.autoware_twist.angular.x, _x.autoware_twist.angular.y, _x.autoware_twist.angular.z, _x.ypspur_twist.linear.x, _x.ypspur_twist.linear.y, _x.ypspur_twist.linear.z, _x.ypspur_twist.angular.x, _x.ypspur_twist.angular.y, _x.ypspur_twist.angular.z, _x.brake, _x.accel, _x.shift, _x.obstacle_id, _x.detected_flag, _x.pedestrian_flag,) = _get_struct_I26d2f4I().unpack(str[start:end])
       return self
     except struct.error as e:
       raise genpy.DeserializationError(e) #most likely buffer underfill
@@ -267,9 +275,9 @@ def _get_struct_3I():
     if _struct_3I is None:
         _struct_3I = struct.Struct("<3I")
     return _struct_3I
-_struct_I20d3f3I = None
-def _get_struct_I20d3f3I():
-    global _struct_I20d3f3I
-    if _struct_I20d3f3I is None:
-        _struct_I20d3f3I = struct.Struct("<I20d3f3I")
-    return _struct_I20d3f3I
+_struct_I26d2f4I = None
+def _get_struct_I26d2f4I():
+    global _struct_I26d2f4I
+    if _struct_I26d2f4I is None:
+        _struct_I26d2f4I = struct.Struct("<I26d2f4I")
+    return _struct_I26d2f4I

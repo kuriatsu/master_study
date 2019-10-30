@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.o"
-  "/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/teleop_study/yp_teleop_study1.pdb"
-  "/home/kuriatsu/Program/Ros/master_study_ws/devel/lib/teleop_study/yp_teleop_study1"
+  "/home/mad-autoware/catkin_ws/devel/lib/teleop_study/yp_teleop_study1.pdb"
+  "/home/mad-autoware/catkin_ws/devel/lib/teleop_study/yp_teleop_study1"
 )
 
 # Per-language clean rules from dependency scanning.

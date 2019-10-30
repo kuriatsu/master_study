@@ -9,6 +9,8 @@
           LABEL
           SCORE-VAL
           SCORE
+          DISTANCE-VAL
+          DISTANCE
           POSE-VAL
           POSE
           SHIFT_X-VAL

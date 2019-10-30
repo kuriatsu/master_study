@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/swipe_obstacles_generate_messages_cpp"
-  "/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle_array.h"
-  "/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h"
-  "/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/closest_obstacle.h"
+  "/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/detected_obstacle.h"
+  "/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/closest_obstacle.h"
+  "/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/detected_obstacle_array.h"
 )
 
 # Per-language clean rules from dependency scanning.

@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/kuriatsu/Autoware/ros/devel/include/autoware_msgs/CloudCluster.h
+/home/mad-autoware/autoware/ros/devel/include/autoware_msgs/CloudCluster.h
 string
 -
 vector
@@ -46,7 +46,7 @@ jsk_recognition_msgs/BoundingBox.h
 geometry_msgs/PolygonStamped.h
 -
 
-/home/kuriatsu/Autoware/ros/devel/include/autoware_msgs/CloudClusterArray.h
+/home/mad-autoware/autoware/ros/devel/include/autoware_msgs/CloudClusterArray.h
 string
 -
 vector
@@ -66,7 +66,7 @@ std_msgs/Header.h
 autoware_msgs/CloudCluster.h
 -
 
-/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle.h
+/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/detected_obstacle.h
 string
 -
 vector
@@ -86,7 +86,7 @@ std_msgs/Header.h
 geometry_msgs/Pose.h
 -
 
-/home/kuriatsu/Program/Ros/master_study_ws/devel/include/swipe_obstacles/detected_obstacle_array.h
+/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/detected_obstacle_array.h
 string
 -
 vector
@@ -106,7 +106,7 @@ std_msgs/Header.h
 swipe_obstacles/detected_obstacle.h
 -
 
-/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_reflector.cpp
+/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_reflector.cpp
 ros/ros.h
 -
 tf/transform_listener.h
@@ -114,9 +114,9 @@ tf/transform_listener.h
 geometry_msgs/Pose.h
 -
 swipe_obstacles/detected_obstacle.h
-/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle.h
+/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle.h
 swipe_obstacles/detected_obstacle_array.h
-/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle_array.h
+/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle_array.h
 sensor_msgs/PointCloud2.h
 -
 pcl_conversions/pcl_conversions.h
@@ -130,7 +130,7 @@ autoware_msgs/CloudCluster.h
 autoware_msgs/CloudClusterArray.h
 -
 std_msgs/Int32.h
-/home/kuriatsu/Program/Ros/master_study_ws/src/swipe_obstacles/src/std_msgs/Int32.h
+/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/std_msgs/Int32.h
 cmath
 -
 

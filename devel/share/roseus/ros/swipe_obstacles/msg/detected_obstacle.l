@@ -18,7 +18,7 @@
 
 (defclass swipe_obstacles::detected_obstacle
   :super ros::object
-  :slots (_header _id _managed_id _label _score _pose _shift_x _shift_y _round _detected_time ))
+  :slots (_header _id _managed_id _label _score _distance _pose _shift_x _shift_y _round _detected_time ))
 
 (defmethod swipe_obstacles::detected_obstacle
   (:init
@@ -28,6 +28,7 @@
     ((:managed_id __managed_id) 0)
     ((:label __label) "")
     ((:score __score) 0.0)
+    ((:distance __distance) 0.0)
     ((:pose __pose) (instance geometry_msgs::Pose :init))
     ((:shift_x __shift_x) 0.0)
     ((:shift_y __shift_y) 0.0)
@@ -40,6 +41,7 @@
    (setq _managed_id (round __managed_id))
    (setq _label (string __label))
    (setq _score (float __score))
+   (setq _distance (float __distance))
    (setq _pose __pose)
    (setq _shift_x (float __shift_x))
    (setq _shift_y (float __shift_y))
@@ -65,6 +67,9 @@
   (:score
    (&optional __score)
    (if __score (setq _score __score)) _score)
+  (:distance
+   (&optional __distance)
+   (if __distance (setq _distance __distance)) _distance)
   (:pose
    (&rest __pose)
    (if (keywordp (car __pose))
@@ -97,6 +102,8 @@
     4 (length _label)
     ;; float32 _score
     4
+    ;; float32 _distance
+    4
     ;; geometry_msgs/Pose _pose
     (send _pose :serialization-length)
     ;; float32 _shift_x
@@ -122,6 +129,8 @@
        (write-long (length _label) s) (princ _label s)
      ;; float32 _score
        (sys::poke _score (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
+     ;; float32 _distance
+       (sys::poke _distance (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
      ;; geometry_msgs/Pose _pose
        (send _pose :serialize s)
      ;; float32 _shift_x
@@ -146,6 +155,8 @@
      (let (n) (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4) (setq _label (subseq buf ptr- (+ ptr- n))) (incf ptr- n))
    ;; float32 _score
      (setq _score (sys::peek buf ptr- :float)) (incf ptr- 4)
+   ;; float32 _distance
+     (setq _distance (sys::peek buf ptr- :float)) (incf ptr- 4)
    ;; geometry_msgs/Pose _pose
      (send _pose :deserialize buf ptr-) (incf ptr- (send _pose :serialization-length))
    ;; float32 _shift_x
@@ -160,7 +171,7 @@
    self)
   )
 
-(setf (get swipe_obstacles::detected_obstacle :md5sum-) "9978e5bb58ee01f8e45fc2d8376b759a")
+(setf (get swipe_obstacles::detected_obstacle :md5sum-) "ded6fe15314248041bfd81694d77c110")
 (setf (get swipe_obstacles::detected_obstacle :datatype-) "swipe_obstacles/detected_obstacle")
 (setf (get swipe_obstacles::detected_obstacle :definition-)
       "std_msgs/Header header
@@ -169,6 +180,7 @@ uint32 id
 uint32 managed_id
 string label
 float32 score
+float32 distance
 geometry_msgs/Pose pose
 
 float32 shift_x
@@ -220,6 +232,6 @@ float64 w
 
 
 
-(provide :swipe_obstacles/detected_obstacle "9978e5bb58ee01f8e45fc2d8376b759a")
+(provide :swipe_obstacles/detected_obstacle "ded6fe15314248041bfd81694d77c110")
 
 

@@ -1,2 +1,2 @@
-data_logger:swipe_obstacles:teleop_study:ypspur_ros
--DCATKIN_DEVEL_PREFIX=/home/kuriatsu/Program/Ros/master_study_ws/devel -DCMAKE_INSTALL_PREFIX=/home/kuriatsu/Program/Ros/master_study_ws/install -G Unix Makefiles
+data_logger:swipe_obstacles:teleop_study
+-DCATKIN_DEVEL_PREFIX=/home/mad-autoware/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/mad-autoware/catkin_ws/install -G Unix Makefiles

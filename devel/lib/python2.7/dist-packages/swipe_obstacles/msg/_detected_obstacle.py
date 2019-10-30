@@ -10,7 +10,7 @@ import genpy
 import std_msgs.msg
 
 class detected_obstacle(genpy.Message):
-  _md5sum = "9978e5bb58ee01f8e45fc2d8376b759a"
+  _md5sum = "ded6fe15314248041bfd81694d77c110"
   _type = "swipe_obstacles/detected_obstacle"
   _has_header = True #flag to mark the presence of a Header object
   _full_text = """std_msgs/Header header
@@ -19,6 +19,7 @@ uint32 id
 uint32 managed_id
 string label
 float32 score
+float32 distance
 geometry_msgs/Pose pose
 
 float32 shift_x
@@ -66,8 +67,8 @@ float64 y
 float64 z
 float64 w
 """
-  __slots__ = ['header','id','managed_id','label','score','pose','shift_x','shift_y','round','detected_time']
-  _slot_types = ['std_msgs/Header','uint32','uint32','string','float32','geometry_msgs/Pose','float32','float32','uint32','time']
+  __slots__ = ['header','id','managed_id','label','score','distance','pose','shift_x','shift_y','round','detected_time']
+  _slot_types = ['std_msgs/Header','uint32','uint32','string','float32','float32','geometry_msgs/Pose','float32','float32','uint32','time']
 
   def __init__(self, *args, **kwds):
     """
@@ -77,7 +78,7 @@ float64 w
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       header,id,managed_id,label,score,pose,shift_x,shift_y,round,detected_time
+       header,id,managed_id,label,score,distance,pose,shift_x,shift_y,round,detected_time
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -96,6 +97,8 @@ float64 w
         self.label = ''
       if self.score is None:
         self.score = 0.
+      if self.distance is None:
+        self.distance = 0.
       if self.pose is None:
         self.pose = geometry_msgs.msg.Pose()
       if self.shift_x is None:
@@ -112,6 +115,7 @@ float64 w
       self.managed_id = 0
       self.label = ''
       self.score = 0.
+      self.distance = 0.
       self.pose = geometry_msgs.msg.Pose()
       self.shift_x = 0.
       self.shift_y = 0.
@@ -147,7 +151,7 @@ float64 w
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_f7d2f3I().pack(_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs))
+      buff.write(_get_struct_2f7d2f3I().pack(_x.score, _x.distance, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -192,8 +196,8 @@ float64 w
         self.label = str[start:end]
       _x = self
       start = end
-      end += 80
-      (_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs,) = _get_struct_f7d2f3I().unpack(str[start:end])
+      end += 84
+      (_x.score, _x.distance, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs,) = _get_struct_2f7d2f3I().unpack(str[start:end])
       self.detected_time.canon()
       return self
     except struct.error as e:
@@ -224,7 +228,7 @@ float64 w
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self
-      buff.write(_get_struct_f7d2f3I().pack(_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs))
+      buff.write(_get_struct_2f7d2f3I().pack(_x.score, _x.distance, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -270,8 +274,8 @@ float64 w
         self.label = str[start:end]
       _x = self
       start = end
-      end += 80
-      (_x.score, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs,) = _get_struct_f7d2f3I().unpack(str[start:end])
+      end += 84
+      (_x.score, _x.distance, _x.pose.position.x, _x.pose.position.y, _x.pose.position.z, _x.pose.orientation.x, _x.pose.orientation.y, _x.pose.orientation.z, _x.pose.orientation.w, _x.shift_x, _x.shift_y, _x.round, _x.detected_time.secs, _x.detected_time.nsecs,) = _get_struct_2f7d2f3I().unpack(str[start:end])
       self.detected_time.canon()
       return self
     except struct.error as e:
@@ -287,15 +291,15 @@ def _get_struct_3I():
     if _struct_3I is None:
         _struct_3I = struct.Struct("<3I")
     return _struct_3I
-_struct_f7d2f3I = None
-def _get_struct_f7d2f3I():
-    global _struct_f7d2f3I
-    if _struct_f7d2f3I is None:
-        _struct_f7d2f3I = struct.Struct("<f7d2f3I")
-    return _struct_f7d2f3I
 _struct_2I = None
 def _get_struct_2I():
     global _struct_2I
     if _struct_2I is None:
         _struct_2I = struct.Struct("<2I")
     return _struct_2I
+_struct_2f7d2f3I = None
+def _get_struct_2f7d2f3I():
+    global _struct_2f7d2f3I
+    if _struct_2f7d2f3I is None:
+        _struct_2f7d2f3I = struct.Struct("<2f7d2f3I")
+    return _struct_2f7d2f3I
