@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/closest_obstacle.h
+/home/mad-carla/share/catkin_ws/devel/include/swipe_obstacles/closest_obstacle.h
 string
 -
 vector
@@ -24,7 +24,7 @@ ros/message_operations.h
 std_msgs/Header.h
 -
 
-/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/detected_obstacle.h
+/home/mad-carla/share/catkin_ws/devel/include/swipe_obstacles/detected_obstacle.h
 string
 -
 vector
@@ -44,7 +44,7 @@ std_msgs/Header.h
 geometry_msgs/Pose.h
 -
 
-/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/detected_obstacle_array.h
+/home/mad-carla/share/catkin_ws/devel/include/swipe_obstacles/detected_obstacle_array.h
 string
 -
 vector
@@ -64,7 +64,7 @@ std_msgs/Header.h
 swipe_obstacles/detected_obstacle.h
 -
 
-/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_detector_carla.cpp
+/home/mad-carla/share/catkin_ws/src/swipe_obstacles/src/swipe_detector_carla.cpp
 ros/ros.h
 -
 tf/transform_listener.h
@@ -78,11 +78,11 @@ derived_object_msgs/Object.h
 math.h
 -
 swipe_obstacles/detected_obstacle.h
-/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle.h
+/home/mad-carla/share/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle.h
 swipe_obstacles/detected_obstacle_array.h
-/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle_array.h
+/home/mad-carla/share/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle_array.h
 swipe_obstacles/closest_obstacle.h
-/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/closest_obstacle.h
+/home/mad-carla/share/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/closest_obstacle.h
 
 /opt/ros/kinetic/include/boost_161_condition_variable.h
 boost/thread/detail/platform.hpp

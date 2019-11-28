@@ -1,2 +1,2 @@
-data_logger:swipe_obstacles:teleop_study
--DCATKIN_DEVEL_PREFIX=/home/mad-autoware/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/mad-autoware/catkin_ws/install -G Unix Makefiles
+carla_helper:data_logger:swipe_obstacles:teleop_study
+-DCATKIN_DEVEL_PREFIX=/home/mad-carla/share/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/mad-carla/share/catkin_ws/install -G Unix Makefiles

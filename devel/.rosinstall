@@ -1,2 +1,2 @@
 - setup-file:
-    local-name: /home/mad-autoware/catkin_ws/devel/setup.sh
+    local-name: /home/mad-carla/share/catkin_ws/devel/setup.sh

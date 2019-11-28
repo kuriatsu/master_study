@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/detected_obstacle.h
+/home/mad-carla/share/catkin_ws/devel/include/swipe_obstacles/detected_obstacle.h
 string
 -
 vector
@@ -26,7 +26,7 @@ std_msgs/Header.h
 geometry_msgs/Pose.h
 -
 
-/home/mad-autoware/catkin_ws/devel/include/swipe_obstacles/detected_obstacle_array.h
+/home/mad-carla/share/catkin_ws/devel/include/swipe_obstacles/detected_obstacle_array.h
 string
 -
 vector
@@ -46,19 +46,19 @@ std_msgs/Header.h
 swipe_obstacles/detected_obstacle.h
 -
 
-/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_position_manager.cpp
+/home/mad-carla/share/catkin_ws/src/swipe_obstacles/src/swipe_position_manager.cpp
 ros/ros.h
-/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/ros/ros.h
+/home/mad-carla/share/catkin_ws/src/swipe_obstacles/src/ros/ros.h
 geometry_msgs/Pose.h
 -
 tf/transform_listener.h
 -
 swipe_obstacles/detected_obstacle.h
-/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle.h
+/home/mad-carla/share/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle.h
 swipe_obstacles/detected_obstacle_array.h
-/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle_array.h
+/home/mad-carla/share/catkin_ws/src/swipe_obstacles/src/swipe_obstacles/detected_obstacle_array.h
 std_msgs/Int32.h
-/home/mad-autoware/catkin_ws/src/swipe_obstacles/src/std_msgs/Int32.h
+/home/mad-carla/share/catkin_ws/src/swipe_obstacles/src/std_msgs/Int32.h
 
 /opt/ros/kinetic/include/boost_161_condition_variable.h
 boost/thread/detail/platform.hpp

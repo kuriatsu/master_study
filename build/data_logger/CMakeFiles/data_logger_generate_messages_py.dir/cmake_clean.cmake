@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/data_logger_generate_messages_py"
-  "/home/mad-autoware/catkin_ws/devel/lib/python2.7/dist-packages/data_logger/msg/_swipe_obstacles_log.py"
-  "/home/mad-autoware/catkin_ws/devel/lib/python2.7/dist-packages/data_logger/msg/__init__.py"
+  "/home/mad-carla/share/catkin_ws/devel/lib/python2.7/dist-packages/data_logger/msg/_swipe_obstacles_log.py"
+  "/home/mad-carla/share/catkin_ws/devel/lib/python2.7/dist-packages/data_logger/msg/__init__.py"
 )
 
 # Per-language clean rules from dependency scanning.
