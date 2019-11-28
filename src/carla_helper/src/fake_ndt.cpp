@@ -12,15 +12,17 @@ private:
 	ros::Publisher pub_pose;
 	ros::Subscriber sub_odom;
 
-	geometry_msgs::Pose ego_pose;
+	geometry_msgs::PoseStamped ego_pose;
+
 	tf::TransformBroadcaster br;
+	ros::Timer pub_timer;
 
 public:
 	fakeNdt();
 
 private:
 	void subOdomCallback(const nav_msgs::Odometry &in_odom);
-	void pub_tf(const geometry_msgs::Pose &in_pose);
+	void pubTf(const ros::TimerEvent&);
 };
 
 
@@ -31,36 +33,38 @@ fakeNdt::fakeNdt()
 	pub_twist = n.advertise<geometry_msgs::TwistStamped>("/estimate_twist", 5);
 
 	sub_odom = n.subscribe("/carla/ego_vehicle/odometry", 5, &fakeNdt::subOdomCallback, this);
+
+	ros::Duration(1).sleep();
+	pub_timer = n.createTimer(ros::Duration(0.1), &fakeNdt::pubTf, this);
 }
 
 
 void fakeNdt::subOdomCallback(const nav_msgs::Odometry &in_odom)
 {
-	geometry_msgs::PoseStamped out_pose;
-	geometry_msgs::TwistStamped out_twist;
+	geometry_msgs::TwistStamped ego_twist;
 	
-	out_pose.header.stamp = ros::Time::now();
-	out_pose.header.frame_id = "map";
-	out_twist.header.stamp = ros::Time::now();
-	out_twist.header.frame_id = "map";
+	ego_pose.header.stamp = ros::Time::now();
+	ego_pose.header.frame_id = "map";
+	ego_twist.header.stamp = ros::Time::now();
+	ego_twist.header.frame_id = "map";
 
-	out_pose.pose = in_odom.pose.pose;
-	out_twist.twist = in_odom.twist.twist;
+	ego_pose.pose = in_odom.pose.pose;
+	ego_twist.twist = in_odom.twist.twist;
 	
-	pub_twist.publish(out_twist);
-	pub_pose.publish(out_pose);
-	pub_tf(out_pose.pose);
+	pub_twist.publish(ego_twist);
+	pub_pose.publish(ego_pose);
+	// pubTf(ego_pose.pose);
 
 }
 
 
-void fakeNdt::pub_tf(const geometry_msgs::Pose &in_pose)
+void fakeNdt::pubTf(const ros::TimerEvent&)
 {
 	tf::Transform transform;
 	// transform.setOrigin(tf::Vector3(in_pose.position.x, in_pose.position.y, in_pose.position.z));
 	// transform.setRotation(tf::quaternionMsgToTF(in_pose.orientation));
-	tf::poseMsgToTF(in_pose, transform);
-	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "ego_vehicle"));
+	tf::poseMsgToTF(ego_pose.pose, transform);
+	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "base_link"));
 }
 
 
