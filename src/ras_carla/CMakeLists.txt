@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(swipe_obstacles)
+project(ras_carla)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -58,9 +58,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
 	FILES
-    detected_obstacle.msg
-    detected_obstacle_array.msg
-    closest_obstacle.msg
+    RasObject.msg
+    RasObjectArray.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -144,13 +143,12 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(swipe_detector_fixed_node src/swipe_detector_fixed.cpp)
 add_executable(swipe_detector_fixed1_node src/swipe_detector_fixed1.cpp)
 add_executable(swipe_detector_yolo_node src/swipe_detector_yolo.cpp)
-add_executable(swipe_detector_carla_node src/swipe_detector_carla.cpp)
-add_executable(swipe_position_manager_node src/swipe_position_manager.cpp)
-add_executable(swipe_visualizer_node src/swipe_visualizer.cpp)
-add_executable(swipe_reflector_node src/swipe_reflector.cpp)
+add_executable(ras_detector_gt_node src/ras_detector_gt.cpp)
+add_executable(ras_manager_node src/ras_manager.cpp)
+add_executable(ras_visualizer_node src/ras_visualizer.cpp)
+add_executable(ras_autoware_connector_node src/ras_autoware_connector.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -163,19 +161,18 @@ add_executable(swipe_reflector_node src/swipe_reflector.cpp)
 add_dependencies(swipe_detector_fixed_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(swipe_detector_fixed1_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(swipe_detector_yolo_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(swipe_detector_carla_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(swipe_position_manager_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(swipe_visualizer_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(swipe_reflector_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(ras_detector_gt_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(ras_manager_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(ras_visualizer_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(ras_autoware_connector_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(swipe_detector_fixed_node ${catkin_LIBRARIES})
 target_link_libraries(swipe_detector_fixed1_node ${catkin_LIBRARIES})
 target_link_libraries(swipe_detector_yolo_node ${catkin_LIBRARIES})
-target_link_libraries(swipe_detector_carla_node ${catkin_LIBRARIES})
-target_link_libraries(swipe_position_manager_node ${catkin_LIBRARIES})
-target_link_libraries(swipe_visualizer_node ${catkin_LIBRARIES})
-target_link_libraries(swipe_reflector_node ${catkin_LIBRARIES})
+target_link_libraries(ras_detector_gt_node ${catkin_LIBRARIES})
+target_link_libraries(ras_manager_node ${catkin_LIBRARIES})
+target_link_libraries(ras_visualizer_node ${catkin_LIBRARIES})
+target_link_libraries(ras_autoware_connector_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##
