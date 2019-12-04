@@ -6,23 +6,27 @@
 #include <derived_object_msgs/ObjectArray.h>
 #include <derived_object_msgs/Object.h>
 #include <math.h>
+#include "ras_lib.h"
 
 #include "ras_carla/RasObject.h"
 #include "ras_carla/RasObjectArray.h"
 
-class DetectorGT
+class RasCore
 {
 private:
 	ros::Publisher pub_obj;
 	ros::Subscriber sub_carla_obj;
+	ros::Subscriber sub_shift;
 
-	geometry_msgs::Pose ego_pose;
-    tf::TransformListener tf_listener;
+    int keep_time;
+	float recognize_distance;
+    std::unordered_map<int, ras_carla::RasObject> obj_map;
 
 public:
-	DetectorGT();
+	RasCore();
 
 private:
-	void subObjCallback(const derived_object_msgs::ObjectArray &in_object_array);
-	geometry_msgs::Pose tfTransformer(const geometry_msgs::Pose &current_pose, const std::string &current_frame_id, const std::string &target_frame_id);
+	void subObjCallback(derived_object_msgs::ObjectArray &in_obj_array);
+	void containerManage();
+	void subShiftCallback(const ras_carla::RasObject &in_msg);
 };

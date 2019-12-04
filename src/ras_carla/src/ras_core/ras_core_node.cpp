@@ -1,12 +1,12 @@
 #include <ros/ros.h>
-#include "ras_detector_gt.h"
+#include "ras_core.h"
 
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "ras_detector_gt_node");
+	ros::init(argc, argv, "ras_core_node");
 
 	ROS_INFO("initialized detector");
-	DetectorGT ras_detector_gt;
+	RasCore ras_core;
 
 	ros::spin();
 	return 0;

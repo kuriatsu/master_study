@@ -1,99 +1,67 @@
 #include <ros/ros.h>
-#include "ras_detector_gt.h"
+#include "ras_core.h"
 
-DetectorGT::DetectorGT()
+RasCore::RasCore()
 {
 	ros::NodeHandle n;
 
-	pub_obj = n.advertise<ras_carla::RasObjectArray>("/detected_objects", 5);
-	sub_carla_obj = n.subscribe("/carla/objects", 5, &DetectorGT::subObjCallback, this);
-
+	sub_carla_obj = n.subscribe("/carla/objects", 5, &RasCore::subObjCallback, this);
+	sub_shift = n.subscribe("/shifted_info", 5, &RasCore::subShiftCallback, this);
+	pub_obj = n.advertise<ras_carla::RasObjectArray>("/managed_objects", 5);
+	// pub_erase = n.advertise<std_msgs::Int32>("/erase_signal", 1);
 }
 
 
-void DetectorGT::subObjCallback(const derived_object_msgs::ObjectArray &in_object_array)
+void RasCore::subObjCallback(derived_object_msgs::ObjectArray &in_obj_array)
 {
-	
-	geometry_msgs::Pose ego_pose, object_pose; // obj_pose : position on [ego_vehicle] frame
-	derived_object_msgs::Object in_object; // buffer for subscrived msgs
+	geometry_msgs::Pose obj_pose;
+	ras_carla::RasObject ras_obj;
 
-	// buffer for publish msg
-	ras_carla::RasObject ras_object;
-	ras_carla::RasObjectArray ras_object_array;
-
-	for (size_t index=0; index < in_object_array.objects.size(); index++)
+	for (size_t index=0; index < in_obj_array.objects.size(); index++)
 	{
-	
-		in_object = in_object_array.objects[index];
+		ras_obj.object = in_obj_array[index];
 
-		// transform obj position to confirm that the object is in the specific area
-		object_pose = tfTransformer(in_object.pose, in_object.header.frame_id, "ego_vehicle");
+		obj_pose = Ras::tfTransformer(ras_obj.pose, ras_obj.header.frame_id, "base_link");
+		ras_obj.distance = sqrt(obj_pose.x**2 + obj_pose.y**2);;
 
-		// add information if object is in the specific area
-		if (0.5 < object_pose.position.x && object_pose.position.x < 100)
+		if (ras_obj.distance < recognize_distance)
 		{
-			if (-20 < object_pose.position.y && object_pose.position.y < 20)
-			{
-				// add object label depend of the classification number on carla
-				switch(in_object.classification)
-				{
-					case 4:
-						ras_object.label = "person";
-						break;
-					case 5:
-						ras_object.label = "bicycle";
-						break;
-					case 6:
-						ras_object.label = "car";
-						break;
-					case 7:
-						ras_object.label = "car";
-						break;
-					case 8:
-						ras_object.label = "car";
-						break;
-				}
-
-				ras_object.header = in_object.header;
-				ras_object.id = in_object.id;
-
-				ras_object.score = in_object.classification_certainty;
-				ras_object.distance = sqrt(pow(object_pose.position.x, 2) + pow(object_pose.position.y, 2));
-				ras_object.pose = in_object.pose;
-				ras_object.twist = in_object.twist;
-				ras_object.accel = in_object.accel;
-
-				ras_object_array.obstacles.push_back(ras_object);
-				ROS_INFO("push_back_obstacle");
-			}
+			obj_map[ras_obj.id].object = ras_obj.object;
+			obj_map[ras_obj.id].distance = ras_obj.distance;
 		}
 	}
-
-	pub_obj.publish(ras_object_array);
+	containerManage();
 }
 
 
-geometry_msgs::Pose DetectorGT::tfTransformer(const geometry_msgs::Pose &current_pose, const std::string &current_frame_id, const std::string &target_frame_id)
+void RasCore::containerManage()
 {
-    tf::Pose current_tf;
-    tf::StampedTransform transform;
-    tf::Pose transformed_tf;
-    geometry_msgs::Pose transformed_pose;
-    geometry_msgs::PoseStamped transform_origin;
+	ras_carla::RasObjectArray obj_array;
 
-    try{
-        tf_listener.waitForTransform(current_frame_id, target_frame_id,  ros::Time(0), ros::Duration(1.0));
-        // current_frame_id　から　target_frame_id　への座標変換
-        tf_listener.lookupTransform(target_frame_id, current_frame_id, ros::Time(0), transform);
+    for(auto itr = obj_map.begin(); itr != obj_map.end(); ++itr)
+    {
 
-    }catch (tf::TransformException &ex)  {
-        ROS_ERROR("%s", ex.what());
-        //ros::Duration(1.0).sleep();
+		if ((ros.Time.now() - itr->object.header.stamp) > ros::Duration(keep_time))
+		{
+			obj_array.append(*itr);
+		}
+		else
+		{
+			obj_map.erace(itr->object.id);
+		}
+	}
+	pub_obj.publish(obj_array);
+}
+
+
+void RasCore::subShiftCallback(const ras_carla::RasObject &in_msg)
+{
+	int id = in_msg.object.id;
+    if (obj_map.find(id))
+    {
+        obj_map[id].shift_x = in_msg.object.pose.position.x - obj_map[id].object.pose.position.x;
+        obj_map[id].shift_y = in_msg.object.pose.position.y - obj_map[id].object.pose.position.y;
+        obj_map[id].object.header.stamp = ros::Time::now();
+        containerManage();
     }
-
-    tf::poseMsgToTF(current_pose, current_tf);
-    transformed_tf = transform * current_tf;
-    tf::poseTFToMsg(transformed_tf, transformed_pose);
-
-    return transformed_pose;
 }
