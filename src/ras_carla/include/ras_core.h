@@ -3,11 +3,13 @@
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
 #include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Point32.h>
 #include <derived_object_msgs/ObjectArray.h>
 #include <derived_object_msgs/Object.h>
 #include <math.h>
-#include "ras_lib.h"
 
+#include "ras_lib.h"
 #include "ras_carla/RasObject.h"
 #include "ras_carla/RasObjectArray.h"
 
@@ -21,6 +23,7 @@ private:
     int keep_time;
 	float recognize_distance;
     std::unordered_map<int, ras_carla::RasObject> obj_map;
+    float polygon_interval;
 
 public:
 	RasCore();
