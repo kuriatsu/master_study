@@ -29,4 +29,7 @@ private:
 	void subObjCallback(derived_object_msgs::ObjectArray &in_obj_array);
 	void containerManage();
 	void subShiftCallback(const ras_carla::RasObject &in_msg);
+    void subOdomCallback(const nav_msgs::Odometry &in_odom);
+    void calcPolygon(ras_carla::RasObject &in_obj);
+    void calcDimention(ras_carla::RasObject &in_obj);
 };

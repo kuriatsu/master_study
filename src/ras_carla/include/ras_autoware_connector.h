@@ -3,8 +3,10 @@
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
 #include <geometry_msgs/Pose.h>
-#include "swipe_obstacles/detected_obstacle.h"
-#include "swipe_obstacles/detected_obstacle_array.h"
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Point32.h>
+#include "ras_carla/RasObject.h"
+#include "ras_carla/RasObjectArray.h"
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/point_cloud.h>
@@ -26,8 +28,11 @@ private:
     pcl::PointCloud<pcl::PointXYZRGB> in_cloud;
     ros::Timer timer;
     tf::TransformListener tf_listener;
+    geometry_msgs::Twist ego_twist;
+    geometry_msgs::Pose ego_pose;
     // ros::Time last_sub_time;
     // int keep_time;
+    float polygon_interval;
 
     public :
     ObstacleReflector();

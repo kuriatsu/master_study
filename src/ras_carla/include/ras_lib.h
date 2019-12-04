@@ -33,4 +33,12 @@ geometry_msgs::Pose tfTransformer(const geometry_msgs::Pose &current_pose, const
     return transformed_pose;
 }
 
+double quatToyaw(const geometry_msgs::Quaternion in_quat)
+{
+    double roll, pitch, yaw;
+
+    tf::Quaternion tf_quat(in_quat.x, in_quat.y, in_quat.z, in_quat.w);
+    tf::Matrix3x3(tf_quat).getRPY(roll, pitch, yaw);
+    return yaw;
+}
 }

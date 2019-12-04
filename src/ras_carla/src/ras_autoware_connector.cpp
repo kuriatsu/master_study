@@ -78,7 +78,6 @@ void ObstacleReflector::subObstaclesCallback(const swipe_obstacles::detected_obs
     double x, y;
     unsigned int count = 0;
 
-
     // std::cout << "sub" <<std::endl;
     in_cloud.points.resize(in_msgs.obstacles.size() * 20);
     in_cloud.header.frame_id = "world";
