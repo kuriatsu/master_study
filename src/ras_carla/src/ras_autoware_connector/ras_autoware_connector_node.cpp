@@ -4,9 +4,9 @@
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "swipe_reflector_node");
+    ros::init(argc, argv, "ras_autoware_connector_node");
     ROS_INFO("Initializing...");
-    ObstacleReflector obstacle_reflector;
+    RasAutowareConnector ras_autoware_connector;
     ROS_INFO("Ready...");
     ros::spin();
 

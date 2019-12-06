@@ -1,32 +1,40 @@
 #include <ros/ros.h>
 #include "ras_visualizer.h"
 
+boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
+
 RasVisualizer::RasVisualizer(): marker_scale(1.0)
 {
 	ros::NodeHandle n;
+    server.reset(new interactive_markers::InteractiveMarkerServer("ras_visualizer_node"));
 
     sub_obj = n.subscribe("/managed_objects", 5, &RasVisualizer::subObjCallback, this);
-	sub_vehicle_info = n.subscribe("/ego_vehicle/", 5, &RasVisualizer::subVehicleInfoCallback, this);
+	// sub_vehicle_info = n.subscribe("/ego_vehicle/", 5, &RasVisualizer::subVehicleInfoCallback, this);
 	// sub_erase_signal = n.subscribe("/erase_signal", 5, &RasVisualizer::erase_signal_callback, this);
 	pub_shift = n.advertise<ras_carla::RasObject>("/shifted_info", 5);
 }
 
 
-void RasVisualizer::subObjCallback(const swipe_obstacles::detected_obstacle_array &in_obj_array)
+RasVisualizer::~RasVisualizer()
+{
+    server.reset();
+}
+
+void RasVisualizer::subObjCallback(const ras_carla::RasObjectArray &in_obj_array)
 {
     server->clear();
-    // ROS_INFO("visualezer subscribed");
+    ROS_INFO("visualezer subscribed");
 
-    for (size_t i=0; i< in_obj_array.obstacles.size(); i++)
+    for (size_t i=0; i< in_obj_array.objects.size(); i++)
     {
-        createInteractiveMarker(in_obj_array.obstacles[i]);
+        createInteractiveMarker(in_obj_array.objects[i]);
     }
 
     server->applyChanges();
 }
 
 
-void RasVisualizer::createInteractiveMarker(const ras_carla::RasObject &in_obj)
+void RasVisualizer::createInteractiveMarker(ras_carla::RasObject in_obj)
 {
     // for debag
     // std::cout <<"ss id is:" << in_obj.id << std::endl;
@@ -49,15 +57,15 @@ void RasVisualizer::createInteractiveMarker(const ras_carla::RasObject &in_obj)
 }
 
 
-void RasVisualizer::setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, const ras_carla::RasObject &in_obj)
+void RasVisualizer::setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, ras_carla::RasObject in_obj)
 {
 	visualization_msgs::InteractiveMarkerControl control;
 
 	control.always_visible  = true;
 	control.interaction_mode = visualization_msgs::InteractiveMarkerControl::MOVE_AXIS;
 	control.orientation.x = 0;
-	control.orientation.y = 1;
-	control.orientation.z = 0;
+	control.orientation.y = 0;
+	control.orientation.z = 1;
 	control.orientation.w = 1;
 
     setMarkerToMarkerControl(control, in_obj);
@@ -66,43 +74,43 @@ void RasVisualizer::setMarkerControl(visualization_msgs::InteractiveMarker &int_
 }
 
 
-void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMarkerControl &control, const swipe_obstacles::detected_obstacle &in_obj)
+void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMarkerControl &control, ras_carla::RasObject in_obj)
 {
     visualization_msgs::Marker marker;
 
     marker.ns = "ras";
     marker.id = in_obj.object.id;
 
-    if (in_obj.object.label == 4)
+    if (in_obj.object.classification == 4)
     {
         marker.type = visualization_msgs::Marker::CYLINDER;
-        marker.scale.x = marker_scale*in_obj.distance;
-        marker.scale.y = marker_scale*in_obj.distance;
-        marker.scale.z = marker_scale*0.5;
+        marker.scale.x = marker_scale*in_obj.object.shape.dimensions[0];
+        marker.scale.y = marker_scale*in_obj.object.shape.dimensions[1];
+        marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2];
         marker.color.r = 0;
         marker.color.g = 1;
         marker.color.b = 0;
         marker.color.a = 0.6;
     }
 
-    else if (in_obj.label == 5)
+    else if (in_obj.object.classification == 5)
     {
         marker.type = visualization_msgs::Marker::ARROW;
-        marker.scale.x = marker_scale*15;
-        marker.scale.y = marker_scale*15;
-        marker.scale.z = marker_scale*1.3;
+        marker.scale.x = marker_scale*in_obj.object.shape.dimensions[0];
+        marker.scale.y = marker_scale*in_obj.object.shape.dimensions[1];
+        marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2];
         marker.color.r = 1;
         marker.color.g = 0;
         marker.color.b = 0;
         marker.color.a = 0.6;
     }
 
-    else if (in_obj.label == 6)
+    else if (in_obj.object.classification == 6)
     {
         marker.type = visualization_msgs::Marker::CUBE;
-        marker.scale.x = marker_scale*40;
-        marker.scale.y = marker_scale*4.0;
-        marker.scale.z = marker_scale*1.5;
+        marker.scale.x = marker_scale*in_obj.object.shape.dimensions[0];
+        marker.scale.y = marker_scale*in_obj.object.shape.dimensions[1];
+        marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2];
         marker.color.r = 1;
         marker.color.g = 0;
         marker.color.b = 0;
@@ -122,9 +130,4 @@ void RasVisualizer::shiftFeedback(const visualization_msgs::InteractiveMarkerFee
     feedback_obj.object.pose = feedback->pose;
     sis >> feedback_obj.object.id;
     pub_shift.publish(feedback_obj);
-}
-
-void RasVisualizer::subVehicleInfoCallback()
-{
-	
 }
