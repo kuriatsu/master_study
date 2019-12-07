@@ -22,7 +22,7 @@ private:
         ros::Publisher pub_shift;
         std::vector<uint32_t> id_vec;
         float marker_scale;
-
+        float marker_vertical_shrink_rate;
 public:
     RasVisualizer();
 	~RasVisualizer();

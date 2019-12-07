@@ -15,7 +15,7 @@ class RasAutowareConnector{
 private:
     ros::Subscriber sub_obj;
     ros::Publisher pub_obj;
-
+    // ros::Publisher pub_polygon;
 public :
     RasAutowareConnector();
 

@@ -24,7 +24,8 @@ private:
 	ros::Subscriber sub_odom;
 
     int keep_time;
-	float recognize_distance;
+    float max_recognize_distance;
+	float min_recognize_distance;
     std::unordered_map<int, ras_carla::RasObject> obj_map;
     float polygon_interval;
     geometry_msgs::Pose ego_pose;

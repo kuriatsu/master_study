@@ -7,6 +7,7 @@ RasAutowareConnector::RasAutowareConnector()//: keep_time(2)
 
     sub_obj = n.subscribe("/managed_objects", 5, &RasAutowareConnector::subObjCallback, this);
     pub_obj = n.advertise<autoware_msgs::DetectedObjectArray>("/tracked_objects", 5);
+    // pub_polygon = n.advertise<geometry_msgs::PolygonStamped>("/ras_polygon", 10);
 }
 
 
@@ -42,6 +43,8 @@ void RasAutowareConnector::subObjCallback(ras_carla::RasObjectArray in_obj_array
         out_obj.acceleration.angular.z = in_obj.object.accel.angular.z;
         // out_obj.pointcloud = in_obj.object.pose;
         out_obj.convex_hull.polygon = in_obj.object.polygon;
+        out_obj.convex_hull.header = in_obj.object.header;
+        // pub_polygon.publish(out_obj.convex_hull);
         out_obj.pose.position.x = in_obj.object.pose.position.x + in_obj.shift_x;
         out_obj.pose.position.y = in_obj.object.pose.position.y + in_obj.shift_y;
         // out_obj.candidate_trajectories = in_obj.object.pose;

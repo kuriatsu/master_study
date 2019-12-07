@@ -3,7 +3,7 @@
 
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 
-RasVisualizer::RasVisualizer(): marker_scale(1.0)
+RasVisualizer::RasVisualizer(): marker_scale(1.0), marker_vertical_shrink_rate(0.3)
 {
 	ros::NodeHandle n;
     server.reset(new interactive_markers::InteractiveMarkerServer("ras_visualizer_node"));
@@ -23,7 +23,7 @@ RasVisualizer::~RasVisualizer()
 void RasVisualizer::subObjCallback(const ras_carla::RasObjectArray &in_obj_array)
 {
     server->clear();
-    ROS_INFO("visualezer subscribed");
+    // ROS_INFO("visualezer subscribed");
 
     for (size_t i=0; i< in_obj_array.objects.size(); i++)
     {
@@ -48,7 +48,15 @@ void RasVisualizer::createInteractiveMarker(ras_carla::RasObject in_obj)
 	int_marker.scale = marker_scale;
     int_marker.pose = in_obj.object.pose;
     int_marker.pose.position.x = in_obj.object.pose.position.x + in_obj.shift_x;
-	int_marker.pose.position.y = in_obj.object.pose.position.y + in_obj.shift_y;
+    int_marker.pose.position.y = in_obj.object.pose.position.y + in_obj.shift_y;
+    if(in_obj.object.classification == 4)
+    {
+        int_marker.pose.position.z = in_obj.object.pose.position.z - in_obj.object.shape.dimensions[2] * (1 - marker_vertical_shrink_rate) * 0.5;
+    }
+    else if (in_obj.object.classification == 6)
+    {
+        int_marker.pose.position.z = in_obj.object.pose.position.z;
+    }
 
     setMarkerControl(int_marker, in_obj);
 
@@ -86,11 +94,7 @@ void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMark
         marker.type = visualization_msgs::Marker::CYLINDER;
         marker.scale.x = marker_scale*in_obj.object.shape.dimensions[0];
         marker.scale.y = marker_scale*in_obj.object.shape.dimensions[1];
-        marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2];
-        marker.color.r = 0;
-        marker.color.g = 1;
-        marker.color.b = 0;
-        marker.color.a = 0.6;
+        marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2] * marker_vertical_shrink_rate;
     }
 
     else if (in_obj.object.classification == 5)
@@ -98,11 +102,7 @@ void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMark
         marker.type = visualization_msgs::Marker::ARROW;
         marker.scale.x = marker_scale*in_obj.object.shape.dimensions[0];
         marker.scale.y = marker_scale*in_obj.object.shape.dimensions[1];
-        marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2];
-        marker.color.r = 1;
-        marker.color.g = 0;
-        marker.color.b = 0;
-        marker.color.a = 0.6;
+        marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2] * marker_vertical_shrink_rate;
     }
 
     else if (in_obj.object.classification == 6)
@@ -110,12 +110,29 @@ void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMark
         marker.type = visualization_msgs::Marker::CUBE;
         marker.scale.x = marker_scale*in_obj.object.shape.dimensions[0];
         marker.scale.y = marker_scale*in_obj.object.shape.dimensions[1];
-        marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2];
+        marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2] * marker_vertical_shrink_rate;
+    }
+
+    if(in_obj.importance == 1.0)
+    {
         marker.color.r = 1;
         marker.color.g = 0;
         marker.color.b = 0;
-        marker.color.a = 0.6;
     }
+    else if(in_obj.importance == 0.5)
+    {
+        marker.color.r = 0;
+        marker.color.g = 1;
+        marker.color.b = 0;
+    }
+    else
+    {
+        marker.color.r = 0;
+        marker.color.g = 0;
+        marker.color.b = 1;
+    }
+    marker.color.a = 0.5;
+
     // marker.lifetime = ros::Duration(2.0);
     control.markers.push_back(marker);
 }
