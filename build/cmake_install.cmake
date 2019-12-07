@@ -126,10 +126,10 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/mad-carla/share/catkin_ws/build/gtest/cmake_install.cmake")
-  include("/home/mad-carla/share/catkin_ws/build/carla_helper/cmake_install.cmake")
-  include("/home/mad-carla/share/catkin_ws/build/swipe_obstacles/cmake_install.cmake")
   include("/home/mad-carla/share/catkin_ws/build/data_logger/cmake_install.cmake")
-  include("/home/mad-carla/share/catkin_ws/build/teleop_study/cmake_install.cmake")
+  include("/home/mad-carla/share/catkin_ws/build/teleop_carla/cmake_install.cmake")
+  include("/home/mad-carla/share/catkin_ws/build/carla_helper/cmake_install.cmake")
+  include("/home/mad-carla/share/catkin_ws/build/ras_carla/cmake_install.cmake")
 
 endif()
 
