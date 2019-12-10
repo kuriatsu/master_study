@@ -100,13 +100,14 @@ void RasCore::containerManage()
 void RasCore::calcDimension(ras_carla::RasObject &in_obj)
 {
     float movable_dist;
-    if (ego_twist.linear.x > 4.0)
-    {
+    float clipped_vel = (ego_twist.linear.x > 3.0) ? ego_twist.linear.x : 3.0;
+    // if (clipped_vel > 3.0)
+    // {
 
         switch(in_obj.object.classification)
         {
             case 4: //pedestrian
-                movable_dist = in_obj.object.twist.linear.x * in_obj.distance / ego_twist.linear.x;
+                movable_dist = in_obj.object.twist.linear.x * in_obj.distance / clipped_vel;
                 in_obj.object.shape.type = 1;
                 in_obj.object.shape.dimensions[0] = movable_dist;
                 in_obj.object.shape.dimensions[1] = movable_dist;
@@ -119,7 +120,7 @@ void RasCore::calcDimension(ras_carla::RasObject &in_obj)
 
                 if (in_obj.is_front && inner_prod < 0)
                 {
-                    movable_dist = in_obj.object.twist.linear.x * in_obj.distance / ego_twist.linear.x;
+                    movable_dist = in_obj.object.twist.linear.x * in_obj.distance / clipped_vel;
                     in_obj.object.shape.dimensions[0] = movable_dist;
                     in_obj.object.pose.position.x += 0.5 * movable_dist * cos(Ras::quatToYaw(in_obj.object.pose.orientation));
                     in_obj.object.pose.position.y += 0.5 * movable_dist * sin(Ras::quatToYaw(in_obj.object.pose.orientation));
@@ -138,7 +139,7 @@ void RasCore::calcDimension(ras_carla::RasObject &in_obj)
             default:
                 break;
         }
-    }
+    // }
 }
 
 
