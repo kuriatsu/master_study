@@ -19,9 +19,10 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/home/mad-carla/share/catkin_ws/devel/include"
   "/home/mad-carla/share/catkin_ws/src/ras_carla/include"
+  "/home/mad-carla/carla-autoware/catkin_ws/devel/include"
+  "/home/mad-carla/autoware/ros/devel/include"
   "/opt/ros/kinetic/include"
   "/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp"
-  "/home/mad-carla/autoware/ros/devel/include"
   )
 
 # Targets to which this target links.

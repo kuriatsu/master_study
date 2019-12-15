@@ -6,5 +6,5 @@ CXX_FLAGS =   -std=c++11
 
 CXX_DEFINES = -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\"ras_carla\"
 
-CXX_INCLUDES = -I/home/mad-carla/share/catkin_ws/devel/include -I/home/mad-carla/share/catkin_ws/src/ras_carla/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp -I/home/mad-carla/autoware/ros/devel/include 
+CXX_INCLUDES = -I/home/mad-carla/share/catkin_ws/devel/include -I/home/mad-carla/share/catkin_ws/src/ras_carla/include -I/home/mad-carla/carla-autoware/catkin_ws/devel/include -I/home/mad-carla/autoware/ros/devel/include -I/opt/ros/kinetic/include -I/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp 
 

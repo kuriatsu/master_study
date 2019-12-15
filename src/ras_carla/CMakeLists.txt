@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   derived_object_msgs
+  carla_msgs
 )
 
 ## Generate messages in the 'msg' folder

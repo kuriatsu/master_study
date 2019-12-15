@@ -90,17 +90,6 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
-# Special rule for the target test
-test:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
-	/usr/bin/ctest --force-new-ctest-process $(ARGS)
-.PHONY : test
-
-# Special rule for the target test
-test/fast: test
-
-.PHONY : test/fast
-
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
@@ -132,6 +121,17 @@ install/strip: preinstall
 install/strip/fast: install/strip
 
 .PHONY : install/strip/fast
+
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -166,6 +166,36 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+teleop_carla/CMakeFiles/teleop_study_gencfg.dir/rule:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/teleop_study_gencfg.dir/rule
+.PHONY : teleop_carla/CMakeFiles/teleop_study_gencfg.dir/rule
+
+# Convenience name for target.
+teleop_study_gencfg: teleop_carla/CMakeFiles/teleop_study_gencfg.dir/rule
+
+.PHONY : teleop_study_gencfg
+
+# fast build rule for target.
+teleop_study_gencfg/fast:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/teleop_study_gencfg.dir/build.make teleop_carla/CMakeFiles/teleop_study_gencfg.dir/build
+.PHONY : teleop_study_gencfg/fast
+
+# Convenience name for target.
+teleop_carla/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule
+.PHONY : teleop_carla/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule
+
+# Convenience name for target.
+dynamic_reconfigure_gencfg: teleop_carla/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule
+
+.PHONY : dynamic_reconfigure_gencfg
+
+# fast build rule for target.
+dynamic_reconfigure_gencfg/fast:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/dynamic_reconfigure_gencfg.dir/build.make teleop_carla/CMakeFiles/dynamic_reconfigure_gencfg.dir/build
+.PHONY : dynamic_reconfigure_gencfg/fast
+
+# Convenience name for target.
 teleop_carla/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule:
 	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule
 .PHONY : teleop_carla/CMakeFiles/sound_play_generate_messages_nodejs.dir/rule
@@ -179,21 +209,6 @@ sound_play_generate_messages_nodejs: teleop_carla/CMakeFiles/sound_play_generate
 sound_play_generate_messages_nodejs/fast:
 	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/sound_play_generate_messages_nodejs.dir/build.make teleop_carla/CMakeFiles/sound_play_generate_messages_nodejs.dir/build
 .PHONY : sound_play_generate_messages_nodejs/fast
-
-# Convenience name for target.
-teleop_carla/CMakeFiles/yp_teleop_study.dir/rule:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/yp_teleop_study.dir/rule
-.PHONY : teleop_carla/CMakeFiles/yp_teleop_study.dir/rule
-
-# Convenience name for target.
-yp_teleop_study: teleop_carla/CMakeFiles/yp_teleop_study.dir/rule
-
-.PHONY : yp_teleop_study
-
-# fast build rule for target.
-yp_teleop_study/fast:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study.dir/build
-.PHONY : yp_teleop_study/fast
 
 # Convenience name for target.
 teleop_carla/CMakeFiles/sound_play_generate_messages_eus.dir/rule:
@@ -226,6 +241,21 @@ sound_play_generate_messages_cpp/fast:
 .PHONY : sound_play_generate_messages_cpp/fast
 
 # Convenience name for target.
+teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule
+.PHONY : teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule
+
+# Convenience name for target.
+dynamic_reconfigure_generate_messages_py: teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule
+
+.PHONY : dynamic_reconfigure_generate_messages_py
+
+# fast build rule for target.
+dynamic_reconfigure_generate_messages_py/fast:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/build.make teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/build
+.PHONY : dynamic_reconfigure_generate_messages_py/fast
+
+# Convenience name for target.
 teleop_carla/CMakeFiles/sound_play_generate_messages_py.dir/rule:
 	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/sound_play_generate_messages_py.dir/rule
 .PHONY : teleop_carla/CMakeFiles/sound_play_generate_messages_py.dir/rule
@@ -239,51 +269,6 @@ sound_play_generate_messages_py: teleop_carla/CMakeFiles/sound_play_generate_mes
 sound_play_generate_messages_py/fast:
 	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/sound_play_generate_messages_py.dir/build.make teleop_carla/CMakeFiles/sound_play_generate_messages_py.dir/build
 .PHONY : sound_play_generate_messages_py/fast
-
-# Convenience name for target.
-teleop_carla/CMakeFiles/yp_teleop_study0.dir/rule:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/yp_teleop_study0.dir/rule
-.PHONY : teleop_carla/CMakeFiles/yp_teleop_study0.dir/rule
-
-# Convenience name for target.
-yp_teleop_study0: teleop_carla/CMakeFiles/yp_teleop_study0.dir/rule
-
-.PHONY : yp_teleop_study0
-
-# fast build rule for target.
-yp_teleop_study0/fast:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study0.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study0.dir/build
-.PHONY : yp_teleop_study0/fast
-
-# Convenience name for target.
-teleop_carla/CMakeFiles/teleop_study_gencfg.dir/rule:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/teleop_study_gencfg.dir/rule
-.PHONY : teleop_carla/CMakeFiles/teleop_study_gencfg.dir/rule
-
-# Convenience name for target.
-teleop_study_gencfg: teleop_carla/CMakeFiles/teleop_study_gencfg.dir/rule
-
-.PHONY : teleop_study_gencfg
-
-# fast build rule for target.
-teleop_study_gencfg/fast:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/teleop_study_gencfg.dir/build.make teleop_carla/CMakeFiles/teleop_study_gencfg.dir/build
-.PHONY : teleop_study_gencfg/fast
-
-# Convenience name for target.
-teleop_carla/CMakeFiles/yp_teleop_study1.dir/rule:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/yp_teleop_study1.dir/rule
-.PHONY : teleop_carla/CMakeFiles/yp_teleop_study1.dir/rule
-
-# Convenience name for target.
-yp_teleop_study1: teleop_carla/CMakeFiles/yp_teleop_study1.dir/rule
-
-.PHONY : yp_teleop_study1
-
-# fast build rule for target.
-yp_teleop_study1/fast:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study1.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study1.dir/build
-.PHONY : yp_teleop_study1/fast
 
 # Convenience name for target.
 teleop_carla/CMakeFiles/sound_play_generate_messages_lisp.dir/rule:
@@ -300,86 +285,65 @@ sound_play_generate_messages_lisp/fast:
 	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/sound_play_generate_messages_lisp.dir/build.make teleop_carla/CMakeFiles/sound_play_generate_messages_lisp.dir/build
 .PHONY : sound_play_generate_messages_lisp/fast
 
-src/teleop_study.o: src/teleop_study.cpp.o
+# Convenience name for target.
+teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule
+.PHONY : teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule
 
-.PHONY : src/teleop_study.o
+# Convenience name for target.
+dynamic_reconfigure_generate_messages_cpp: teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule
 
-# target to build an object file
-src/teleop_study.cpp.o:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study.dir/src/teleop_study.cpp.o
-.PHONY : src/teleop_study.cpp.o
+.PHONY : dynamic_reconfigure_generate_messages_cpp
 
-src/teleop_study.i: src/teleop_study.cpp.i
+# fast build rule for target.
+dynamic_reconfigure_generate_messages_cpp/fast:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/build.make teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/build
+.PHONY : dynamic_reconfigure_generate_messages_cpp/fast
 
-.PHONY : src/teleop_study.i
+# Convenience name for target.
+teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/rule:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/rule
+.PHONY : teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/rule
 
-# target to preprocess a source file
-src/teleop_study.cpp.i:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study.dir/src/teleop_study.cpp.i
-.PHONY : src/teleop_study.cpp.i
+# Convenience name for target.
+dynamic_reconfigure_generate_messages_eus: teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/rule
 
-src/teleop_study.s: src/teleop_study.cpp.s
+.PHONY : dynamic_reconfigure_generate_messages_eus
 
-.PHONY : src/teleop_study.s
+# fast build rule for target.
+dynamic_reconfigure_generate_messages_eus/fast:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/build.make teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/build
+.PHONY : dynamic_reconfigure_generate_messages_eus/fast
 
-# target to generate assembly for a file
-src/teleop_study.cpp.s:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study.dir/src/teleop_study.cpp.s
-.PHONY : src/teleop_study.cpp.s
+# Convenience name for target.
+teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule
+.PHONY : teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule
 
-src/teleop_study0.o: src/teleop_study0.cpp.o
+# Convenience name for target.
+dynamic_reconfigure_generate_messages_lisp: teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule
 
-.PHONY : src/teleop_study0.o
+.PHONY : dynamic_reconfigure_generate_messages_lisp
 
-# target to build an object file
-src/teleop_study0.cpp.o:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study0.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study0.dir/src/teleop_study0.cpp.o
-.PHONY : src/teleop_study0.cpp.o
+# fast build rule for target.
+dynamic_reconfigure_generate_messages_lisp/fast:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/build.make teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/build
+.PHONY : dynamic_reconfigure_generate_messages_lisp/fast
 
-src/teleop_study0.i: src/teleop_study0.cpp.i
+# Convenience name for target.
+teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/rule:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/rule
+.PHONY : teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/rule
 
-.PHONY : src/teleop_study0.i
+# Convenience name for target.
+dynamic_reconfigure_generate_messages_nodejs: teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/rule
 
-# target to preprocess a source file
-src/teleop_study0.cpp.i:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study0.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study0.dir/src/teleop_study0.cpp.i
-.PHONY : src/teleop_study0.cpp.i
+.PHONY : dynamic_reconfigure_generate_messages_nodejs
 
-src/teleop_study0.s: src/teleop_study0.cpp.s
-
-.PHONY : src/teleop_study0.s
-
-# target to generate assembly for a file
-src/teleop_study0.cpp.s:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study0.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study0.dir/src/teleop_study0.cpp.s
-.PHONY : src/teleop_study0.cpp.s
-
-src/teleop_study1.o: src/teleop_study1.cpp.o
-
-.PHONY : src/teleop_study1.o
-
-# target to build an object file
-src/teleop_study1.cpp.o:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study1.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.o
-.PHONY : src/teleop_study1.cpp.o
-
-src/teleop_study1.i: src/teleop_study1.cpp.i
-
-.PHONY : src/teleop_study1.i
-
-# target to preprocess a source file
-src/teleop_study1.cpp.i:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study1.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.i
-.PHONY : src/teleop_study1.cpp.i
-
-src/teleop_study1.s: src/teleop_study1.cpp.s
-
-.PHONY : src/teleop_study1.s
-
-# target to generate assembly for a file
-src/teleop_study1.cpp.s:
-	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/yp_teleop_study1.dir/build.make teleop_carla/CMakeFiles/yp_teleop_study1.dir/src/teleop_study1.cpp.s
-.PHONY : src/teleop_study1.cpp.s
+# fast build rule for target.
+dynamic_reconfigure_generate_messages_nodejs/fast:
+	cd /home/mad-carla/share/catkin_ws/build && $(MAKE) -f teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/build.make teleop_carla/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/build
+.PHONY : dynamic_reconfigure_generate_messages_nodejs/fast
 
 # Help Target
 help:
@@ -390,28 +354,22 @@ help:
 	@echo "... install"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... test"
+	@echo "... teleop_study_gencfg"
+	@echo "... dynamic_reconfigure_gencfg"
 	@echo "... sound_play_generate_messages_nodejs"
-	@echo "... yp_teleop_study"
 	@echo "... install/local"
 	@echo "... sound_play_generate_messages_eus"
 	@echo "... sound_play_generate_messages_cpp"
+	@echo "... dynamic_reconfigure_generate_messages_py"
 	@echo "... sound_play_generate_messages_py"
-	@echo "... yp_teleop_study0"
-	@echo "... teleop_study_gencfg"
-	@echo "... yp_teleop_study1"
 	@echo "... list_install_components"
-	@echo "... sound_play_generate_messages_lisp"
 	@echo "... install/strip"
-	@echo "... src/teleop_study.o"
-	@echo "... src/teleop_study.i"
-	@echo "... src/teleop_study.s"
-	@echo "... src/teleop_study0.o"
-	@echo "... src/teleop_study0.i"
-	@echo "... src/teleop_study0.s"
-	@echo "... src/teleop_study1.o"
-	@echo "... src/teleop_study1.i"
-	@echo "... src/teleop_study1.s"
+	@echo "... sound_play_generate_messages_lisp"
+	@echo "... dynamic_reconfigure_generate_messages_cpp"
+	@echo "... dynamic_reconfigure_generate_messages_eus"
+	@echo "... dynamic_reconfigure_generate_messages_lisp"
+	@echo "... test"
+	@echo "... dynamic_reconfigure_generate_messages_nodejs"
 .PHONY : help
 
 

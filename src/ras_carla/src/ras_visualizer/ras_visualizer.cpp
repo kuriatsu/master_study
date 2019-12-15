@@ -3,7 +3,7 @@
 
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 
-RasVisualizer::RasVisualizer(): marker_scale(1.0), marker_vertical_shrink_rate(0.3)
+RasVisualizer::RasVisualizer(): marker_scale(1.0), marker_vertical_shrink_rate(0.1)
 {
 	ros::NodeHandle n;
     server.reset(new interactive_markers::InteractiveMarkerServer("ras_visualizer_node"));
@@ -131,7 +131,7 @@ void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMark
         marker.color.g = 0;
         marker.color.b = 1;
     }
-    marker.color.a = 0.5;
+    marker.color.a = 0.3;
 
     // marker.lifetime = ros::Duration(2.0);
     control.markers.push_back(marker);

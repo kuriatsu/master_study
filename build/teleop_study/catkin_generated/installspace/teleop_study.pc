@@ -1,8 +1,0 @@
-prefix=/home/mad-carla/share/catkin_ws/install
-
-Name: teleop_study
-Description: Description of teleop_study
-Version: 0.0.0
-Cflags: -I/home/mad-carla/share/catkin_ws/install/include
-Libs: -L/home/mad-carla/share/catkin_ws/install/lib 
-Requires: 

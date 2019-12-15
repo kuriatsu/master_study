@@ -7,6 +7,7 @@
 ;;
 (ros::load-ros-package "actionlib")
 (ros::load-ros-package "actionlib_msgs")
+(ros::load-ros-package "autoware_msgs")
 (ros::load-ros-package "bond")
 (ros::load-ros-package "derived_object_msgs")
 (ros::load-ros-package "dynamic_reconfigure")

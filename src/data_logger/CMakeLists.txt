@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   nav_msgs
   sensor_msgs
-  swipe_obstacles
+##  ras_carla
   message_generation
 )
 

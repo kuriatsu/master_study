@@ -6,6 +6,40 @@
 
 #IncludeRegexTransform: 
 
+/home/mad-carla/carla-autoware/catkin_ws/devel/include/carla_msgs/CarlaActorInfo.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+
+/home/mad-carla/carla-autoware/catkin_ws/devel/include/carla_msgs/CarlaActorList.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+carla_msgs/CarlaActorInfo.h
+-
+
 /home/mad-carla/share/catkin_ws/devel/include/ras_carla/RasObject.h
 string
 -
@@ -71,6 +105,8 @@ ras_carla/RasObject.h
 /home/mad-carla/share/catkin_ws/src/ras_carla/include/ras_carla/RasObject.h
 ras_carla/RasObjectArray.h
 /home/mad-carla/share/catkin_ws/src/ras_carla/include/ras_carla/RasObjectArray.h
+carla_msgs/CarlaActorList.h
+/home/mad-carla/share/catkin_ws/src/ras_carla/include/carla_msgs/CarlaActorList.h
 
 /home/mad-carla/share/catkin_ws/src/ras_carla/include/ras_lib.h
 ros/ros.h

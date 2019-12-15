@@ -1,10 +1,10 @@
 
 "use strict";
 
-let RasObjectArray = require('./RasObjectArray.js');
 let RasObject = require('./RasObject.js');
+let RasObjectArray = require('./RasObjectArray.js');
 
 module.exports = {
-  RasObjectArray: RasObjectArray,
   RasObject: RasObject,
+  RasObjectArray: RasObjectArray,
 };

@@ -15,7 +15,7 @@ joy
 sound_play
 roscpp
 std_msgs
-swipe_obstacles
+#ras_carla
 dynamic_reconfigure
 )
 
@@ -133,16 +133,12 @@ ${catkin_INCLUDE_DIRS}
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-add_executable(yp_teleop_study0 src/teleop_study0.cpp)
-add_executable(yp_teleop_study1 src/teleop_study1.cpp)
-add_dependencies(yp_teleop_study0 teleop_study_gencfg)
-add_dependencies(yp_teleop_study1 teleop_study_gencfg)
+#add_executable(yp_teleop_study0 src/teleop_study0.cpp)
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/teleop_node.cpp)
-add_executable(yp_teleop_study src/teleop_study.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -153,17 +149,12 @@ add_executable(yp_teleop_study src/teleop_study.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(yp_teleop_study0 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(yp_teleop_study1 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(yp_teleop_study0 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(yp_teleop_study ${catkin_LIBRARIES})
-target_link_libraries(yp_teleop_study0 ${catkin_LIBRARIES})
-target_link_libraries(yp_teleop_study1 ${catkin_LIBRARIES})
-
 
 #############
 ## Install ##

@@ -1,8 +1,0 @@
-prefix=/home/mad-carla/share/catkin_ws/devel
-
-Name: add_intensity
-Description: Description of add_intensity
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/mad-carla/share/catkin_ws/devel/lib 
-Requires: 
