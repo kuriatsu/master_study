@@ -29,10 +29,9 @@ WaypointPublisher::WaypointPublisher()
 
 	std::string file_name;
 	n.getParam("/file_name", file_name);
-	
+	std::cout << file_name << std::endl;
 	readFile(file_name);
 
-	ROS_INFO("read file");
 }
 
 
@@ -48,10 +47,10 @@ void WaypointPublisher::readFile(const std::string &file_name)
 		ROS_ERROR("Cannot Open File!!!");
 		return;
 	}
+	ROS_INFO("read file");
 
 	std::getline(ifs, in_line);
-
-
+	std::cout << in_line << std::endl;
 	while (std::getline(ifs, in_line))
 	{
 		std::istringstream stream(in_line);
