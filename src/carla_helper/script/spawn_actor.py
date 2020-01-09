@@ -34,10 +34,10 @@ class SpawnActor(object):
 		self.ego_pose = None
 		self.blueprintVehicles = None
 		self.blueprintWalkers = None
-		self.actor_list = []
-		self.scenario_list = []
-		self.spawned_vehicle_list = []
-		self.spawned_walker_list = []
+		self.blueprintWalkerController = None
+		self.actor_profile = []
+		self.scenario = []
+		self.spawning_actor_list = []
 
 	def readFile(self, filename):
 
@@ -61,7 +61,7 @@ class SpawnActor(object):
 		ego_pose = self.ego_vehicle.get_transform()
 		intrusion_thres = 1.0
 
-		for scenario in scenario_list:
+		for scenario in self.scenario:
 			distance = (ego_pose.location.x - float(scenario[1])) ** 2 \
 					   + (ego_pose.location.y - float(scenario[2])) ** 2
 			if distance < intrusion_thres:
@@ -69,6 +69,8 @@ class SpawnActor(object):
 					spawnActor(scenario[4:])
 				elif (scenario[4] == 'controll'):
 					controllActor(scenario[4:])
+				elif (scenario[4] == 'destroy'):
+					destroyActor(scenario[4:])
 
 
 	def spawnActor(self, actor_id_list):
@@ -79,20 +81,25 @@ class SpawnActor(object):
 
     	logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
-
-		vehicle_batch = []
-		walker_batch = []
-		
+    	# we spawn the actor
+		batch = []
 		for actor_id in actor_id_list:
 
+			# check whether the required actor id exists in the profile list or not
 			try:
-				index = self.actor_list[:][0].index(actor_id)
+				index = self.actor_profile[:][0].index(actor_id)
 
 			except ValueError:
 				print("actor_id {} does not registered in the actor file".format(actor_id))
+				actor_id_list.remove(actor_id)
 				continue
 
-			actor = self.actor_list[index]
+			# get target object from not aligned list
+			actor = self.actor_profile[index]
+
+			# add id to the list of currently existing actor under the world
+			self.spawning_actor_list.append({'id':int(actor_id)})
+			self.spawning_actor_list[-1]['attribute'] = actor[1]
 
 			# spawn the walker object
 			if (actor[1] == 'walker'):
@@ -102,8 +109,8 @@ class SpawnActor(object):
 				if blueprint.has_attribute('is_invincible'):
 					blueprint.set_attribute('is_invincible', 'false')
 
-				transform = carla.Transform(carla.Location(actor[2], actor[3], actor[4]), carla.Rotation(actor[5], actor[6], actor[7]))
-				walker_batch.append(carla.command.SpawnActor(walker_bp, transform))
+				transform = carla.Transform(carla.Location(float(actor[2]), float(actor[3]), float(actor[4])), carla.Rotation(actor[5], actor[6], actor[7]))
+				batch.append(carla.command.SpawnActor(walker_bp, transform))
 
 
 			# spawn the vehicle object
@@ -119,63 +126,39 @@ class SpawnActor(object):
 					blueprint.set_attribute('driver_id', driver_id)
 
 				blueprint.set_attribute('role_name', 'autopilot')
-				transform = carla.Transform(carla.Location(actor[2], actor[3], actor[4]), carla.Rotation(actor[5], actor[6], actor[7]))
-				vehicle_batch.append(carla.command.SpawnActor(blueprint, transform).then(carla.command.SetAutopilot(carla.command.FutureActor, True)))
+				transform = carla.Transform(carla.Location(float(actor[2]), float(actor[3]), float(actor[4])), carla.Rotation(actor[5], actor[6], actor[7]))
+				batch.append(carla.command.SpawnActor(blueprint, transform).then(carla.command.SetAutopilot(carla.command.FutureActor, True)))
 
-
-		results = client.apply_batch_sync(vehicle_batch)
-		for response in range(len(results)):
-			if response.error:
-				logging.error(response.error)
-			else:
-				self.spawned_vehicle_list.append(response.actor_id)
-
-		results = client.apply_batch_sync(walker_batch, True)
+		# conduct spawn
+		results = client.apply_batch_sync(batch)
 		for i in range(len(results)):
 			if results[i].error:
 				logging.error(results[i].error)
 			else:
-				walkers_list.append({"id": results[i].actor_id})
+				self.spawning_actor_list[i]["world_id"] = results[i].actor_id
 
-
-		# 3. we spawn the walker controller
+		# we spawn the walker controller
 		batch = []
-		walker_controller_bp = world.get_blueprint_library().find('controller.ai.walker')
-		for i in range(len(walkers_list)):
-			batch.append(SpawnActor(walker_controller_bp, carla.Transform(), walkers_list[i]["id"]))
+		for i, spawning_actor in enumerate(self.spawning_actor_list):
+			if spawning_actor['attribute'] == 'walker':
+				batch.append(SpawnActor(self.blueprintWalkerController, carla.Transform(), walkers_list[i]["world_id"]))
 		results = client.apply_batch_sync(batch, True)
+	
+		# conduct spawn
 		for i in range(len(results)):
 			if results[i].error:
 				logging.error(results[i].error)
 			else:
-				walkers_list[i]["con"] = results[i].actor_id
-		# 4. we put altogether the walkers and controllers id to get the objects from their id
-		for i in range(len(walkers_list)):
-			all_id.append(walkers_list[i]["con"])
-			all_id.append(walkers_list[i]["id"])
-		all_actors = world.get_actors(all_id)
+				self.spawning_actor_list[i]['controller'] = results[i].actor_id
 
 		# wait for a tick to ensure client receives the last transform of the walkers we have just created
 		world.wait_for_tick()
 
 
-
-		# 5. initialize each controller and set target to walk to (list is [controler, actor, controller, actor ...])
-		for i in range(0, len(all_id), 2):
-			# start walker
-			all_actors[i].start()
-			# set walk to random point
-			all_actors[i].go_to_location(world.get_random_location_from_navigation())
-			# random max speed
-			all_actors[i].set_max_speed(1 + random.random())    # max speed between 1 and 2 (default is 1.4 m/s)
-
-		print('spawned %d vehicles and %d walkers, press Ctrl+C to exit.' % (len(vehicles_list), len(walkers_list)))
+	def controllActor(self, actor_id_list):
 
 
-		while True:
-			world.wait_for_tick()
-
-
+	def destroyActor(self, actor_id_list):
 
 
 	def game_loop(self, args):
@@ -187,8 +170,9 @@ class SpawnActor(object):
 			self.world = self.client.get_world()
 			self.blueprintVehicles = self.world.get_blueprint_library().filter(args.filterv)
 			self.blueprintWalkers = self.world.get_blueprint_library().filter(args.filterw)
-			self.actor_list = self.readFile(args.actor_file)
-			self.scenario_list = self.readFile(args.scenario_file)
+			self.blueprintWalkerController = world.get_blueprint_library().find('controller.ai.walker')
+			self.actor_profile = self.readFile(args.actor_file)
+			self.scenario = self.readFile(args.scenario_file)
 			self.getEgoCar()
 
 
