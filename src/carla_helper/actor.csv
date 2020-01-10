@@ -1,2 +1,2 @@
-id,actor_type,x,y,z,pitch,roll,yaw,goal.x,goal.y,goal.z
-0,walker,-41.042728,-216.029874,0.13919,0.0,0.0,0.0,-40.042728,-210.029874,0.13919
+id,actor_type,x,y,z,pitch,roll,yaw,speed,goal.x,goal.y,goal.z
+0,walker,-41.042728,-216.029874,0.13919,0.0,0.0,0.0,run,-40.042728,-210.029874,0.13919
