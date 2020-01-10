@@ -66,27 +66,27 @@ class SpawnActor(object):
 					   + (ego_pose.location.y - float(scenario[2])) ** 2
 			if distance < intrusion_thres:
 				if (scenario[4] == 'spawn'):
-					spawnActor(scenario[4:])
-				elif (scenario[4] == 'controll'):
-					controllActor(scenario[4:])
+					self.spawnActor(scenario[5:])
+					print("spawned {}".format(scenario[5:]))
+				elif (scenario[4] == 'control'):
+					self.controllActor(scenario[5:])
+					print("control {}".format(scenario[5:]))
 				elif (scenario[4] == 'destroy'):
-					destroyActor(scenario[4:])
+					self.destroyActor(scenario[5:])
+					print("destroy {}".format(scenario[5:]))
 
+				self.scenario_list.remove(scenario)
 
 	def spawnActor(self, actor_id_list):
-		'''
-		Spawn vehicles
-		Spawn Walkers
-		'''
 
-    	logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+		logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
     	# we spawn the actor
 		batch = []
 		for actor_id in actor_id_list:
-
+			print('profile list len', len(self.actor_profile_list))
 			# check whether the required actor id exists in the profile list or not
-			if actor_id > len(self.actor_profile_list):
+			if int(actor_id) > len(self.actor_profile_list):
 				print("actor_id {} does not registered in the actor file".format(actor_id))
 				actor_id_list.remove(actor_id)
 				continue
@@ -130,7 +130,7 @@ class SpawnActor(object):
 				batch.append(carla.command.SpawnActor(blueprint, transform))
 
 		# conduct spawn
-		results = client.apply_batch_sync(batch)
+		results = self.client.apply_batch_sync(batch)
 		for i in range(len(results)):
 			if results[i].error:
 				logging.error(results[i].error)
@@ -152,7 +152,7 @@ class SpawnActor(object):
 				self.spawning_actor_list[i]['controller'] = results[i].actor_id
 
 		# wait for a tick to ensure client receives the last transform of the walkers we have just created
-		world.wait_for_tick()
+		self.world.wait_for_tick()
 
 
 	def controllActor(self, actor_id_list):
@@ -197,16 +197,17 @@ class SpawnActor(object):
 			self.world = self.client.get_world()
 			self.blueprintVehicles = self.world.get_blueprint_library().filter(args.filterv)
 			self.blueprintWalkers = self.world.get_blueprint_library().filter(args.filterw)
-			self.blueprintWalkerController = world.get_blueprint_library().find('controller.ai.walker')
+			self.blueprintWalkerController = self.world.get_blueprint_library().find('controller.ai.walker')
 			self.actor_profile_list = self.readFile(args.actor_file)
 			self.scenario_list = self.readFile(args.scenario_file)
 			self.getEgoCar()
 
-			self.actor_profile_list.insert(0, {'id': 0})
-
+			self.actor_profile_list.insert(0, ['0'])
+			print(self.actor_profile_list)
 			while True:
 
-				self.world.tick()
+				self.world.wait_for_tick()
+				self.checkScenario()
 				time.sleep(0.1)
 
 		finally:
@@ -231,12 +232,12 @@ def main():
 	argparser.add_argument(
 		'-a', '--actor_file',
 		metavar='A',
-		default='~/share/catkin_ws/src/carla_helper/actor.csv',
+		default='../actor.csv',
 		help='scenario file (default: actor.csv)')
 	argparser.add_argument(
 		'-s', '--scenario_file',
 		metavar='S',
-		default='~/share/catkin_ws/src/carla_helper/scenario.csv',
+		default='/home/mad-carla/share/catkin_ws/src/carla_helper/scenario.csv',
 		help='scenario file (default: scenario.csv)')
 	argparser.add_argument(
 		'--filterv',
