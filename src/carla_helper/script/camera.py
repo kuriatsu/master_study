@@ -28,8 +28,8 @@ except IndexError:
 # ==============================================================================
 
 import carla
-
 import weakref
+import argparse
 
 try:
     import pygame
@@ -41,11 +41,7 @@ try:
 except ImportError:
     raise RuntimeError('cannot import numpy, make sure numpy package is installed')
 
-VIEW_WIDTH = 1920
-VIEW_HEIGHT = 1080
-# VIEW_WIDTH = 1920//2
-# VIEW_HEIGHT = 1080//2
-VIEW_FOV = 90
+VIEW_FOV = 100
 
 
 # ==============================================================================
@@ -62,22 +58,10 @@ class BasicSynchronousClient(object):
         self.client = None
         self.world = None
         self.camera = None
-        self.car = None
 
         self.display = None
         self.image = None
         self.capture = True
-
-    def camera_blueprint(self):
-        """
-        Returns camera blueprint.
-        """
-
-        camera_bp = self.world.get_blueprint_library().find('sensor.camera.rgb')
-        camera_bp.set_attribute('image_size_x', str(VIEW_WIDTH))
-        camera_bp.set_attribute('image_size_y', str(VIEW_HEIGHT))
-        camera_bp.set_attribute('fov', str(VIEW_FOV))
-        return camera_bp
 
     def set_synchronous_mode(self, synchronous_mode):
         """
@@ -88,32 +72,26 @@ class BasicSynchronousClient(object):
         settings.synchronous_mode = synchronous_mode
         self.world.apply_settings(settings)
 
-    def setup_car(self):
-        """
-        Spawns actor-vehicle to be controled.
-        """
-        for carla_actor in self.world.get_actors():
-            print(carla_actor.type_id)
-            if carla_actor.type_id.startswith("vehicle"):
-                print(carla_actor.attributes)
-                if carla_actor.attributes.get('role_name') == 'ego_vehicle':
-                    self.car = carla_actor;
 
-    def setup_camera(self):
+    def setup_camera(self, args):
         """
         Spawns actor-camera to be used to render view.
         Sets calibration for client-side boxes rendering.
         """
+        for carla_actor in self.world.get_actors():
+            # print(carla_actor.type_id)
+            if carla_actor.type_id == "sensor.camera.rgb":
+                # print(carla_actor.attributes)
+                if carla_actor.attributes.get('role_name') == args.rolename:
+                    self.camera = carla_actor;
 
-        camera_transform = carla.Transform(carla.Location(x=-5.5, z=2.8), carla.Rotation(pitch=-15))
-        self.camera = self.world.spawn_actor(self.camera_blueprint(), camera_transform, attach_to=self.car)
         weak_self = weakref.ref(self)
         self.camera.listen(lambda image: weak_self().set_image(weak_self, image))
 
         calibration = np.identity(3)
-        calibration[0, 2] = VIEW_WIDTH / 2.0
-        calibration[1, 2] = VIEW_HEIGHT / 2.0
-        calibration[0, 0] = calibration[1, 1] = VIEW_WIDTH / (2.0 * np.tan(VIEW_FOV * np.pi / 360.0))
+        calibration[0, 2] = args.width / 2.0
+        calibration[1, 2] = args.height / 2.0
+        calibration[0, 0] = calibration[1, 1] = args.width / (2.0 * np.tan(VIEW_FOV * np.pi / 360.0))
         self.camera.calibration = calibration
 
     @staticmethod
@@ -142,7 +120,7 @@ class BasicSynchronousClient(object):
             surface = pygame.surfarray.make_surface(array.swapaxes(0, 1))
             display.blit(surface, (0, 0))
 
-    def game_loop(self):
+    def game_loop(self, args):
         """
         Main program loop.
         """
@@ -150,14 +128,13 @@ class BasicSynchronousClient(object):
         try:
             pygame.init()
 
-            self.client = carla.Client('127.0.0.1', 2000)
+            self.client = carla.Client(args.host, args.port)
             self.client.set_timeout(2.0)
             self.world = self.client.get_world()
 
-            self.setup_car()
-            self.setup_camera()
+            self.setup_camera(args)
 
-            self.display = pygame.display.set_mode((VIEW_WIDTH, VIEW_HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
+            self.display = pygame.display.set_mode((args.width, args.height), pygame.HWSURFACE | pygame.DOUBLEBUF)
             pygame_clock = pygame.time.Clock()
 
             self.set_synchronous_mode(True)
@@ -176,7 +153,6 @@ class BasicSynchronousClient(object):
 
         finally:
             self.set_synchronous_mode(False)
-            self.camera.destroy()
             pygame.quit()
 
 
@@ -189,10 +165,35 @@ def main():
     """
     Initializes the client-side bounding box demo.
     """
+    argparser = argparse.ArgumentParser(
+        description='Carla image viewer for demo')
+    argparser.add_argument(
+        '--host',
+        default='127.0.0.1',
+        help='IP of the host server (127.0.0.1)')
+    argparser.add_argument(
+        '-p', '--port',
+        metavar='P',
+        default=2000,
+        type=int,
+        help='TCP port to listen to (default: 2000)')
+    argparser.add_argument(
+        '-r', '--rolename',
+        metavar='NAME',
+        default='ros_camera',
+        help='camera role name (default: "ros_camera")')
+    argparser.add_argument(
+        '--res',
+        metavar='WIDTHxHEIGHT',
+        default='800x600',
+        help='window resolution (default: 800x600)')
+    args = argparser.parse_args()
+
+    args.width, args.height = [int(x) for x in args.res.split('x')]
 
     try:
         client = BasicSynchronousClient()
-        client.game_loop()
+        client.game_loop(args)
     finally:
         print('EXIT')
 
