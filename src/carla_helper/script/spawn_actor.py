@@ -37,7 +37,8 @@ class SpawnActor(object):
 		self.blueprintWalkerController = None
 		self.actor_profile_list = []
 		self.scenario_list = []
-		self.spawning_actor_list = []
+		self.spawned_actor_list = []
+		self.control_actor_list = []
 
 	def readFile(self, filename):
 
@@ -68,8 +69,8 @@ class SpawnActor(object):
 				if (scenario[4] == 'spawn'):
 					self.spawnActor(scenario[5:])
 					print("spawned {}".format(scenario[5:]))
-				elif (scenario[4] == 'control'):
-					self.controllActor(scenario[5:])
+				elif (scenario[4] == 'start'):
+					self.startActor(scenario[5:])
 					print("control {}".format(scenario[5:]))
 				elif (scenario[4] == 'destroy'):
 					self.destroyActor(scenario[5:])
@@ -83,6 +84,7 @@ class SpawnActor(object):
 
     	# we spawn the actor
 		batch = []
+
 		for actor_id in actor_id_list:
 			# print('profile list len = {}'.format(len(self.actor_profile_list)))
 			# check whether the required actor id exists in the profile list or not
@@ -94,11 +96,12 @@ class SpawnActor(object):
 			# get target object from not aligned list
 			actor = self.actor_profile_list[int(actor_id)]
 			# add id to the list of currently existing actor under the world
-			self.spawning_actor_list.append({'id':int(actor_id)})
-			self.spawning_actor_list[-1]['attribute'] = actor[1]
+			self.spawned_actor_list.append({'id':int(actor_id)})
+			self.spawned_actor_list[-1]['attribute'] = actor[1]
 
 			# spawn the walker object
-			if (actor[1] == 'walker'):
+			if (actor[1] == 'walker' or actor[1] == 'ai_walker'):
+
 				blueprint = random.choice(self.blueprintWalkers)
 
 				# set as not invencible
@@ -106,19 +109,16 @@ class SpawnActor(object):
 					blueprint.set_attribute('is_invincible', 'false')
 
 				# set walker's speed
-				if blueprint.has_attribute('speed'):
-					self.spawning_actor_list[-1]['walk'] = blueprint.get_attribute('speed').recommended_values[1]
-					self.spawning_actor_list[-1]['run'] = blueprint.get_attribute('speed').recommended_values[2]
-				else:
-					self.spawning_actor_list[-1]['walk'] = 3
-					self.spawning_actor_list[-1]['run'] = 10
+				self.spawned_actor_list[-1]['walk'] = 3
+				self.spawned_actor_list[-1]['run'] = 10
+				self.spawned_actor_list[-1]['free'] = random.randint(1, 10)
 
 				transform = carla.Transform(carla.Location(float(actor[2]), float(actor[3]), float(actor[4])), carla.Rotation(float(actor[5]), float(actor[6]), float(actor[7])))
 				batch.append(carla.command.SpawnActor(blueprint, transform))
 
 
 			# spawn the vehicle object
-			elif (actor[1] == 'vehicle'):
+		elif (actor[1] == 'vehicle' or or actor[1] == 'ai_vehicle'):
 				blueprint = random.choice(blueprintVehicles)
 
 				if blueprint.has_attribute('color'):
@@ -129,7 +129,7 @@ class SpawnActor(object):
 					driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
 					blueprint.set_attribute('driver_id', driver_id)
 
-				blueprint.set_attribute('role_name', 'autopilot')
+				blueprint.set_attribute('role_name', 'driver')
 				transform = carla.Transform(carla.Location(float(actor[2]), float(actor[3]), float(actor[4])), carla.Rotation(actor[5], actor[6], actor[7]))
 				batch.append(carla.command.SpawnActor(blueprint, transform))
 
@@ -139,57 +139,110 @@ class SpawnActor(object):
 			if results[i].error:
 				print(results[i].error)
 			else:
-				self.spawning_actor_list[i]["world_id"] = results[i].actor_id
-				print("spawned", self.spawning_actor_list[i])
-		# # we spawn the walker controller
-		# batch = []
-		# for spawning_actor in self.spawning_actor_list:
-		# 	if spawning_actor['attribute'] == 'walker':
-		# 		batch.append(carla.command.SpawnActor(self.blueprintWalkerController, carla.Transform(), spawning_actor['world_id']))
-		# results = self.client.apply_batch_sync(batch, True)
-		#
-		# # conduct spawn
-		# for i in range(len(results)):
-		# 	if results[i].error:
-		# 		logging.error(results[i].error)
-		# 	else:
-		# 		self.spawning_actor_list[i]['controller'] = results[i].actor_id
+				self.spawned_actor_list[i]["world_id"] = results[i].actor_id
+				print("spawned", self.spawned_actor_list[i])
+
+		# we spawn the ai walker controller
+		batch = []
+		ai_walker_ids = []
+		for i, spawned_actor in enumerate(self.spawned_actor_list):
+			if spawned_actor['attribute'] == 'ai_walker':
+				ai_walker_ids.append(i)
+				batch.append(carla.command.SpawnActor(self.blueprintWalkerController, carla.Transform(), spawned_actor['world_id']))
+		results = self.client.apply_batch_sync(batch, True)
+
+		# conduct spawn
+		for i in range(len(results)):
+			if results[i].error:
+				logging.error(results[i].error)
+			else:
+				self.spawned_actor_list[ai_walker_ids[i]]['controller'] = results[i].actor_id
 
 		# wait for a tick to ensure client receives the last transform of the walkers we have just created
 		self.world.wait_for_tick()
 
 
-	def controllActor(self, actor_id_list):
+	def startActor(self, actor_id_list):
 
 		for actor_id in actor_id_list:
-			for spawning_actor in self.spawning_actor_list:
-				if spawning_actor['id'] == int(actor_id):
-					if spawning_actor['attribute'] == 'walker':
-						actor = self.world.get_actor(spawning_actor['controller'])
-						actor_profile = self.actor_profile_list[int(actor_id)]
-						destination = carla.Location(float(actor_profile[9]), float(actor_profile[10]), float(actor_profile[11]))
-						actor.start()
-						actor.go_to_location(destination)
-						actor.set_max_speed(spawning_actor[actor_profile[8]])
-						del actor_profile[8:12]
+			for spawned_actor in self.spawned_actor_list:
+				if spawned_actor['id'] == int(actor_id):
 
-					if spawning_actor['attribute'] == 'vehicle':
-						actor = self.world.get_actor(spawning_actor['world_id'])
+					if spawned_actor['attribute'] == 'ai_walker':
+						actor = self.world.get_actor(spawned_actor['controller'])
+						actor.start()
+						actor.go_to_location(self.world.get_random_location_from_navigation())
+						actor.set_max_speed(spawned_actor[actor_profile[8]])
+
+					if spawned_actor['attribute'] == 'walker' or spawned_actor['attribute'] == 'vehicle':
+						control_actor = {}
+						control_actor['actor'] = self.world.get_actor(spawned_actor['world_id'])
+						control_actor['actor'].set_max_speed(spawned_actor[actor_profile[8]])
+						control_actor['attribute'] = spawned_actor['attribute']
+						goal = float(self.actor_profile_list[int(actor_id)][9:12])
+						control_actor['goal'] = carla.Location(goal[0], goal[1], goal[2])
+						control_actor['speed'] = spawned_actor['free']
+						del actor_profile[8:12]
+						self.control_actor_list.append(control_actor)
+
+					if spawned_actor['attribute'] == 'ai_vehicle':
+						actor = self.world.get_actor(spawned_actor['world_id'])
 						self.client.apply_batch(carla.command.SetAutopilot(actor, True))
+
+
+	def controlActor(self):
+
+		batch = []
+		for control_actor in self.control_actor_list:
+			if control_actor['actor'].is_alive == False:
+				self.control_actor_list.remove(control_actor)
+				continue
+
+			if control_actor['attribute'] == 'walker':
+				actor = control_actor['actor']
+				actor_location = actor.get_location()
+				destination = carla.Vector3D(control_actor['goal'].x - actor_location.x,/
+			 							 	 control_actor['goal'].y - actor_location.y,/
+										 	 control_actor['goal'].z)
+
+				if destination.x ** 2 + destination.y ** 2 < 0.25:
+					self.control_actor_list.remove(control_actor)
+
+				else:
+					control = carla.WalkerControl(destination, control_actor['speed'])
+					batch.append(carla.command.ApplyWalkerControl(actor, control))
+
+			elif control_actor['attribute'] == 'vehicle':
+				actor = control_actor['actor']
+				actor_location = actor.get_location()
+
+				# calc vel and rotation
+				vel = carla.Vector3D(control_actor['goal'].x - actor_location.x,/
+			 							 	 control_actor['goal'].y - actor_location.y,/
+										 	 control_actor['goal'].z)
+				rot =
+
+				if destination.x ** 2 + destination.y ** 2 < 0.25:
+					self.control_actor_list.remove(control_actor)
+
+				else:
+					control = carla.VehicleControl()
+					batch.append(carla.command.ApplyVelocity(actor, vel))
+					batch.append(carla.command.ApplyRotationVelocity(actor, rot))
 
 
 	def destroyActor(self, actor_id_list):
 		batch = []
 		for actor_id in actor_id_list:
-			for spawning_actor in self.spawning_actor_list:
-				if spawning_actor['id'] == int(actor_id):
-					if spawning_actor['attribute'] == 'walker':
-						self.world.get_actor(spawning_actor['controller']).stop()
-						batch.append(carla.command.DestroyActor(spawning_actor['controller']))
+			for spawned_actor in self.spawned_actor_list:
+				if spawned_actor['id'] == int(actor_id):
+					if spawned_actor['attribute'] == 'ai_walker':
+						self.world.get_actor(spawned_actor['controller']).stop()
+						batch.append(carla.command.DestroyActor(spawned_actor['controller']))
 
-					batch.append(carla.command.DestroyActor(spawning_actor['world_id']))
+					batch.append(carla.command.DestroyActor(spawned_actor['world_id']))
 					self.client.apply_batch(batch)
-					self.spawning_actor_list.remove(spawning_actor)
+					self.spawned_actor_list.remove(spawned_actor)
 
 
 	def game_loop(self, args):
@@ -213,6 +266,7 @@ class SpawnActor(object):
 
 				self.world.wait_for_tick()
 				self.checkScenario()
+				self.controlActor()
 				time.sleep(0.1)
 
 		finally:
