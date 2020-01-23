@@ -31,35 +31,21 @@ def main():
 				ego_vehicle = carla_actor
 		
 	batch = []
-	batch.append(carla.command.ApplyVelocity(ego_vehicle, carla.Vector3D(100.0,0.0,0.0)))
+	batch.append(carla.command.ApplyVelocity(ego_vehicle, carla.Vector3D(-100.0,-10.0,100.0)))
 	client.apply_batch(batch)
 	print("accel")
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(1.7)
+
+	for i in range(1,10):
+		print(ego_vehicle.get_velocity())
+		time.sleep(0.01)
+
+	time.sleep(1.0)
 	batch.append(carla.command.ApplyVelocity(ego_vehicle, carla.Vector3D(0.0,0.0,0.0)))
 	client.apply_batch(batch)
 	print("brake")
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
+	for i in range(1,10):
+		print(ego_vehicle.get_velocity())
+		time.sleep(0.01)
 
 	# while True:
 	# 	world.wait_for_tick()
