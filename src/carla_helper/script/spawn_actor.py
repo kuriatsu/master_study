@@ -88,7 +88,6 @@ class SpawnActor(object):
 		batch = []
 
 		for actor_id in actor_id_list:
-			# print('profile list len = {}'.format(len(self.actor_profile_list)))
 			# check whether the required actor id exists in the profile list or not
 			if int(actor_id) > len(self.actor_profile_list):
 				print("actor_id {} does not registered in the actor file".format(actor_id))
@@ -112,9 +111,9 @@ class SpawnActor(object):
 					blueprint.set_attribute('is_invincible', 'false')
 
 				# set walker's speed
-				spawned_actor['walk'] = 3
-				spawned_actor['run'] = 8
-				spawned_actor['free'] = random.randint(1, 7)
+				spawned_actor['walk'] = 1.0
+				spawned_actor['run'] = 3.0
+				spawned_actor['free'] = random.uniform(1.0, 3.0)
 
 				transform = carla.Transform(carla.Location(float(actor[2]), float(actor[3]), float(actor[4])), carla.Rotation(float(actor[5]), float(actor[6]), float(actor[7])))
 				batch.append(carla.command.SpawnActor(blueprint, transform))
@@ -132,8 +131,8 @@ class SpawnActor(object):
 					driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
 					blueprint.set_attribute('driver_id', driver_id)
 
-				spawned_actor['slow'] = 8
-				spawned_actor['fast'] = 18
+				spawned_actor['slow'] = 8.0
+				spawned_actor['fast'] = 18.0
 				spawned_actor['free'] = random.randint(1, 20)
 
 				blueprint.set_attribute('role_name', 'driver')
@@ -172,6 +171,7 @@ class SpawnActor(object):
 
 	def startActor(self, actor_id_list):
 
+
 		for actor_id in actor_id_list:
 			for spawned_actor in self.spawned_actor_list:
 				if spawned_actor['id'] == int(actor_id):
@@ -182,7 +182,11 @@ class SpawnActor(object):
 						actor.go_to_location(self.world.get_random_location_from_navigation())
 						actor.set_max_speed(spawned_actor[self.actor_profile_list[int(actor_id)][8]])
 
-					if spawned_actor['attribute'] == 'walker' or spawned_actor['attribute'] == 'vehicle':
+					elif spawned_actor['attribute'] == 'ai_vehicle':
+						actor = self.world.get_actor(spawned_actor['world_id'])
+						actor.set_autopilot(True)
+
+					elif spawned_actor['attribute'] == 'walker' or spawned_actor['attribute'] == 'vehicle':
 						control_actor = {}
 						control_actor['actor'] = self.world.get_actor(spawned_actor['world_id'])
 						control_actor['attribute'] = spawned_actor['attribute']
@@ -192,14 +196,10 @@ class SpawnActor(object):
 						del self.actor_profile_list[int(actor_id)][8:12]
 						self.control_actor_list.append(control_actor)
 
-					if spawned_actor['attribute'] == 'ai_vehicle':
-						actor = self.world.get_actor(spawned_actor['world_id'])
-						control_actor['speed'] = spawned_actor[self.actor_profile_list[int(actor_id)][8]]
-						actor.set_autopilot(True)
 
 
 	def controlActor(self):
-		# debug = self.world.debug
+		debug = self.world.debug
 		for control_actor in self.control_actor_list:
 			if control_actor['actor'].is_alive == False:
 				self.control_actor_list.remove(control_actor)
@@ -212,13 +212,18 @@ class SpawnActor(object):
 			 							 	 control_actor['goal'].y - transform.location.y,
 										 	 control_actor['goal'].z)
 				dist = math.sqrt(vector.x ** 2 + vector.y ** 2)
-				# debug.draw_arrow(begin=transform.location ,end=control_actor['goal'], life_time=0.5)
+				vector.x = vector.x / dist
+				vector.y = vector.y / dist
+
+				debug.draw_arrow(begin=transform.location ,end=transform.location + carla.Location(vector.x, vector.y, 0.0), life_time=0.5)
+
 			if control_actor['attribute'] == 'walker':
+				# print(control_actor['actor'].id, math.sqrt(control_actor['actor'].get_velocity().x**2 + control_actor['actor'].get_velocity().y**2), math.sqrt(vector.x**2 + vector.y**2),control_actor['speed'])
 				if dist < 0.5:
-					control = carla.WalkerControl(speed=0.0)
+					control = carla.WalkerControl(direction=carla.Vector3D(0.0,0.0,0.0),speed=0.0)
 					self.control_actor_list.remove(control_actor)
 				else:
-					control = carla.WalkerControl(vector, control_actor['speed'])
+					control = carla.WalkerControl(direction=vector, speed=control_actor['speed'])
 					control_actor['actor'].apply_control(control)
 
 			elif control_actor['attribute'] == 'vehicle':
@@ -232,8 +237,8 @@ class SpawnActor(object):
 
 					control = carla.VehicleControl()
 					velocity = carla.Vector3D()
-					velocity.x = (vector.x / dist) * control_actor['speed']
-					velocity.y = (vector.y / dist) * control_actor['speed']
+					velocity.x = vector.x * control_actor['speed']
+					velocity.y = vector.y  * control_actor['speed']
 					velocity.z = 0.0
 					control_actor['actor'].set_velocity(velocity)
 					control_actor['actor'].set_angular_velocity(carla.Vector3D(0.0, 0.0, omega))

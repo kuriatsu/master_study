@@ -49,25 +49,30 @@ def main():
     #     time.sleep(0.02)
 
 
+
+    while True:
+
     ##########################
     #### obrtain position ####
     ##########################
-
-    while True:
-        key = raw_input('ENTER to copy transorm to clip_boad')
+        # key = raw_input('ENTER to copy transorm to clip_boad')
         # print(key)
-        key = ''
-        if key == '':
-            ego_pose = ego_vehicle.get_transform()
-            str = "{},{},{},{},{},{}".format(ego_pose.location.x, ego_pose.location.y, ego_pose.location.z, ego_pose.rotation.pitch, ego_pose.rotation.yaw, ego_pose.rotation.roll)
+        # key = ''
+        # if key == '':
+            # ego_pose = ego_vehicle.get_transform()
+            # str = "{},{},{},{},{},{}".format(ego_pose.location.x, ego_pose.location.y, ego_pose.location.z, ego_pose.rotation.pitch, ego_pose.rotation.yaw, ego_pose.rotation.roll)
             # print(ego_pose.location.x, ego_pose.location.y, ego_pose.location.z, ego_pose.rotation.pitch, ego_pose.rotation.roll, ego_pose.rotation.yaw)
-            pyperclip.copy(str)
-            time.sleep(0.1)
-        elif key == 'q':
-            print('exit')
-            break
-        else:
-            print('wrong key')
+            # pyperclip.copy(str)
+            # time.sleep(0.1)
+        # elif key == 'q':
+        #     print('exit')
+        #     break
+        # else:
+        #     print('wrong key')
+
+        control = carla.WalkerControl(carla.Vector3D(-1.0,0.0,0.0), speed=3.5)
+        ego_vehicle.apply_control(control)
+        print(ego_vehicle.get_velocity())
 
 if __name__ == '__main__':
 

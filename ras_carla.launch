@@ -1,7 +1,7 @@
 <launch>
 
     <!-- <rosparam command="load" file="$(find swipe_obstacles)/cfg/swipe_obstacles.yaml"/> -->
-    <!-- <node pkg="carla_helper" type="fake_ndt_node" name="fake_ndt"/> -->
+    <node pkg="carla_helper" type="fake_ndt_node" name="fake_ndt"/>
     
     <node pkg="ras_carla" type="ras_core_node" name="core"/>
     <node pkg="ras_carla" type="ras_visualizer_node" name="visualizer"/>

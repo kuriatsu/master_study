@@ -1,2 +1,0 @@
-carla_helper:data_logger:ras_carla:teleop_carla
--DCATKIN_DEVEL_PREFIX=/home/mad-carla/share/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/mad-carla/share/catkin_ws/install -G Unix Makefiles

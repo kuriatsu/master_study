@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include "ras_core.h"
 
-RasCore::RasCore():polygon_interval(0.5), max_recognize_distance(50.0), min_recognize_distance(1.0), keep_time(2.0), min_recognize_vel(1.0)
+RasCore::RasCore(): max_recognize_distance(50.0), min_recognize_distance(3.0), keep_time(2.0), min_recognize_vel(1.0)
 {
 	ros::NodeHandle n;
 
@@ -29,32 +29,33 @@ void RasCore::subObjCallback(const derived_object_msgs::ObjectArray &in_obj_arra
       obj_pose = Ras::tfTransformer(ras_obj.object.pose, ras_obj.object.header.frame_id, "base_link");
       ras_obj.distance = sqrt(pow(obj_pose.position.x, 2) + pow(obj_pose.position.y, 2));
 
-      if (min_recognize_distance < ras_obj.distance && ras_obj.distance < max_recognize_distance && ras_obj.object.id != ego_id)
-      {
-
-        ras_carla::RasObject &selected_obj = obj_map[ras_obj.object.id];
-        selected_obj.object = ras_obj.object;
-        selected_obj.distance = ras_obj.distance;
-        selected_obj.is_front = (obj_pose.position.x > 0.5) ? true : false;
-
-        if (selected_obj.is_front)
+        if (min_recognize_distance < ras_obj.distance && ras_obj.distance < max_recognize_distance && ras_obj.object.id != ego_id)
         {
-            if (ras_obj.distance < closest_obj_dist)
-            {
-                closest_obj = &obj_map[ras_obj.object.id];
-                closest_obj_dist = ras_obj.distance;
-            }
-            if (ras_obj.distance < max_recognize_distance * 0.5)
-            {
-                selected_obj.importance = 0.5;
-            }
 
-        }
+            ras_carla::RasObject &selected_obj = obj_map[ras_obj.object.id];
+            selected_obj.object = ras_obj.object;
+            selected_obj.distance = ras_obj.distance;
+            selected_obj.is_front = (obj_pose.position.x > 0.5) ? true : false;
+            selected_obj.is_just_back = (fabs(obj_pose.position.y) > 0.5) ? true : false;
+
+            if (selected_obj.is_front)
+            {
+                if (ras_obj.distance < closest_obj_dist)
+                {
+                    closest_obj = &obj_map[ras_obj.object.id];
+                    closest_obj_dist = ras_obj.distance;
+                }
+                if (ras_obj.distance < max_recognize_distance * 0.5)
+                {
+                    selected_obj.importance = 0.5;
+                }
+
+            }
             // std::cout << ras_obj.object.id << " added" << std::endl;
+        }
     }
-}
-closest_obj->importance = 1.0;
-containerManage();
+    closest_obj->importance = 1.0;
+    containerManage();
     // std::cout << obj_map.size() << std::endl;
 }
 
@@ -88,138 +89,76 @@ void RasCore::containerManage()
       if ((ros::Time::now() - itr->second.object.header.stamp) < ros::Duration(keep_time))
       {
         calcDimension(itr->second);
-        calcPolygon(itr->second);
+        // calcPolygon(itr->second);
         obj_array.objects.push_back(itr->second);
             // std::cout << " is left" << std::endl;
+        }
+        else
+        {
+            erase_key_vec.push_back(itr->first);
+                // std::cout <<" is erased" << std::endl;
+        }
     }
-    else
+
+    obj_array.header.stamp = ros::Time::now();
+    obj_array.header.frame_id = "map";
+    pub_obj.publish(obj_array);
+
+    for (auto itr : erase_key_vec)
     {
-        erase_key_vec.push_back(itr->first);
-            // std::cout <<" is erased" << std::endl;
+        obj_map.erase(itr);
     }
-}
-
-obj_array.header.stamp = ros::Time::now();
-obj_array.header.frame_id = "map";
-pub_obj.publish(obj_array);
-
-for (auto itr : erase_key_vec)
-{
-    obj_map.erase(itr);
-}
 }
 
 
 void RasCore::calcDimension(ras_carla::RasObject &in_obj)
 {
-    float movable_dist;
+    float movable_dist, movable_vel, safety_dist;
     float clipped_ego_vel = ego_twist.linear.x > min_recognize_vel ? ego_twist.linear.x : min_recognize_vel;
-
-    switch(in_obj.object.classification)
+    if(ego_twist.linear.x > min_recognize_vel)
     {
-        case 4: //pedestrian
 
-        movable_dist = (in_obj.object.twist.linear.x > min_recognize_vel ? in_obj.object.twist.linear.x : min_recognize_vel) * in_obj.distance / clipped_ego_vel;
-        in_obj.object.shape.type = 1;
-        in_obj.object.shape.dimensions[0] = movable_dist;
-        in_obj.object.shape.dimensions[1] = movable_dist;
-        break;
-
-        case 6: //car
+        switch(in_obj.object.classification)
         {
-            float inner_prod = cos(Ras::quatToYaw(ego_pose.orientation) - Ras::quatToYaw(in_obj.object.pose.orientation));
+            case 4: //pedestrian
+            // movable_vel = in_obj.object.twist.linear.x > min_recognize_vel ? in_obj.object.twist.linear.x : min_recognize_vel;
+            // movable_dist = movable_vel * in_obj.distance / clipped_ego_vel;
+            safety_dist = pow((ego_twist.linear.x+in_obj.object.twist.linear.x) * 3.6, 2) / (254 * 0.7);
             in_obj.object.shape.type = 1;
+            in_obj.object.shape.dimensions[0] = safety_dist;
+            in_obj.object.shape.dimensions[1] = safety_dist;
+            break;
 
-            if (in_obj.is_front && inner_prod < 0 && in_obj.object.twist.linear.x > 0.1)
+            case 6: //car
             {
-                movable_dist = in_obj.object.twist.linear.x * in_obj.distance / clipped_ego_vel;
-                in_obj.object.shape.dimensions[0] = movable_dist;
-                in_obj.object.pose.position.x += 0.5 * movable_dist * cos(Ras::quatToYaw(in_obj.object.pose.orientation));
-                in_obj.object.pose.position.y += 0.5 * movable_dist * sin(Ras::quatToYaw(in_obj.object.pose.orientation));
+                float inner_prod = cos(Ras::quatToYaw(ego_pose.orientation) - Ras::quatToYaw(in_obj.object.pose.orientation));
+                in_obj.object.shape.type = 1;
+
+                if (in_obj.is_front && inner_prod < 0 && in_obj.object.twist.linear.x > 0.1)
+                {
+                    // movable_vel = in_obj.object.twist.linear.x;
+                    // movable_dist = movable_vel * in_obj.distance / clipped_ego_vel;
+                    safety_dist = pow((ego_twist.linear.x+in_obj.object.twist.linear.x) * 3.6, 2) / (254 * 0.7);
+                    in_obj.object.shape.dimensions[0] = safety_dist;
+                    in_obj.object.pose.position.x += 0.5 * safety_dist * cos(Ras::quatToYaw(in_obj.object.pose.orientation));
+                    in_obj.object.pose.position.y += 0.5 * safety_dist * sin(Ras::quatToYaw(in_obj.object.pose.orientation));
+                }
+
+                else if (!in_obj.is_front && !in_obj.is_just_back && inner_prod > 0 && in_obj.object.twist.linear.x - ego_twist.linear.x > 5.0)
+                {
+                    movable_vel = in_obj.object.twist.linear.x;
+                    movable_dist = movable_vel * in_obj.distance / (in_obj.object.twist.linear.x - ego_twist.linear.x) ;
+                    in_obj.object.shape.dimensions[0] = movable_dist;
+                    in_obj.object.pose.position.x += 0.5 * movable_dist * cos(Ras::quatToYaw(in_obj.object.pose.orientation));
+                    in_obj.object.pose.position.y += 0.5 * movable_dist * sin(Ras::quatToYaw(in_obj.object.pose.orientation));
+                }
+                break;
             }
 
-            else if (!in_obj.is_front && inner_prod > 0 && in_obj.object.twist.linear.x - ego_twist.linear.x > 5.0)
-            {
-                movable_dist = in_obj.object.twist.linear.x * in_obj.distance / (in_obj.object.twist.linear.x - ego_twist.linear.x) ;
-                in_obj.object.shape.dimensions[0] = movable_dist;
-                in_obj.object.pose.position.x += 0.5 * movable_dist * cos(Ras::quatToYaw(in_obj.object.pose.orientation));
-                in_obj.object.pose.position.y += 0.5 * movable_dist * sin(Ras::quatToYaw(in_obj.object.pose.orientation));
-            }
+            default:
             break;
         }
 
-        default:
-        break;
-    }
-
-}
-void RasCore::calcPolygon(ras_carla::RasObject &in_obj)
-{
-    geometry_msgs::Point32 polygon;
-    float x, y;
-
-
-    switch(in_obj.object.classification)
-    {
-        case 4:
-        {
-            int polygon_num = (in_obj.object.shape.dimensions[0] * M_PI) / polygon_interval;
-
-            for (int i = 0; i < polygon_num; i++)
-            {
-                x = in_obj.object.shape.dimensions[0] * 0.5 * cos(2 * M_PI * i / polygon_num);
-                y = in_obj.object.shape.dimensions[1] * 0.5 * sin(2 * M_PI * i / polygon_num);
-                // std::cout << "pol num" << i << "/" << polygon_num << std::endl;
-                // std::cout << "dimensions x:" << in_obj.object.shape.dimensions[0] << " y:" << in_obj.object.shape.dimensions[0] << std::endl;
-                polygon.x = x + in_obj.object.pose.position.x + in_obj.shift_x;
-                polygon.y = y + in_obj.object.pose.position.y + in_obj.shift_y;
-                // std::cout << "x:" << polygon.x << " y:" << polygon.y << std::endl;
-                polygon.z = 0.0;
-                in_obj.object.polygon.points.push_back(polygon);
-            }
-            break;
-        }
-
-        case 6:
-        {
-            int polygon_num_x = in_obj.object.shape.dimensions[0] / polygon_interval;
-            int polygon_num_y = in_obj.object.shape.dimensions[1] / polygon_interval;
-            double yaw = Ras::quatToYaw(in_obj.object.pose.orientation);
-
-            for (int i = 0; i < polygon_num_x; i++)
-            {
-                x = ( -in_obj.object.shape.dimensions[0] / 2 + polygon_interval * i );
-                y = ( in_obj.object.shape.dimensions[1] / 2 );
-                polygon.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x + in_obj.shift_x;
-                polygon.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y + in_obj.shift_y;
-                polygon.z = 0.0;
-                in_obj.object.polygon.points.push_back(polygon);
-
-                y = ( -in_obj.object.shape.dimensions[1] / 2 );
-                polygon.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x + in_obj.shift_x;
-                polygon.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y + in_obj.shift_y;
-                in_obj.object.polygon.points.push_back(polygon);
-            }
-
-            for (int i = 0; i < polygon_num_y; i++)
-            {
-                x = ( in_obj.object.shape.dimensions[0] / 2 );
-                y = ( -in_obj.object.shape.dimensions[1] / 2 + polygon_interval * i );
-                polygon.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x + in_obj.shift_x;
-                polygon.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y + in_obj.shift_y;
-                polygon.z = 0.0;
-                in_obj.object.polygon.points.push_back(polygon);
-
-                x = ( -in_obj.object.shape.dimensions[0] / 2 );
-                polygon.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x + in_obj.shift_x;
-                polygon.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y + in_obj.shift_y;
-                in_obj.object.polygon.points.push_back(polygon);
-            }
-            break;
-        }
-
-        default:
-        break;
     }
 }
 
