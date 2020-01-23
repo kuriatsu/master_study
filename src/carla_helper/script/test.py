@@ -29,42 +29,28 @@ def main():
 		if carla_actor.type_id.startswith("vehicle"):
 			if carla_actor.attributes.get('role_name') == 'ego_vehicle':
 				ego_vehicle = carla_actor
-		
-	batch = []
-	batch.append(carla.command.ApplyVelocity(ego_vehicle, carla.Vector3D(100.0,0.0,0.0)))
-	client.apply_batch(batch)
-	print("accel")
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(1.7)
-	batch.append(carla.command.ApplyVelocity(ego_vehicle, carla.Vector3D(0.0,0.0,0.0)))
-	client.apply_batch(batch)
-	print("brake")
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
-	time.sleep(0.02)
-	print(ego_vehicle.get_velocity())
 
-	# while True:
-	# 	world.wait_for_tick()
-	# 	ego_pose = ego_vehicle.get_transform()
-	# 	time.sleep(0.1)
+    # batch = []
+    # batch.append(carla.command.ApplyVelocity(ego_vehicle, carla.Vector3D(100.0,0.0,0.0)))
+    # client.apply_batch(batch)
+	# print("accel")
+    # for i in range(0,5):
+    #     print(ego_vehicle.get_velocity())
+    #     time.sleep(0.02)
+	# time.sleep(1.0)
+	# batch.append(carla.command.ApplyVelocity(ego_vehicle, carla.Vector3D(0.0,0.0,0.0)))
+	# client.apply_batch(batch)
+    # print("brake")
+    # for i in range(0,5):
+    #     print(ego_vehicle.get_velocity())
+    #     time.sleep(0.02)
+
+
+	while True:
+		world.wait_for_tick()
+		ego_pose = ego_vehicle.get_transform()
+        print(ego_pose.location.x, ego_pose.location.y, ego_pose.location.z, ego_pose.rotation.x, ego_pose.rotation.y, ego_pose.rotation.z)
+        time.sleep(0.1)
 
 
 if __name__ == '__main__':
