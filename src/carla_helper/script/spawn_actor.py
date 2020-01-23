@@ -141,21 +141,21 @@ class SpawnActor(object):
 			else:
 				self.spawning_actor_list[i]["world_id"] = results[i].actor_id
 				print("spawned", self.spawning_actor_list[i])
-		# # we spawn the walker controller
-		# batch = []
-		# for spawning_actor in self.spawning_actor_list:
-		# 	if spawning_actor['attribute'] == 'walker':
-		# 		batch.append(carla.command.SpawnActor(self.blueprintWalkerController, carla.Transform(), spawning_actor['world_id']))
-		# results = self.client.apply_batch_sync(batch, True)
-		#
-		# # conduct spawn
-		# for i in range(len(results)):
-		# 	if results[i].error:
-		# 		logging.error(results[i].error)
-		# 	else:
-		# 		self.spawning_actor_list[i]['controller'] = results[i].actor_id
+		# we spawn the walker controller if it is free actor
+		batch = []
+		for spawning_actor in self.spawning_actor_list:
+			if spawning_actor['attribute'] == 'walker':
+				batch.append(carla.command.SpawnActor(self.blueprintWalkerController, carla.Transform(), spawning_actor['world_id']))
+		results = self.client.apply_batch_sync(batch, True)
+		
+		# conduct spawn
+		for i in range(len(results)):
+			if results[i].error:
+				logging.error(results[i].error)
+			else:
+				self.spawning_actor_list[i]['controller'] = results[i].actor_id
 
-		# wait for a tick to ensure client receives the last transform of the walkers we have just created
+		wait for a tick to ensure client receives the last transform of the walkers we have just created
 		self.world.wait_for_tick()
 
 
