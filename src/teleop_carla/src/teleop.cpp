@@ -16,6 +16,7 @@ private:
 	float accel;
 	float brake;
 	float max_speed;
+	float max_radius;
 	bool autonomou_mode;
 	bool rosbag_flag ;
 	ros::Timer timer;
@@ -46,7 +47,7 @@ Teleop::Teleop(): accel(0.0), brake(0.0), autonomou_mode(false), rosbag_flag(fal
 void joyCallback(const sensor_msgs::Joy &in_joy)
 {
 	accel = (in_msg.axes[5] == -0.0) ? 0.0 : (1.0 - in_msg.axes[5]) * 0.5;
-	brake = (in_msg.axes[5] == -0.0) ? 0.0 : (1.0 + in_msg.axes[2]) * 0.5;
+	brake = (in_msg.axes[5] == -0.0) ? 1.0 : (1.0 + in_msg.axes[2]) * 0.5;
 
 	if(in_joy,button[2])
 	{
@@ -55,7 +56,8 @@ void joyCallback(const sensor_msgs::Joy &in_joy)
 
 	if (!autonomous_mode)
 	{
-		out_twist.angular.z = 0.5 * in_msg.axes[4];
+		out_twist.linear.x = max_speed * accel * brake;
+		out_twist.angular.z = 0.5 * out_twist.linear.x * in_msg.axes[4];
 	}
 
 	// START [7]
@@ -80,7 +82,9 @@ void twistCallback(const geometry_msgs::TwistStamped &in_twist)
 {
 	if (autonomou_mode)
 	{
-		out_twist = in_twist.twist;
+		out_twist = in_twist;
+		out_twist.linear.x = (out_twist.linear.x > accel * max_speed) ? in_twist.linear.x : accel * max_speed;
+		out_twist.linear.x = out_twist.linear.x * brake;
 		out_twist.angular.z = -out_twist.angular.z;
 	}
 }
@@ -88,16 +92,21 @@ void twistCallback(const geometry_msgs::TwistStamped &in_twist)
 
 void timerCallback(const ros::TimerEvent&)
 {
-	geometry_msgs::Twist twist;
-	twist.linear.x = (out_twist.linear.x > accel * max_speed) ? out_twist.linear.x : accel * max_speed;
-	twist.linear.x = twist.linear.x * brake;
-	twist.angular.z = out_twist.angular.z;
-}
+	float radius, steering_angle;
+	float max_radius = 0.818300709; // tan(70deg)/wheelbase = 2.7474774194546 / 3.0
 
+	if (fabs(out_twist.angular.z) > fabs(out_twist.linear.x / max_radius))
+	{
+		out_twist.angular.z = out_twist.linear.x / max_radius;
+	}
+
+	pub_twist.publish(out_twist);
+}
+max_angular_z = out_twist.linear.x * 2.7474774194546 / wheelbase
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "yp_teleop_study0");
+    ros::init(argc, argv, "teleop_node");
 	ros::spin()
 	return(0);
 }
