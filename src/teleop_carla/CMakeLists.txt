@@ -12,6 +12,7 @@ roscpp
 rospy
 std_msgs
 geometry_msgs
+nav_msgs
 joy
 dynamic_reconfigure
 )

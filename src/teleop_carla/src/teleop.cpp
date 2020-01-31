@@ -2,6 +2,7 @@
 #include <sensor_msgs/Joy.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <nav_msgs/Odometry.h>
 
 #include <cmath>
 
@@ -13,13 +14,16 @@ class Teleop
 private:
     ros::Subscriber sub_joy;
     ros::Subscriber sub_twist;
+    ros::Subscriber sub_odom;
     ros::Publisher pub_twist;
 
     float pub_rate;
 
-    geometry_msgs::Twist out_twist;
-    float accel;
+    float throttle;
     float brake;
+    float target_vel;
+    float target_angular;
+    float current_twist;
     // float max_radius;
     ros::Timer timer;
 
@@ -42,12 +46,13 @@ public:
 private:
     void joyCallback(const sensor_msgs::Joy &in_joy);
     void twistCallback(const geometry_msgs::TwistStamped &in_twist);
+    void odomCallback(const nav_msgs::Odometry &in_odom);
     void timerCallback(const ros::TimerEvent&);
     void callbackDynamicReconfigure(teleop_carla::teleopConfig &config, uint32_t lebel);
 };
 
 
-Teleop::Teleop(): accel(0.0), brake(0.0), back(1.0), pub_rate(0.1)
+Teleop::Teleop(): throttle(0.0), brake(0.0), back(1.0), pub_rate(0.1)
 {
     ros::NodeHandle n;
 
@@ -56,6 +61,7 @@ Teleop::Teleop(): accel(0.0), brake(0.0), back(1.0), pub_rate(0.1)
 
     sub_joy = n.subscribe("/joy", 1, &Teleop::joyCallback, this);
     sub_twist = n.subscribe("/twist_cmd", 1, &Teleop::twistCallback, this);
+    sub_odom = n.subscribe("/carla/ego_vehicle/odometry", 1, &Teleop::odomCallback, this);
     pub_twist = n.advertise<geometry_msgs::Twist>("/carla/ego_vehicle/twist_cmd", 1);
 
     ros::Duration(1).sleep();
@@ -67,8 +73,8 @@ void Teleop::callbackDynamicReconfigure(teleop_carla::teleopConfig &config, uint
 {
     max_vel = config.max_speed;
     max_wheel_angle = 90.0 - config.max_steer;
-    accel_step = config.acceleration_coefficient * 9.8 * pub_rate;
-    brake_step = config.deceleration_coefficient * 9.8 * pub_rate;
+    accel_step = config.acceleration_coefficient * 9.8 * pub_rate * 3.6;
+    brake_step = config.deceleration_coefficient * 9.8 * pub_rate  * 3.6;
     decel_step = 1.0 - config.deceleration_coefficient;
     autonomous_mode = config.autonomous_mode?true:false;
     rosbag_flag = config.rosbag_flag?true:false;
@@ -79,8 +85,8 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
 {
     if (controller == 0)
     {
-        accel = (in_joy.axes[5] == -0.0) ? 0.0 : (1.0 - in_joy.axes[5]) * 0.5 * accel_step * 3.6;
-        brake = (in_joy.axes[2] == -0.0) ? 1.0 : (1.0 - in_joy.axes[2]) * 0.5 * brake_step * 3.6;
+        throttle = (in_joy.axes[5] == -0.0) ? 0.0 : (1.0 - in_joy.axes[5]) * 0.5;
+        brake = (in_joy.axes[2] == -0.0) ? 1.0 : (1.0 + in_joy.axes[2]) * 0.5;
         // std::cout << "accel: " << accel << " brake: " << brake << std::endl;
 
         if(in_joy.buttons[1])
@@ -111,8 +117,8 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
     }
     else if(controller == 1)
     {
-        accel = (in_joy.axes[2] == 0.0) ? 0.0 : (1.0 + in_joy.axes[2]) * 0.5 * accel_step;
-        brake = (in_joy.axes[3] == 0.0) ? 1.0 : (1.0 + in_joy.axes[3]) * 0.5 * brake_step;
+        throttle = (in_joy.axes[2] == 0.0) ? 0.0 : (1.0 + in_joy.axes[2]) * 0.5;
+        brake = (in_joy.axes[3] == 0.0) ? 1.0 : (1.0 - in_joy.axes[3]) * 0.5;
         // vel_step = (out_twist.linear.x + vel_step < 0.1 && !back) ? 0.0;
         if(in_joy.buttons[3])
         {
@@ -153,7 +159,7 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
 
     if (!autonomous_mode)
     {
-        out_twist.angular.z = - out_twist.linear.x * tan((90 - max_wheel_angle) * in_joy.axes[0] * M_PI / 180) / 3.0;
+        target_angular = - current_twist * tan((90.0 - max_wheel_angle) * in_joy.axes[0] * M_PI / 180) / 3.0;
     }
 }
 
@@ -162,21 +168,39 @@ void Teleop::twistCallback(const geometry_msgs::TwistStamped &in_twist)
 {
     if (autonomous_mode)
     {
-        out_twist = in_twist.twist;
-        out_twist.angular.z = -out_twist.angular.z;
+        target_vel = in_twist.twist.linear.x;
+        target_angular = -in_twist.twist.angular.z;
     }
 }
 
 
+void Teleop::odomCallback(const nav_msgs::Odometry &in_odom)
+{
+    current_twist = in_odom.twist.twist.linear.x;
+}
+
 void Teleop::timerCallback(const ros::TimerEvent&)
 {
-    std::cout << "accel: " << accel << " brake: " << brake << std::endl;
-    float max_angular = fabs(out_twist.linear.x) * tan(max_wheel_angle * M_PI / 180) / 3.0;
-    float target_angular = out_twist.angular.z;
-    float target_vel = fabs(out_twist.linear.x) + accel - brake;
+    geometry_msgs::Twist out_twist;
+    float max_angular = fabs(current_twist) * tan(max_wheel_angle * M_PI / 180) / 3.0;
+    target_vel = (fabs(target_vel) < (throttle * max_vel)) ? (throttle * max_vel) : target_vel;
+    target_vel *= brake;
+    std::cout << "current_twist: " << current_twist << " target_vel: " << target_vel << std::endl;
+
+    float vel_diff = target_vel - fabs(current_twist);
+    std::cout << "vel_Diff: " << vel_diff << std::endl;
+
+    if (-brake_step > vel_diff || vel_diff > accel_step)
+    {
+        out_twist.linear.x = current_twist + ((vel_diff > 0.0) ? accel_step : -brake_step);
+    }
+    else
+    {
+        out_twist.linear.x = current_twist + vel_diff;
+    }
 
     // std::cout << "target_angular" << target_angular << std::endl;
-    out_twist.linear.x = ((target_vel < max_vel) ? target_vel : max_vel) * back;
+    out_twist.linear.x *= back;
     out_twist.angular.z = (fabs(target_angular) < max_angular) ? target_angular : (target_angular < 0.0) ? -max_angular : max_angular;
     // std::cout << "out_angular" << out_twist.angular.z << std::endl;
 
