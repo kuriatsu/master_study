@@ -138,8 +138,8 @@ include_directories(
 add_executable(add_intensity_node src/add_intensity.cpp)
 target_link_libraries(add_intensity_node ${catkin_LIBRARIES})
 
-add_executable(carla_helper_node src/carla_helper.cpp)
-target_link_libraries(carla_helper_node ${catkin_LIBRARIES})
+add_executable(fake_ndt_node src/fake_ndt.cpp)
+target_link_libraries(fake_ndt_node ${catkin_LIBRARIES})
 
 add_executable(carla_waypoint_publisher_node src/carla_waypoint_publisher.cpp)
 target_link_libraries(carla_waypoint_publisher_node ${catkin_LIBRARIES})
