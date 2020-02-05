@@ -34,6 +34,7 @@ private:
     float m_max_wheel_angle;
     float m_max_accel;
     float m_max_decel;
+    float m_natural_decel;
     int m_controller;
     bool m_autonomous_mode;
     bool m_rosbag_flag;
@@ -78,6 +79,7 @@ void Teleop::callbackDynamicReconfigure(teleop_carla::teleopConfig &config, uint
     m_max_wheel_angle = 90.0 - config.max_steer;
     m_max_accel = config.acceleration_coefficient * 9.8 * pub_rate * 3.6;
     m_max_decel = config.deceleration_coefficient * 9.8 * pub_rate  * 3.6;
+    m_natural_decel = config.natural_deceleration_coefficient * 9.8 * pub_rate  * 3.6;
     m_autonomous_mode = config.autonomous_mode?true:false;
     m_rosbag_flag = config.rosbag_flag?true:false;
     m_controller = config.controller;
@@ -87,9 +89,11 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
 {
     if (m_controller == 0)
     {
-        m_throttle = (in_joy.axes[5] == 0.0) ? 0.0 : (1.0 + in_joy.axes[5]) * 0.5;
-        m_brake = (in_joy.axes[2] == 0.0) ? 0.0 : (1.0 + in_joy.axes[2]) * 0.5;
-        // std::cout << "accel: " << accel << " m_brake: " << m_brake << std::endl;
+        // m_throttle = (in_joy.axes[5] == 0.0) ? 0.0 : (1.0 - in_joy.axes[5]) * 0.5;
+        m_throttle = (1.0 - in_joy.axes[5]) * 0.5;
+        // m_brake = (in_joy.axes[2] == 0.0) ? 0.0 : (1.0 - in_joy.axes[2]) * 0.5;
+        m_brake = (1.0 - in_joy.axes[2]) * 0.5;
+        // std::cout << "m_throttle: " << m_throttle << " m_brake: " << m_brake << std::endl;
 
         if(in_joy.buttons[1])
         {
@@ -170,6 +174,7 @@ void Teleop::twistCallback(const geometry_msgs::TwistStamped &in_twist)
 void Teleop::odomCallback(const nav_msgs::Odometry &in_odom)
 {
     m_current_twist = in_odom.twist.twist;
+    std::cout << "<- curent" << in_odom.twist.twist.linear.x << std::endl;
 }
 
 
@@ -177,25 +182,33 @@ void Teleop::timerCallback(const ros::TimerEvent&)
 {
     geometry_msgs::Twist out_twist;
 
-
     // when there is no signal, skip everything to avoid publishing message
-    if (m_brake == 0.0 && m_throttle == 0.0 && m_autoware_twist.linear.x == 0.0)
-        return;
+    if (m_brake == 0.0 && m_throttle == 0.0 && m_autoware_twist.linear.x == 0.0){
+        std::cout << "current" << fabs(m_current_twist.linear.x) << " out" << out_twist.linear.x << " natural_decel" << m_natural_decel << std::endl;
 
+        out_twist.linear.x = fabs(m_current_twist.linear.x) - m_natural_decel;
+        std::cout << "->current" << fabs(m_current_twist.linear.x) << " out" << out_twist.linear.x << " natural_decel" << m_natural_decel << std::endl;
+    }
     else
     {
-        out_twist.linear.x = m_current_twist.linear.x + calcVelChange(m_current_twist.linear.x, m_autoware_twist.linear.x, m_throttle, m_brake, m_max_vel,m_max_accel, m_max_decel);
+        out_twist.linear.x = fabs(m_current_twist.linear.x) + calcVelChange(m_current_twist.linear.x, m_autoware_twist.linear.x, m_throttle, m_brake, m_max_vel,m_max_accel, m_max_decel);
+        std::cout << "    current" << m_current_twist.linear.x << " out" << out_twist.linear.x << std::endl;
+    }
 
-        if (m_back)
-            out_twist.linear.x = -fabs(out_twist.linear.x);
+    if (m_back)
+        out_twist.linear.x = -fabs(out_twist.linear.x);
 
-        out_twist.angular.z = calcOmega(m_current_twist.linear.x, m_autoware_twist.angular.z, m_manual_omega, m_max_wheel_angle);
-        
+    if ((m_back && out_twist.linear.x > 0.0) || (!m_back && out_twist.linear.x < 0.0))
+    {
+        std::cout << "sign changed unexpectedly" << m_back << out_twist.linear.x << std::endl;
+        out_twist.linear.x = 0.0;
     }
     
+    out_twist.angular.z = calcOmega(m_current_twist.linear.x, m_autoware_twist.angular.z, m_manual_omega, m_max_wheel_angle);
+
     pub_twist.publish(out_twist);
-    m_manual_omega = 0.0;
-    m_autoware_twist.linear.x = 0.0;
+    std::cout << "published" << std::endl;
+    // m_autoware_twist.linear.x = 0.0;
 }
 
 
@@ -210,6 +223,7 @@ float Teleop::calcVelChange(const float current_vel, const float autonomous_vel,
         // cut velocity change with threshold
         if (vel_change < -max_decel || max_accel < vel_change)
         {
+            std::cout << "velchange over max" << std::endl;
             return (vel_change > 0.0) ? max_accel : -max_decel;
         }
     }
@@ -217,15 +231,14 @@ float Teleop::calcVelChange(const float current_vel, const float autonomous_vel,
     else
     {
         vel_change = throttle * max_accel - brake * max_decel;
-        std::cout << vel_change << std::endl;
+        std::cout << throttle << "*" << max_accel << "-" << brake << "*" << max_decel << std::endl;
     }
 
-    // When the sign of velocity changed unexpectedly, set 0 to avoid bag. 
-    if ((vel_change > 0.0) != (autonomous_vel > 0.0))
-        return 0.0;
-
     if (fabs(current_vel) > max_vel)
+    {
+        std::cout << "vel is over max" << std::endl;
         return 0.0;
+    }
 
     return vel_change;
 }
@@ -233,7 +246,7 @@ float Teleop::calcVelChange(const float current_vel, const float autonomous_vel,
 
 float Teleop::calcOmega(const float current_vel, const float autonomous_omega, const float manual_omega, const float max_wheel_angle )
 {
-    float max_angular = current_vel * tan(max_wheel_angle * M_PI / 180) / 3.0;
+    float max_angular = fabs(current_vel) * tan(max_wheel_angle * M_PI / 180) / 3.0;
     if (manual_omega == 0.0)
         return (fabs(autonomous_omega) < max_angular) ? -autonomous_omega : (autonomous_omega < 0.0) ? max_angular : -max_angular;
     else
