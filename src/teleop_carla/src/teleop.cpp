@@ -51,7 +51,7 @@ private:
     void odomCallback(const nav_msgs::Odometry &in_odom);
     void timerCallback(const ros::TimerEvent&);
     void callbackDynamicReconfigure(teleop_carla::teleopConfig &config, uint32_t lebel);
-    float calcVelChange(float current_vel, float autonomous_vel, float throttle, float brake, float max_vel, float max_throttle, float max_decel);
+    float calcVelChange(float current_vel, float autonomous_vel, float throttle, float brake, float natural_decel, float max_vel, float max_throttle, float max_decel);
     float calcOmega(float current_vel, float autonomous_omega, float manual_omega, float max_wheel_angle );
 };
 
@@ -89,13 +89,10 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
 {
     if (m_controller == 0)
     {
-        // m_throttle = (in_joy.axes[5] == 0.0) ? 0.0 : (1.0 - in_joy.axes[5]) * 0.5;
         m_throttle = (1.0 - in_joy.axes[5]) * 0.5;
-        // m_brake = (in_joy.axes[2] == 0.0) ? 0.0 : (1.0 - in_joy.axes[2]) * 0.5;
         m_brake = (1.0 - in_joy.axes[2]) * 0.5;
-        // std::cout << "m_throttle: " << m_throttle << " m_brake: " << m_brake << std::endl;
 
-        if(in_joy.buttons[1])
+        if(in_joy.buttons[1] && fabs(m_current_twist.linear.x) < 2.0)
         {
             m_back = !m_back;
             m_autonomous_mode = false;
@@ -126,11 +123,9 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
     {
         m_throttle = (in_joy.axes[2] == 0.0) ? 0.0 : (1.0 + in_joy.axes[2]) * 0.5;
         m_brake = (in_joy.axes[3] == 0.0) ? 1.0 : (1.0 - in_joy.axes[3]) * 0.5;
-        // vel_step = (out_twist.linear.x + vel_step < 0.1 && !m_back) ? 0.0;
+    
         if(in_joy.buttons[3])
-        {
             m_autonomous_mode = !m_autonomous_mode;
-        }
 
         if(in_joy.buttons[2] && !m_autonomous_mode)
         {
@@ -174,29 +169,18 @@ void Teleop::twistCallback(const geometry_msgs::TwistStamped &in_twist)
 void Teleop::odomCallback(const nav_msgs::Odometry &in_odom)
 {
     m_current_twist = in_odom.twist.twist;
-    std::cout << "<- curent" << in_odom.twist.twist.linear.x << std::endl;
 }
 
 
 void Teleop::timerCallback(const ros::TimerEvent&)
 {
     geometry_msgs::Twist out_twist;
+    float vel_change = calcVelChange(m_current_twist.linear.x, m_autoware_twist.linear.x, m_throttle, m_brake, m_natural_decel, m_max_vel,m_max_accel, m_max_decel);
 
-    // when there is no signal, skip everything to avoid publishing message
-    if (m_brake == 0.0 && m_throttle == 0.0 && m_autoware_twist.linear.x == 0.0){
-        std::cout << "current" << fabs(m_current_twist.linear.x) << " out" << out_twist.linear.x << " natural_decel" << m_natural_decel << std::endl;
+    if(m_back)
+        vel_change *= -1;
 
-        out_twist.linear.x = fabs(m_current_twist.linear.x) - m_natural_decel;
-        std::cout << "->current" << fabs(m_current_twist.linear.x) << " out" << out_twist.linear.x << " natural_decel" << m_natural_decel << std::endl;
-    }
-    else
-    {
-        out_twist.linear.x = fabs(m_current_twist.linear.x) + calcVelChange(m_current_twist.linear.x, m_autoware_twist.linear.x, m_throttle, m_brake, m_max_vel,m_max_accel, m_max_decel);
-        std::cout << "    current" << m_current_twist.linear.x << " out" << out_twist.linear.x << std::endl;
-    }
-
-    if (m_back)
-        out_twist.linear.x = -fabs(out_twist.linear.x);
+    out_twist.linear.x = m_current_twist.linear.x + vel_change;
 
     if ((m_back && out_twist.linear.x > 0.0) || (!m_back && out_twist.linear.x < 0.0))
     {
@@ -207,32 +191,34 @@ void Teleop::timerCallback(const ros::TimerEvent&)
     out_twist.angular.z = calcOmega(m_current_twist.linear.x, m_autoware_twist.angular.z, m_manual_omega, m_max_wheel_angle);
 
     pub_twist.publish(out_twist);
-    std::cout << "published" << std::endl;
     // m_autoware_twist.linear.x = 0.0;
 }
 
 
-float Teleop::calcVelChange(const float current_vel, const float autonomous_vel, const float throttle, const float brake, const float max_vel, const float max_accel, const float max_decel)
+float Teleop::calcVelChange(const float current_vel, const float autonomous_vel, const float throttle, const float brake, const float natural_decel, const float max_vel, const float max_accel, const float max_decel)
 {
     float vel_change;
+
     // when no manual override
     if (brake == 0.0 && throttle == 0.0)
     {
-        vel_change = autonomous_vel - current_vel;
+        if (autonomous_vel == 0.0)
+            return -natural_decel;
 
-        // cut velocity change with threshold
-        if (vel_change < -max_decel || max_accel < vel_change)
+        else
         {
-            std::cout << "velchange over max" << std::endl;
-            return (vel_change > 0.0) ? max_accel : -max_decel;
+            vel_change = autonomous_vel - current_vel;
+            // cut velocity change with threshold
+            if (vel_change < -max_decel || max_accel < vel_change)
+            {
+                std::cout << "velchange over max" << std::endl;
+                return (vel_change > 0.0) ? max_accel : -max_decel;
+            }
         }
     }
-    // when manual override
+    // when manual override autonomous operation is ignored
     else
-    {
         vel_change = throttle * max_accel - brake * max_decel;
-        std::cout << throttle << "*" << max_accel << "-" << brake << "*" << max_decel << std::endl;
-    }
 
     if (fabs(current_vel) > max_vel)
     {
