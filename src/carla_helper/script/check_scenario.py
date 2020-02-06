@@ -93,8 +93,8 @@ def main():
             if action.tag == 'spawn':
                 buf = action.find('transform').text
                 location = carla.Location(buf[0], buf[1], buf[2])
-                debug.draw_point(location=location, life_time=30, size=0.1, color=color[i%10])
-                debug.draw_string(location=location+carla.Location(z=1.0), text='spawn'+action.find('type').text, color=carla.Color(255,255,255), life_time=30)
+                debug.draw_point(location=location, life_time=30, size=0.1, color=color[int(trriger.attrib.get('id'))%10])
+                debug.draw_string(location=location+carla.Location(z=1.0), text='spawn'+action.find('type').text + action.attrib.get('id'), color=carla.Color(255,255,255), life_time=30)
                 actor_position[action.attrib.get('id')] = location
 
             if action.tag == 'move':

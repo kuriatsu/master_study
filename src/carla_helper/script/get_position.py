@@ -16,7 +16,7 @@ import pyperclip
 import time
 import random
 
-def main():
+def main(args):
 
     print(sys.version)
     client = carla.Client("127.0.0.1", 2000)
@@ -26,9 +26,9 @@ def main():
     # print(start)
     # get ego car
     for carla_actor in world.get_actors():
-        # print(carla_actor)
+        print(carla_actor.attributes.get('role_name'))
         # if carla_actor.type_id.startswith("vehicle"):
-        if carla_actor.attributes.get('role_name') == 'ego_vehicle':
+        if carla_actor.attributes.get('role_name') == args[1]:
             ego_vehicle = carla_actor
     ####################
     #### speed test ####
@@ -71,4 +71,4 @@ def main():
 
 if __name__ == '__main__':
 
-    main()
+    main(sys.argv)
