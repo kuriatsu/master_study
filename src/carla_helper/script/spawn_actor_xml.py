@@ -126,12 +126,25 @@ class SpawnActor(object):
             buf = spawn.find('transform').text
             transform = carla.Transform(carla.Location(buf[0], buf[1], buf[2]), carla.Rotation(buf[3], buf[4], buf[5]))
             batch.append(carla.command.SpawnActor(blueprint, transform))
+            print("spawn: " + spawn.attrib.get("id"));
 
         # conduct spawn actor
         results = self.client.apply_batch_sync(batch)
         for i in range(len(results)):
+            spawn = spawn_list[i]
             if results[i].error:
                 warnings.warn(results[i].error)
+                print("removes ", spawn.attrib.get('id'))
+                if spawn in ai_walkers_list:
+                    ai_walkers_list.remove(spawn)
+                for trigger in self.scenario.findall('trigger'):
+                    for move in trigger.findall('move'):
+                        if move.attrib.get('id') == spawn.attrib.get('id'):
+                            trigger.remove(move)
+                    for kill in trigger.findall('kill'):
+                        if kill.attrib.get('id') == spawn.attrib.get('id'):
+                            trigger.remove(kill)
+
             else:
                 world_id = ET.SubElement(spawn_list[i], 'world_id')
                 world_id.text = results[i].actor_id
@@ -145,7 +158,7 @@ class SpawnActor(object):
         # conduct spawn ai controller
         for i in range(len(results)):
             if (results[i].error):
-                logging.error(results[i].error)
+                warnings.warn(results[i].error)
             else:
                 ai_controller_id = ET.SubElement(ai_walkers_list[i], 'ai_controller_id')
                 ai_controller_id.text = results[i].actor_id
@@ -156,18 +169,27 @@ class SpawnActor(object):
     def moveActor(self, move_list):
 
         def moveAiWalker(world_id, speed):
-            actor = self.world.get_actor(world_id)
-            actor.start()
-            actor.go_to_location(self.world.get_random_location_from_navigation())
-            actor.set_max_speed(speed)
+            try:
+                actor = self.world.get_actor(world_id)
+                actor.start()
+                actor.go_to_location(self.world.get_random_location_from_navigation())
+                actor.set_max_speed(speed)
+            except:
+                print('cannot start AI walker. world_id: ', world_id)
+                return
 
         def moveAiVehicle(world_id):
-            actor = self.world.get_actor(world_id)
-            actor.set_autopilot(True)
+            try:
+                actor = self.world.get_actor(world_id)
+                actor.set_autopilot(True)
+            except:
+                print('cannot start AI vehicle. world_id: ', world_id)
+                return
 
         def moveInnocentActor(world_id, type, speed, goal):
             control_actor = {}
-            control_actor['actor'] = self.world.get_actor(world_id)
+            actor = self.world.get_actor(world_id)
+            control_actor['actor'] = actor
             control_actor['type'] = type
             control_actor['goal'] = carla.Location(goal[0], goal[1], goal[2])
             control_actor['speed'] = speed
@@ -183,6 +205,8 @@ class SpawnActor(object):
                         moveAiVehicle(spawn.find('world_id').text)
                     elif type == 'walker' or type == 'vehicle':
                         moveInnocentActor(spawn.find('world_id').text, type, float(move.find('speed').text), move.find('goal').text)
+                    print("move: " + spawn.attrib.get("id"));
+
 
 
 
@@ -191,8 +215,8 @@ class SpawnActor(object):
         for control_actor in self.control_actor_list:
             if control_actor['actor'].is_alive == False:
                 self.control_actor_list.remove(control_actor)
+                print("Innocent actor ", control_actor['actor'].id, "is dead")
                 continue
-
             else:
                 actor = control_actor['actor']
                 transform = actor.get_transform()
@@ -239,6 +263,7 @@ class SpawnActor(object):
 
                     batch.append(carla.command.DestroyActor(spawn.find('world_id').text))
                     spawn.remove(spawn.find('world_id'))
+                    print("killed: " + spawn.attrib.get("id"));
 
         self.client.apply_batch(batch)
 

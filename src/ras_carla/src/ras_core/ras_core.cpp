@@ -89,7 +89,6 @@ void RasCore::containerManage()
       if ((ros::Time::now() - itr->second.object.header.stamp) < ros::Duration(keep_time))
       {
         calcDimension(itr->second);
-        // calcPolygon(itr->second);
         obj_array.objects.push_back(itr->second);
             // std::cout << " is left" << std::endl;
         }
