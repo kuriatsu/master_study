@@ -3,6 +3,7 @@
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <carla_msgs/CarlaEgoVehicleControl.h>
 
 #include <cmath>
 
@@ -16,6 +17,7 @@ private:
     ros::Subscriber sub_twist;
     ros::Subscriber sub_odom;
     ros::Publisher pub_twist;
+    ros::Publisher pub_vehicle_control;
 
     float pub_rate;
 
@@ -23,6 +25,7 @@ private:
     geometry_msgs::Twist m_autoware_twist;
     // geometry_msgs::Twist joy_twist;
     geometry_msgs::Twist m_current_twist;
+    carla_msgs::CarlaEgoVehicleControl m_vehicle_cmd;
     float m_throttle;
     float m_brake;
     float m_manual_omega;
@@ -36,6 +39,7 @@ private:
     float m_max_decel;
     float m_natural_decel;
     int m_controller;
+    int m_control_type;
     bool m_autonomous_mode;
     bool m_rosbag_flag;
     bool m_back;
@@ -67,7 +71,7 @@ Teleop::Teleop(): m_throttle(0.0), m_brake(0.0), m_back(false), pub_rate(0.1)
     sub_twist = n.subscribe("/twist_cmd", 1, &Teleop::twistCallback, this);
     sub_odom = n.subscribe("/carla/ego_vehicle/odometry", 1, &Teleop::odomCallback, this);
     pub_twist = n.advertise<geometry_msgs::Twist>("/carla/ego_vehicle/twist_cmd", 1);
-
+    pub_vehicle_control = n.advertise<carla_msgs::CarlaEgoVehicleControl>("/carla/ego_vehicle/vehicle_control_cmd_manual", 1);
     ros::Duration(1).sleep();
     timer = n.createTimer(ros::Duration(pub_rate), &Teleop::timerCallback, this);
 }
@@ -83,6 +87,7 @@ void Teleop::callbackDynamicReconfigure(teleop_carla::teleopConfig &config, uint
     m_autonomous_mode = config.autonomous_mode?true:false;
     m_rosbag_flag = config.rosbag_flag?true:false;
     m_controller = config.controller;
+    m_control_type = config.control_type;
 }
 
 void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
@@ -91,6 +96,7 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
     {
         m_throttle = (1.0 - in_joy.axes[5]) * 0.5;
         m_brake = (1.0 - in_joy.axes[2]) * 0.5;
+        m_manual_omega = -m_current_twist.linear.x * tan((90.0 - m_max_wheel_angle) * in_joy.axes[0] * M_PI / 180) / 3.0;
 
         if(in_joy.buttons[1] && fabs(m_current_twist.linear.x) < 2.0)
         {
@@ -121,9 +127,10 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
     }
     else if(m_controller == 1)
     {
-        m_throttle = (in_joy.axes[2] == 0.0) ? 0.0 : (1.0 + in_joy.axes[2]) * 0.5;
-        m_brake = (in_joy.axes[3] == 0.0) ? 1.0 : (1.0 - in_joy.axes[3]) * 0.5;
-    
+        m_throttle = (1.0 + in_joy.axes[2]) * 0.5;
+        m_brake = (1.0 + in_joy.axes[3]) * 0.5;
+        m_manual_omega = -m_current_twist.linear.x * tan((90.0 - m_max_wheel_angle) * in_joy.axes[0] * M_PI / 180) / 3.0;
+
         if(in_joy.buttons[3])
             m_autonomous_mode = !m_autonomous_mode;
 
@@ -132,12 +139,10 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
             m_back = !m_back;
             m_autonomous_mode = false;
         }
-
         // START [7]
         if (in_joy.buttons[1])
         {
             m_rosbag_flag = !m_rosbag_flag;
-
             if(!m_rosbag_flag)
             {
                 ROS_INFO("bag_record_on");
@@ -148,11 +153,14 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
                 // system("bash ~/Program/Ros/master_study_ws/src/teleop_study/src/bag_stopper.sh &");
             }
         }
+
+        m_vehicle_cmd.header.stamp = ros::Time::now();
+        m_vehicle_cmd.throttle = m_throttle;
+        m_vehicle_cmd.steer = in_joy.axes[0];
+        m_vehicle_cmd.brake = m_brake;
+        m_vehicle_cmd.reverse = m_back;
+        m_vehicle_cmd.gear = int(m_vehicle_cmd.manual_gear_shift + in_joy.buttons[4] - in_joy.buttons[5]) % 4 + 1;
     }
-
-    // joy_twist.linear.x = m_max_vel * m_throttle * m_brake * m_back;
-    m_manual_omega = -m_current_twist.linear.x * tan((90.0 - m_max_wheel_angle) * in_joy.axes[0] * M_PI / 180) / 3.0;
-
 }
 
 
@@ -161,7 +169,7 @@ void Teleop::twistCallback(const geometry_msgs::TwistStamped &in_twist)
     if (m_autonomous_mode)
     {
         m_autoware_twist = in_twist.twist;
-        m_autoware_twist.angular.z = -in_twist.twist.angular.z;        
+        m_autoware_twist.angular.z = -in_twist.twist.angular.z;
     }
 }
 
@@ -174,24 +182,27 @@ void Teleop::odomCallback(const nav_msgs::Odometry &in_odom)
 
 void Teleop::timerCallback(const ros::TimerEvent&)
 {
-    geometry_msgs::Twist out_twist;
-    float vel_change = calcVelChange(m_current_twist.linear.x, m_autoware_twist.linear.x, m_throttle, m_brake, m_natural_decel, m_max_vel,m_max_accel, m_max_decel);
-
-    if(m_back)
-        vel_change *= -1;
-
-    out_twist.linear.x = m_current_twist.linear.x + vel_change;
-
-    if ((m_back && out_twist.linear.x > 0.0) || (!m_back && out_twist.linear.x < 0.0))
+    if (m_control_type == 0)
     {
-        std::cout << "sign changed unexpectedly" << m_back << out_twist.linear.x << std::endl;
-        out_twist.linear.x = 0.0;
+        geometry_msgs::Twist out_twist;
+        float vel_change = calcVelChange(m_current_twist.linear.x, m_autoware_twist.linear.x, m_throttle, m_brake, m_natural_decel, m_max_vel,m_max_accel, m_max_decel);
+        if (m_back)
+        vel_change *= -1;
+        out_twist.linear.x = m_current_twist.linear.x + vel_change;
+        if ((m_back && out_twist.linear.x > 0.0) || (!m_back && out_twist.linear.x < 0.0))
+        {
+            std::cout << "sign changed unexpectedly" << m_back << m_control_type << out_twist.linear.x << std::endl;
+            out_twist.linear.x = 0.0;
+        }
+        out_twist.angular.z = calcOmega(m_current_twist.linear.x, m_autoware_twist.angular.z, m_manual_omega, m_max_wheel_angle);
+        pub_twist.publish(out_twist);
+        // m_autoware_twist.linear.x = 0.0;
     }
-    
-    out_twist.angular.z = calcOmega(m_current_twist.linear.x, m_autoware_twist.angular.z, m_manual_omega, m_max_wheel_angle);
-
-    pub_twist.publish(out_twist);
-    // m_autoware_twist.linear.x = 0.0;
+    else if (m_control_type == 1)
+    {
+        pub_vehicle_control.publish(m_vehicle_cmd);
+        pub_twist.publish(m_autoware_twist);
+    }
 }
 
 
@@ -225,7 +236,6 @@ float Teleop::calcVelChange(const float current_vel, const float autonomous_vel,
         std::cout << "vel is over max" << std::endl;
         return 0.0;
     }
-
     return vel_change;
 }
 

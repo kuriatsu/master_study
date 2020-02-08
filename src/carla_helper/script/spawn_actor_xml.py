@@ -31,7 +31,7 @@ class SpawnActor(object):
         self.world = None
         self.ego_vehicle = None
         self.scenario = None
-        self.intrusion_thres = 2.0
+        self.intrusion_thres = 3.0
         self.trigger_index = 0
         self.blueprintVehicles = None
         self.blueprintWalkers = None
@@ -58,7 +58,7 @@ class SpawnActor(object):
                     self.ego_vehicle = carla_actor
 
 
-    def checkScenario(self):
+    def checkTrigger(self):
 
         if self.scenario is not None:
             ego_pose = self.ego_vehicle.get_transform()
@@ -268,6 +268,14 @@ class SpawnActor(object):
         self.client.apply_batch(batch)
 
 
+    def controlTrafficLight(self):
+
+        if self.ego_vehicle.is_at_traffic_light():
+            traffic_light = self.ego_vehicle.get_traffic_light()
+            if traffic_light.get_state() == carla.TrafficLightState.Red:
+                traffic_light.set_state(carla.TrafficLightState.Green)
+
+
     def game_loop(self, args):
         print('hello game_loop')
         try:
@@ -285,8 +293,9 @@ class SpawnActor(object):
 
             while True:
                 self.world.wait_for_tick()
-                self.checkScenario()
+                self.checkTrigger()
                 self.controlActor()
+                self.controlTrafficLight()
                 time.sleep(0.1)
 
         finally:

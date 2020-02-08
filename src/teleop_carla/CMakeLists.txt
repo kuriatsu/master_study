@@ -15,6 +15,7 @@ geometry_msgs
 nav_msgs
 joy
 dynamic_reconfigure
+carla_msgs
 )
 
 ## Generate messages in the 'msg' folder
