@@ -71,7 +71,7 @@ Teleop::Teleop(): m_throttle(0.0), m_brake(0.0), m_back(false), pub_rate(0.1)
     sub_twist = n.subscribe("/twist_cmd", 1, &Teleop::twistCallback, this);
     sub_odom = n.subscribe("/carla/ego_vehicle/odometry", 1, &Teleop::odomCallback, this);
     pub_twist = n.advertise<geometry_msgs::Twist>("/carla/ego_vehicle/twist_cmd", 1);
-    pub_vehicle_control = n.advertise<carla_msgs::CarlaEgoVehicleControl>("/carla/ego_vehicle/vehicle_control_cmd_manual", 1);
+    pub_vehicle_control = n.advertise<carla_msgs::CarlaEgoVehicleControl>("/carla/ego_vehicle/vehicle_control_cmd", 1);
     ros::Duration(1).sleep();
     timer = n.createTimer(ros::Duration(pub_rate), &Teleop::timerCallback, this);
 }
@@ -156,10 +156,11 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
 
         m_vehicle_cmd.header.stamp = ros::Time::now();
         m_vehicle_cmd.throttle = m_throttle;
-        m_vehicle_cmd.steer = in_joy.axes[0];
+        m_vehicle_cmd.steer = -in_joy.axes[0];
         m_vehicle_cmd.brake = m_brake;
         m_vehicle_cmd.reverse = m_back;
-        m_vehicle_cmd.gear = int(m_vehicle_cmd.manual_gear_shift + in_joy.buttons[4] - in_joy.buttons[5]) % 4 + 1;
+        m_vehicle_cmd.gear = 4;
+        // m_vehicle_cmd.gear = int(m_vehicle_cmd.manual_gear_shift + in_joy.buttons[4] - in_joy.buttons[5]) % 4 + 1;
     }
 }
 
@@ -244,7 +245,7 @@ float Teleop::calcOmega(const float current_vel, const float autonomous_omega, c
 {
     float max_angular = fabs(current_vel) * tan(max_wheel_angle * M_PI / 180) / 3.0;
     if (manual_omega == 0.0)
-        return (fabs(autonomous_omega) < max_angular) ? -autonomous_omega : (autonomous_omega < 0.0) ? max_angular : -max_angular;
+        return (fabs(autonomous_omega) < max_angular) ? autonomous_omega : (autonomous_omega < 0.0) ? max_angular : -max_angular;
     else
         return (fabs(manual_omega) < max_angular) ? manual_omega : (manual_omega < 0.0) ? -max_angular : max_angular;
 }

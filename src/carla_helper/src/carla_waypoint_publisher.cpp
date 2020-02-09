@@ -1,23 +1,26 @@
 #include <ros/ros.h>
-#include <nav_msgs/Path.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <tf/transform_broadcaster.h>
+#include <geometry_msgs/Pose.h>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <vector>
 
+#include <autoware_msgs/Lane.h>
+#include <autoware_msgs/LaneArray.h>
+#include <autoware_msgs/Waypoint.h>
+
 class WaypointPublisher
 {
 private:
 	ros::Publisher pub_waypoint;
-	
-	nav_msgs::Path path;
 
 public:
 	WaypointPublisher();
 
 private:
 	void readFile(const std::string &file_name);
+    geometry_msgs::Quaternion yawToQuat(float yaw);
 };
 
 
@@ -25,10 +28,10 @@ WaypointPublisher::WaypointPublisher()
 {
 	ros::NodeHandle n;
 
-	pub_waypoint = n.advertise<nav_msgs::Path>("/carla/ego_vehicle/waypoints", 1, true);
+	pub_waypoint = n.advertise<autoware_msgs::LaneArray>("/lane_waypoints_array", 1, true);
 
-	std::string file_name;
-	n.getParam("/file_name", file_name);
+	std::string file_name = "/home/mad-carla/share/Town05_waypoint_3.csv";
+	// n.getParam("/file_name", file_name);
 	std::cout << file_name << std::endl;
 	readFile(file_name);
 
@@ -37,10 +40,12 @@ WaypointPublisher::WaypointPublisher()
 
 void WaypointPublisher::readFile(const std::string &file_name)
 {
-	std::string in_line;
+	std::string line_buf;
 	std::ifstream ifs(file_name);
-	geometry_msgs::PoseStamped got_point;
 
+    autoware_msgs::LaneArray out_lane_array;
+    autoware_msgs::Lane out_lane;
+	autoware_msgs::Waypoint in_waypoint;
 
 	if(!ifs == 2)
 	{
@@ -49,34 +54,38 @@ void WaypointPublisher::readFile(const std::string &file_name)
 	}
 	ROS_INFO("read file");
 
-	std::getline(ifs, in_line);
-	std::cout << in_line << std::endl;
-	while (std::getline(ifs, in_line))
+	std::getline(ifs, line_buf);
+	while (std::getline(ifs, line_buf))
 	{
-		std::istringstream stream(in_line);
-		std::string value;
-		std::vector<std::string> got_line;
+        std::istringstream stream(line_buf);
+        std::vector<std::string> list_buf;
+        std::string value;
 
 		while (std::getline(stream, value, ','))
 		{
-			got_line.emplace_back(value);
+			list_buf.emplace_back(value);
 		}
 
-		got_point.pose.position.x = std::stof(got_line.at(4));
-		got_point.pose.position.y = std::stof(got_line.at(5));
-		got_point.pose.position.z = std::stof(got_line.at(6));
-		got_point.pose.orientation.x = std::stof(got_line.at(7));
-		got_point.pose.orientation.y = std::stof(got_line.at(8));
-		got_point.pose.orientation.z = std::stof(got_line.at(9));
-		got_point.pose.orientation.w = std::stof(got_line.at(10));
-
-		path.poses.push_back(got_point);
+		in_waypoint.pose.pose.position.x = std::stof(list_buf.at(0));
+		in_waypoint.pose.pose.position.y = std::stof(list_buf.at(1));
+		in_waypoint.pose.pose.position.z = std::stof(list_buf.at(2));
+        in_waypoint.pose.pose.orientation = yawToQuat(std::stof(list_buf.at(3)));
+		out_lane.waypoints.emplace_back(in_waypoint);
 	}
+    out_lane.header.stamp = ros::Time::now();
+    out_lane.header.frame_id = "map";
+    out_lane.lane_id = 1;
+    out_lane_array.lanes.emplace_back(out_lane);
+	pub_waypoint.publish(out_lane_array);
+}
 
-	path.header.stamp = ros::Time::now();
-	path.header.frame_id = "map";
-	ROS_INFO_STREAM(path);
-	pub_waypoint.publish(path);
+
+geometry_msgs::Quaternion WaypointPublisher::yawToQuat(const float yaw)
+{
+    tf::Quaternion tf_quat = tf::createQuaternionFromRPY(0.0, 0.0, yaw);
+    geometry_msgs::Quaternion msg_quat;
+    quaternionTFToMsg(tf_quat, msg_quat);
+    return msg_quat;
 }
 
 
