@@ -32,7 +32,7 @@ class SpawnActor(object):
         self.ego_vehicle = None
         self.scenario = None
         self.intrusion_thres = 3.0
-        self.trigger_index = 0
+        self.trigger_index = 1
         self.blueprintVehicles = None
         self.blueprintWalkers = None
         self.blueprintWalkerController = None
@@ -67,6 +67,7 @@ class SpawnActor(object):
                        + (ego_pose.location.y - trigger[0].text[1]) ** 2
 
             if distance < self.intrusion_thres:
+                print(self.trigger_index)
                 self.spawnActor(trigger.findall('spawn'))
                 self.moveActor(trigger.findall('move'))
                 self.killActor(trigger.findall('kill'))
@@ -289,19 +290,24 @@ class SpawnActor(object):
             self.blueprintWalkerController = self.world.get_blueprint_library().find('controller.ai.walker')
             self.scenario = self.readFile(args.scenario_file)
 
-            self.getEgoCar()
+            # self.getEgoCar()
+            self.spawnActor(self.scenario[0].findall('spawn'))
 
             while True:
                 self.world.wait_for_tick()
-                self.checkTrigger()
-                self.controlActor()
-                self.controlTrafficLight()
+                if self.ego_vehicle is None:
+                    self.getEgoCar()
+                else:
+                    self.checkTrigger()
+                    self.controlActor()
+                    self.controlTrafficLight()
+
                 time.sleep(0.1)
 
         finally:
             batch = []
             for carla_actor in self.world.get_actors():
-                if carla_actor.type_id.startswith("vehicle") or carla_actor.type_id.startswith("walker"):
+                if carla_actor.type_id.startswith("vehicle") or carla_actor.type_id.startswith("walker") or carla_actor.type_id.startswith("controller"):
                     if carla_actor.attributes.get('role_name') != 'ego_vehicle':
                         batch.append(carla.command.DestroyActor(carla_actor.id))
 

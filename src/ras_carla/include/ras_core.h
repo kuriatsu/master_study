@@ -16,6 +16,9 @@
 
 #include "carla_msgs/CarlaActorList.h"
 
+#include <dynamic_reconfigure/server.h>
+#include <ras_carla/rasConfig.h>
+
 class RasCore
 {
 private:
@@ -34,6 +37,10 @@ private:
     geometry_msgs::Twist ego_twist;
     int ego_id;
 
+    dynamic_reconfigure::Server<ras_carla::rasConfig> server;
+    dynamic_reconfigure::Server<ras_carla::rasConfig>::CallbackType server_callback;
+    bool m_conservative_recognition;
+
 public:
 	RasCore();
 
@@ -44,4 +51,5 @@ private:
     void containerManage();
     void calcDimension(ras_carla::RasObject &in_obj);
     void subShiftCallback(const ras_carla::RasObject &in_msg);
+    void callbackDynamicReconfigure(ras_carla::rasConfig &config, uint32_t lebel);
 };

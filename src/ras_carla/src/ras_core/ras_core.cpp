@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include "ras_core.h"
 
-RasCore::RasCore(): max_recognize_distance(50.0), min_recognize_distance(3.0), keep_time(2.0), min_recognize_vel(1.0)
+RasCore::RasCore()
 {
 	ros::NodeHandle n;
 
@@ -11,7 +11,21 @@ RasCore::RasCore(): max_recognize_distance(50.0), min_recognize_distance(3.0), k
     sub_odom = n.subscribe("/carla/ego_vehicle/odometry", 5, &RasCore::subOdomCallback, this);
     pub_obj = n.advertise<ras_carla::RasObjectArray>("/managed_objects", 5);
 	// pub_erase = n.advertise<std_msgs::Int32>("/erase_signal", 1);
+
+    server_callback = boost::bind(&RasCore::callbackDynamicReconfigure, this, _1, _2);
+    server.setCallback(server_callback);
+
     obj_map.clear();
+}
+
+
+void RasCore::callbackDynamicReconfigure(ras_carla::rasConfig &config, uint32_t lebel)
+{
+    m_conservative_recognition = config.conservative?true:false;
+    max_recognize_distance = config.max_recognize_distance;
+    min_recognize_distance = config.min_recognize_distance;
+    keep_time = config.keep_time;
+    min_recognize_vel = config.min_recognize_vel;
 }
 
 
@@ -114,7 +128,7 @@ void RasCore::calcDimension(ras_carla::RasObject &in_obj)
 {
     float movable_dist, movable_vel, safety_dist;
     float clipped_ego_vel = ego_twist.linear.x > min_recognize_vel ? ego_twist.linear.x : min_recognize_vel;
-    if(ego_twist.linear.x > min_recognize_vel)
+    if(ego_twist.linear.x > min_recognize_vel && m_conservative_recognition)
     {
 
         switch(in_obj.object.classification)

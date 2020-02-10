@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   derived_object_msgs
+  dynamic_reconfigure
   carla_msgs
 )
 
@@ -26,6 +27,11 @@ add_message_files(
 generate_messages(
     DEPENDENCIES
    	std_msgs derived_object_msgs geometry_msgs
+)
+
+## Generate dynamic reconfigure parameters in the 'cfg' folder
+generate_dynamic_reconfigure_options(
+cfg/ras.cfg
 )
 
 catkin_package(
@@ -54,7 +60,7 @@ target_link_libraries(ras_lib ${catkin_LIBRARIES})
 
 add_executable(ras_core_node src/ras_core/ras_core_node.cpp src/ras_core/ras_core.cpp)
 target_link_libraries(ras_core_node ras_lib ${catkin_LIBRARIES})
-add_dependencies(ras_core_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(ras_core_node ${catkin_EXPORTED_TARGETS} ras_gencfg)
 
 add_executable(ras_visualizer_node src/ras_visualizer/ras_visualizer_node.cpp src/ras_visualizer/ras_visualizer.cpp)
 target_link_libraries(ras_visualizer_node ras_lib ${catkin_LIBRARIES})

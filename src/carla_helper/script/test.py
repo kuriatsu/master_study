@@ -26,7 +26,7 @@ def main():
     # print(start)
     # get ego car
     for carla_actor in world.get_actors():
-        # print(carla_actor)
+        print(carla_actor)
         # if carla_actor.type_id.startswith("vehicle"):
         if carla_actor.attributes.get('role_name') == 'ego_vehicle':
             ego_vehicle = carla_actor
@@ -50,7 +50,7 @@ def main():
 
 
 
-    while True:
+    # while True:
 
     ##########################
     #### obrtain position ####
@@ -70,9 +70,9 @@ def main():
         # else:
         #     print('wrong key')
 
-        control = carla.WalkerControl(carla.Vector3D(-1.0,0.0,0.0), speed=3.5)
-        ego_vehicle.apply_control(control)
-        print(ego_vehicle.get_velocity())
+        # control = carla.WalkerControl(carla.Vector3D(-1.0,0.0,0.0), speed=3.5)
+        # ego_vehicle.apply_control(control)
+        # print(ego_vehicle.get_velocity())
 
 if __name__ == '__main__':
 
