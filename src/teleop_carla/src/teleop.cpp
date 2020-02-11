@@ -55,8 +55,9 @@ private:
     void odomCallback(const nav_msgs::Odometry &in_odom);
     void timerCallback(const ros::TimerEvent&);
     void callbackDynamicReconfigure(teleop_carla::teleopConfig &config, uint32_t lebel);
-    float calcVelChange(float current_vel, float autonomous_vel, float throttle, float brake, float natural_decel, float max_vel, float max_throttle, float max_decel);
-    float calcOmega(float current_vel, float autonomous_omega, float manual_omega, float max_wheel_angle );
+    void dynamicReconfigureUpdate();
+    float calcVelChange();
+    float calcOmega(float angular_vel);
 };
 
 
@@ -79,8 +80,8 @@ Teleop::Teleop(): m_throttle(0.0), m_brake(0.0), m_back(false), pub_rate(0.1)
 
 void Teleop::callbackDynamicReconfigure(teleop_carla::teleopConfig &config, uint32_t lebel)
 {
-    m_max_vel = config.max_speed;
-    m_max_wheel_angle = 90.0 - config.max_steer;
+    m_max_vel = config.max_speed / 3.6;
+    m_max_wheel_angle = config.max_steer;
     m_max_accel = config.acceleration_coefficient * 9.8 * pub_rate * 3.6;
     m_max_decel = config.deceleration_coefficient * 9.8 * pub_rate  * 3.6;
     m_natural_decel = config.natural_deceleration_coefficient * 9.8 * pub_rate  * 3.6;
@@ -90,13 +91,32 @@ void Teleop::callbackDynamicReconfigure(teleop_carla::teleopConfig &config, uint
     m_control_type = config.control_type;
 }
 
+
+void Teleop::dynamicReconfigureUpdate()
+{
+    teleop_carla::teleopConfig config;
+    config.max_speed = m_max_vel * 3.6;
+    config.max_steer = m_max_wheel_angle;
+    config.acceleration_coefficient = m_max_accel / (9.8 * pub_rate * 3.6);
+    config.deceleration_coefficient = m_max_decel / (9.8 * pub_rate  * 3.6);
+    config.natural_deceleration_coefficient = m_natural_decel / (9.8 * pub_rate  * 3.6);
+    config.autonomous_mode = m_autonomous_mode;
+    config.rosbag_flag = m_rosbag_flag;
+    config.controller = m_device_type;
+    config.control_type = m_control_type;
+
+    server.updateConfig(config);
+}
+
+
 void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
 {
     if (m_device_type == 0)
     {
         m_throttle = (1.0 - in_joy.axes[5]) * 0.5;
         m_brake = (1.0 - in_joy.axes[2]) * 0.5;
-        m_manual_omega = -m_current_twist.linear.x * tan((90.0 - m_max_wheel_angle) * in_joy.axes[0] * M_PI / 180) / 3.0;
+        m_manual_omega = -m_current_twist.linear.x * tan(m_max_wheel_angle * in_joy.axes[0] * M_PI / 180) / 3.0;
+        // m_manual_omega = -m_current_twist.linear.x * tan((90.0 - m_max_wheel_angle) * in_joy.axes[0] * M_PI / 180) / 3.0;
 
         if(in_joy.buttons[1] && fabs(m_current_twist.linear.x) < 2.0)
         {
@@ -107,13 +127,14 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
         if(in_joy.buttons[2])
         {
             m_autonomous_mode = !m_autonomous_mode;
+            dynamicReconfigureUpdate();
         }
 
         // START [7]
         if (in_joy.buttons[7])
         {
             m_rosbag_flag = !m_rosbag_flag;
-
+            dynamicReconfigureUpdate();
             if(!m_rosbag_flag)
             {
                 ROS_INFO("bag_record_on");
@@ -129,10 +150,14 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
     {
         m_throttle = (1.0 + in_joy.axes[2]) * 0.5;
         m_brake = (1.0 + in_joy.axes[3]) * 0.5;
-        m_manual_omega = -m_current_twist.linear.x * tan((90.0 - m_max_wheel_angle) * in_joy.axes[0] * M_PI / 180) / 3.0;
+        m_manual_omega = -m_current_twist.linear.x * tan(m_max_wheel_angle * in_joy.axes[0] * M_PI / 180) / 3.0;
+        // m_manual_omega = -m_current_twist.linear.x * tan((90.0 - m_max_wheel_angle) * in_joy.axes[0] * M_PI / 180) / 3.0;
 
         if(in_joy.buttons[3])
+        {
             m_autonomous_mode = !m_autonomous_mode;
+            dynamicReconfigureUpdate();
+        }
 
         if(in_joy.buttons[2] && !m_autonomous_mode)
         {
@@ -143,6 +168,7 @@ void Teleop::joyCallback(const sensor_msgs::Joy &in_joy)
         if (in_joy.buttons[1])
         {
             m_rosbag_flag = !m_rosbag_flag;
+            dynamicReconfigureUpdate();
             if(!m_rosbag_flag)
             {
                 ROS_INFO("bag_record_on");
@@ -182,14 +208,15 @@ void Teleop::odomCallback(const nav_msgs::Odometry &in_odom)
 
 void Teleop::timerCallback(const ros::TimerEvent&)
 {
-    if (m_autonomous_mode)
+    if (m_autonomous_mode || m_control_type == 0)
     {
         geometry_msgs::Twist out_twist;
-        float vel_change = calcVelChange(m_current_twist.linear.x, m_autoware_twist.linear.x, m_throttle, m_brake, m_natural_decel, m_max_vel,m_max_accel, m_max_decel);
+        float vel_change = calcVelChange();
 
         if (m_back)
             vel_change *= -1;
-            out_twist.linear.x = m_current_twist.linear.x + vel_change;
+
+        out_twist.linear.x = m_current_twist.linear.x + vel_change;
 
         if ((m_back && out_twist.linear.x > 0.0) || (!m_back && out_twist.linear.x < 0.0))
         {
@@ -197,7 +224,7 @@ void Teleop::timerCallback(const ros::TimerEvent&)
             out_twist.linear.x = 0.0;
         }
 
-        out_twist.angular.z = calcOmega(m_current_twist.linear.x, m_autoware_twist.angular.z, m_manual_omega, m_max_wheel_angle);
+        out_twist.angular.z = m_autonomous_mode ? calcOmega(m_autoware_twist.angular.z) : calcOmega(m_manual_omega);
         pub_twist.publish(out_twist);
         // m_autoware_twist.linear.x = 0.0;
     }
@@ -209,32 +236,31 @@ void Teleop::timerCallback(const ros::TimerEvent&)
 }
 
 
-float Teleop::calcVelChange(const float current_vel, const float autonomous_vel, const float throttle, const float brake, const float natural_decel, const float max_vel, const float max_accel, const float max_decel)
+float Teleop::calcVelChange()
 {
     float vel_change;
 
-    // when no manual override
-    if (brake == 0.0 && throttle == 0.0)
+    // when no pedal control
+    if (m_brake == 0.0 && m_throttle == 0.0 && !m_autonomous_mode)
     {
-        if (autonomous_vel == 0.0)
-            return -natural_decel;
-
-        else
-        {
-            vel_change = autonomous_vel - current_vel;
-            // cut velocity change with threshold
-            if (vel_change < -max_decel || max_accel < vel_change)
-            {
-                std::cout << "velchange over max" << std::endl;
-                return (vel_change > 0.0) ? max_accel : -max_decel;
-            }
-        }
+        return -m_natural_decel;
     }
-    // when manual override autonomous operation is ignored
+    else if (m_brake == 0.0 && m_throttle == 0.0 && m_autonomous_mode)
+    {
+        vel_change = m_autoware_twist.linear.x - m_current_twist.linear.x;
+    }
+    // when manual override
     else
-        vel_change = throttle * max_accel - brake * max_decel;
-
-    if (fabs(current_vel) > max_vel)
+    {
+        vel_change = m_throttle * m_max_accel - m_brake * m_max_decel;
+    }
+    // cut velocity change with threshold
+    if (vel_change < -m_max_decel || m_max_accel < vel_change)
+    {
+        std::cout << "velchange over max" << std::endl;
+        return (vel_change > 0.0) ? m_max_accel : -m_max_decel;
+    }
+    if (fabs(m_current_twist.linear.x) > m_max_vel)
     {
         std::cout << "vel is over max" << std::endl;
         return 0.0;
@@ -243,11 +269,12 @@ float Teleop::calcVelChange(const float current_vel, const float autonomous_vel,
 }
 
 
-float Teleop::calcOmega(const float current_vel, const float autonomous_omega, const float manual_omega, const float max_wheel_angle )
+float Teleop::calcOmega(const float angular_vel)
 {
-    float max_angular = fabs(current_vel) * tan(max_wheel_angle * M_PI / 180) / 3.0;
-    // return (fabs(autonomous_omega) < max_angular) ? autonomous_omega : (autonomous_omega < 0.0) ? -max_angular : max_angular;
-    return autonomous_omega;
+    float max_angular = fabs(m_current_twist.linear.x) * tan(m_max_wheel_angle * M_PI / 180) / 3.0;
+    std::cout <<  m_current_twist.linear.x << " : " << angular_vel << " : " << max_angular << std::endl;
+    return (fabs(angular_vel) < max_angular) ?  angular_vel : ( angular_vel < 0.0) ? -max_angular : max_angular;
+    // return autonomous_omega;
     // if (m_autonomous_mode)
     //     return (fabs(autonomous_omega) < max_angular) ? autonomous_omega : (autonomous_omega < 0.0) ? max_angular : -max_angular;
     // else

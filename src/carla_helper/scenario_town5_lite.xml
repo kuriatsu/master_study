@@ -238,6 +238,18 @@
         <move id="5">
             <speed>2.0</speed>
         </move>
+    </trigger>
+    <trigger id="2">
+        <location>139.328369141,-2.28178095818,0.0109937665984</location>
+        <move id="0">
+            <speed>4.0</speed>
+            <goal>112.466842651,10.5819349289,1.10365664959</goal>
+        </move>
+        <move id="1">
+            <speed>4.0</speed>
+            <goal>91.9000549316,10.2342824936,1.10389995575</goal>
+            <goal>91.4931793213,-9.86814117432,1.10179519653</goal>
+        </move>
         <move id="6">
             <speed>12.0</speed>
         </move>
@@ -252,18 +264,6 @@
         </move>
         <move id="10">
             <speed>12.0</speed>
-        </move>
-    </trigger>
-    <trigger id="2">
-        <location>147.949859619,-1.8595430851,0.0193662252277</location>
-        <move id="0">
-            <speed>4.0</speed>
-            <goal>112.466842651,10.5819349289,1.10365664959</goal>
-        </move>
-        <move id="1">
-            <speed>4.0</speed>
-            <goal>91.9000549316,10.2342824936,1.10389995575</goal>
-            <goal>91.4931793213,-9.86814117432,1.10179519653</goal>
         </move>
         <move id="21">
             <speed>2.0</speed>
@@ -385,13 +385,13 @@
             <speed>4.0</speed>
             <goal>-199.38269043,12.7455329895,1.15771591663</goal>
         </move>
+    </trigger>
+    <trigger id="8">
+        <location>-191.672866821,17.9044952393,0.0918678641319</location>
         <move id="57">
             <speed>2.0</speed>
             <goal>-198.593673706,45.9402046204,1.1593503952</goal>
         </move>
-    </trigger>
-    <trigger id="8">
-        <location>-191.823806763,25.6273975372,0.0979181826115</location>
         <kill id="42"/>
         <kill id="44"/>
         <kill id="45"/>
@@ -412,10 +412,6 @@
         <move id="76">
             <speed>12.0</speed>
         </move>
-        <move id="77">
-            <speed>12.0</speed>
-            <goal>-171.050354004,87.7529678345,-0.0136675639078</goal>
-        </move>
     </trigger>
     <trigger id="10">
         <location>-191.483917236,69.9509811401,0.0977389141917</location>
@@ -426,6 +422,10 @@
         <move id="73">
             <speed>2.0</speed>
             <goal>-178.25227356,99.8391113281,1.12149655819</goal>
+        </move>
+        <move id="77">
+            <speed>12.0</speed>
+            <goal>-171.050354004,87.7529678345,-0.0136675639078</goal>
         </move>
     </trigger>
     <trigger id="12">
