@@ -1,7 +1,9 @@
 derived_object_msgs/Object object
 float32 distance
-float32 shift_x
-float32 shift_y
+float32[] swipe
+bool touch
+bool is_interaction
 bool is_front
-bool is_just_back
+bool is_same_lane
 float32 importance
+geometry_msgs::Pose cross_point

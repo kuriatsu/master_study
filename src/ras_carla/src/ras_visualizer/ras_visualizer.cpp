@@ -38,6 +38,8 @@ void RasVisualizer::createInteractiveMarker(ras_carla::RasObject in_obj)
 {
     // for debag
     // std::cout <<"ss id is:" << in_obj.id << std::endl;
+
+
     std::stringstream ss;
     ss << in_obj.object.id;
 
