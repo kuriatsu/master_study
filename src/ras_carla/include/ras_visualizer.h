@@ -31,7 +31,8 @@ public:
 private:
         void subObjCallback(const ras_carla::RasObjectArray &in_obj_array);
         void shiftFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
-        void createInteractiveMarker(ras_carla::RasObject in_obj);
+        visualization_msgs::Marker createMarker(const ras_carla::RasObject &in_obj);
+        void createInteractiveMarker(ras_carla::RasObject &in_obj);
         void setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, ras_carla::RasObject in_obj);
         void setMarkerToMarkerControl(visualization_msgs::InteractiveMarkerControl &control, ras_carla::RasObject in_obj);
 };

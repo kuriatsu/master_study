@@ -1,9 +1,9 @@
 derived_object_msgs/Object object
 float32 distance
 float32[] swipe
-bool touch
+int32 touch
 bool is_interaction
 bool is_front
 bool is_same_lane
 float32 importance
-geometry_msgs::Pose cross_point
+int32[] cross_wp_list
