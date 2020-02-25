@@ -44,8 +44,8 @@ void RasAutowareConnector::subObjCallback(ras_carla::RasObjectArray in_obj_array
         // out_obj.pointcloud = in_obj.object.pose;
         out_obj.convex_hull = calcPolygon(in_obj);
         // pub_polygon.publish(out_obj.convex_hull);
-        out_obj.pose.position.x = in_obj.object.pose.position.x + in_obj.shift_x;
-        out_obj.pose.position.y = in_obj.object.pose.position.y + in_obj.shift_y;
+        out_obj.pose.position.x = in_obj.object.pose.position.x;
+        out_obj.pose.position.y = in_obj.object.pose.position.y;
         // out_obj.candidate_trajectories = in_obj.object.pose;
         out_obj.pose_reliable = true;
         out_obj.velocity_reliable = true;
@@ -76,68 +76,38 @@ geometry_msgs::PolygonStamped RasAutowareConnector::calcPolygon(ras_carla::RasOb
 
     polygon_stamped.header = in_obj.object.header;
 
-    switch(in_obj.object.classification)
+    int polygon_num_x = in_obj.object.shape.dimensions[0] / polygon_interval;
+    int polygon_num_y = in_obj.object.shape.dimensions[1] / polygon_interval;
+    double yaw = Ras::quatToYaw(in_obj.object.pose.orientation);
+
+    for (int i = 0; i < polygon_num_x; i++)
     {
-        case 4:
-        {
-            int polygon_num = (in_obj.object.shape.dimensions[0] * M_PI) / polygon_interval;
+        x = ( -in_obj.object.shape.dimensions[0] / 2 + polygon_interval * i );
+        y = ( in_obj.object.shape.dimensions[1] / 2 );
+        point.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x;
+        point.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y;
+        point.z = 0.0;
+        polygon_stamped.polygon.points.push_back(point);
 
-            for (int i = 0; i < polygon_num; i++)
-            {
-                x = in_obj.object.shape.dimensions[0] * 0.5 * cos(2 * M_PI * i / polygon_num);
-                y = in_obj.object.shape.dimensions[1] * 0.5 * sin(2 * M_PI * i / polygon_num);
-                // std::cout << "pol num" << i << "/" << polygon_num << std::endl;
-                // std::cout << "dimensions x:" << in_obj.object.shape.dimensions[0] << " y:" << in_obj.object.shape.dimensions[0] << std::endl;
-                point.x = x + in_obj.object.pose.position.x + in_obj.shift_x;
-                point.y = y + in_obj.object.pose.position.y + in_obj.shift_y;
-                // std::cout << "x:" << point.x << " y:" << point.y << std::endl;
-                point.z = 0.0;
-                polygon_stamped.polygon.points.push_back(point);
-            }
-            break;
-        }
-
-        case 6:
-        {
-            int polygon_num_x = in_obj.object.shape.dimensions[0] / polygon_interval;
-            int polygon_num_y = in_obj.object.shape.dimensions[1] / polygon_interval;
-            double yaw = Ras::quatToYaw(in_obj.object.pose.orientation);
-
-            for (int i = 0; i < polygon_num_x; i++)
-            {
-                x = ( -in_obj.object.shape.dimensions[0] / 2 + polygon_interval * i );
-                y = ( in_obj.object.shape.dimensions[1] / 2 );
-                point.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x + in_obj.shift_x;
-                point.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y + in_obj.shift_y;
-                point.z = 0.0;
-                polygon_stamped.polygon.points.push_back(point);
-
-                y = ( -in_obj.object.shape.dimensions[1] / 2 );
-                point.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x + in_obj.shift_x;
-                point.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y + in_obj.shift_y;
-                polygon_stamped.polygon.points.push_back(point);
-            }
-
-            for (int i = 0; i < polygon_num_y; i++)
-            {
-                x = ( in_obj.object.shape.dimensions[0] / 2 );
-                y = ( -in_obj.object.shape.dimensions[1] / 2 + polygon_interval * i );
-                point.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x + in_obj.shift_x;
-                point.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y + in_obj.shift_y;
-                point.z = 0.0;
-                polygon_stamped.polygon.points.push_back(point);
-
-                x = ( -in_obj.object.shape.dimensions[0] / 2 );
-                point.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x + in_obj.shift_x;
-                point.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y + in_obj.shift_y;
-                polygon_stamped.polygon.points.push_back(point);
-            }
-            break;
-        }
-
-        default:
-        break;
+        y = ( -in_obj.object.shape.dimensions[1] / 2 );
+        point.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x;
+        point.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y;
+        polygon_stamped.polygon.points.push_back(point);
     }
 
+    for (int i = 0; i < polygon_num_y; i++)
+    {
+        x = ( in_obj.object.shape.dimensions[0] / 2 );
+        y = ( -in_obj.object.shape.dimensions[1] / 2 + polygon_interval * i );
+        point.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x;
+        point.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y;
+        point.z = 0.0;
+        polygon_stamped.polygon.points.push_back(point);
+
+        x = ( -in_obj.object.shape.dimensions[0] / 2 );
+        point.x = x * cos( 2 * M_PI + yaw ) - y * sin( 2 * M_PI + yaw ) + in_obj.object.pose.position.x;
+        point.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y;
+        polygon_stamped.polygon.points.push_back(point);
+    }
     return polygon_stamped;
 }

@@ -21,6 +21,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <unordered_map>
 #include <math.h>
+#include <typeinfo>
 
 class RasCore
 {
@@ -44,8 +45,8 @@ private:
     geometry_msgs::Twist m_ego_twist;
     int m_ego_id;
     std::vector<geometry_msgs::Pose> m_wps_vec;
-    auto m_itr_of_ego_wp;
-    auto m_itr_of_stoppable_wp;
+    int m_ego_wp;
+    int m_brakable_wp;
     float m_wp_interval;
 
     dynamic_reconfigure::Server<ras_carla::rasConfig> server;
@@ -60,7 +61,7 @@ private:
 	void subActorCallback(const carla_msgs::CarlaActorList &in_actor_list);
     void subOdomCallback(const nav_msgs::Odometry &in_odom);
     void subObjCallback(const derived_object_msgs::ObjectArray &in_obj_array);
-    std::list<int> setCrossWp(ras_carla::RasObject &obj);
+    std::vector<int> setCrossWp(ras_carla::RasObject &obj);
     void takeAttendance();
     void subShiftCallback(const ras_carla::RasObject &in_msg);
 };

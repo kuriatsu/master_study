@@ -7,6 +7,7 @@ int main(int argc, char **argv)
 
 	ROS_INFO("initialized detector");
 	RasCore ras_core;
+    ROS_INFO("start spin");
 
 	ros::spin();
 	return 0;

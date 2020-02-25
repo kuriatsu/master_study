@@ -3,7 +3,7 @@
 
 boost::shared_ptr<interactive_markers::InteractiveMarkerServer> server;
 
-RasVisualizer::RasVisualizer(): marker_scale(1.0), marker_vertical_shrink_rate(0.1)
+RasVisualizer::RasVisualizer(): marker_scale(1.0)
 {
 	ros::NodeHandle n;
     server.reset(new interactive_markers::InteractiveMarkerServer("ras_visualizer_node"));
@@ -11,8 +11,8 @@ RasVisualizer::RasVisualizer(): marker_scale(1.0), marker_vertical_shrink_rate(0
     sub_obj = n.subscribe("/managed_objects", 5, &RasVisualizer::subObjCallback, this);
 	// sub_vehicle_info = n.subscribe("/ego_vehicle/", 5, &RasVisualizer::subVehicleInfoCallback, this);
 	// sub_erase_signal = n.subscribe("/erase_signal", 5, &RasVisualizer::erase_signal_callback, this);
-    pub_shift = n.advertise<ras_carla::RasObject>("/control_info", 5);
-	pub_marker = n.advertise<visualization_msgs::MarkerArray>("/feedback_info", 5);
+    pub_fb_obj = n.advertise<ras_carla::RasObject>("/feedback_info", 5);
+	pub_marker = n.advertise<visualization_msgs::MarkerArray>("/ras_marker", 5);
 }
 
 
@@ -34,18 +34,18 @@ void RasVisualizer::subObjCallback(const ras_carla::RasObjectArray &in_obj_array
         }
         else
         {
-            marker_array.emplace_back(createMarker(itr));
+            marker_array.markers.emplace_back(createMarker(itr));
         }
     }
     server->applyChanges();
     pub_marker.publish(marker_array);
 }
 
-visualization_msgs::Marker RasVisualizer::createMarker(ras_carla::RasObject &in_obj)
+visualization_msgs::Marker RasVisualizer::createMarker(const ras_carla::RasObject &in_obj)
 {
     visualization_msgs::Marker marker;
 
-    marker.header = in_msgs.object.header;
+    marker.header = in_obj.object.header;
     marker.ns = "ras";
     marker.id = in_obj.object.id;
 
@@ -69,7 +69,7 @@ visualization_msgs::Marker RasVisualizer::createMarker(ras_carla::RasObject &in_
     marker.color.b = 0;
     marker.color.a = 0.3;
 
-    marker.lifetime = ros::duration(0.1);
+    marker.lifetime = ros::Duration(0.1);
     return marker;
 }
 
@@ -87,21 +87,13 @@ void RasVisualizer::createInteractiveMarker(ras_carla::RasObject &in_obj)
 	int_marker.name = ss.str();
 	int_marker.scale = marker_scale;
     int_marker.pose = in_obj.object.pose;
-    int_marker.pose.position.x = in_obj.object.pose.position.x + in_obj.shift_x;
-    int_marker.pose.position.y = in_obj.object.pose.position.y + in_obj.shift_y;
-    if(in_obj.object.classification == 4)
-    {
-        int_marker.pose.position.z = in_obj.object.pose.position.z - in_obj.object.shape.dimensions[2] * (1 - marker_vertical_shrink_rate) * 0.5;
-    }
-    else if (in_obj.object.classification == 6)
-    {
-        int_marker.pose.position.z = in_obj.object.pose.position.z;
-    }
+    int_marker.pose.position.x = in_obj.object.pose.position.x;
+    int_marker.pose.position.y = in_obj.object.pose.position.y;
 
     setMarkerControl(int_marker, in_obj);
 
 	server->insert(int_marker);
-	server->setCallback(int_marker.name, boost::bind(&RasVisualizer::shiftFeedback, this, _1));
+	server->setCallback(int_marker.name, boost::bind(&RasVisualizer::intMarkerCallback, this, _1));
 }
 
 
@@ -127,7 +119,7 @@ void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMark
     marker.type = visualization_msgs::Marker::CUBE;
     marker.scale.x = marker_scale*in_obj.object.shape.dimensions[0];
     marker.scale.y = marker_scale*in_obj.object.shape.dimensions[1];
-    marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2] * marker_vertical_shrink_rate;
+    marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2];
 
     marker.color.r = 1;
     marker.color.g = 0;
@@ -139,11 +131,11 @@ void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMark
 }
 
 
-void RasVisualizer::shiftFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
+void RasVisualizer::intMarkerCallback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
 {
     ras_carla::RasObject feedback_obj;
     std::istringstream sis;
 
     std::istringstream(feedback->marker_name) >> feedback_obj.object.id;
-    pub_shift.publish(feedback_obj);
+    pub_fb_obj.publish(feedback_obj);
 }

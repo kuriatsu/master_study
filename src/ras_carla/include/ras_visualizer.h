@@ -4,6 +4,7 @@
 #include <tf/transform_listener.h>
 
 #include <interactive_markers/interactive_marker_server.h>
+#include <visualization_msgs/MarkerArray.h>
 #include <cmath>
 
 #include "ras_carla/RasObject.h"
@@ -19,10 +20,11 @@ private:
         ros::Subscriber sub_obj;
         // ros::Subscriber sub_erase_signal;
         // ros::Subscriber sub_vehicle_info;
-        ros::Publisher pub_shift;
+        ros::Publisher pub_fb_obj;
+        ros::Publisher pub_marker;
         std::vector<uint32_t> id_vec;
         float marker_scale;
-        float marker_vertical_shrink_rate;
+        // float marker_vertical_shrink_rate;
 public:
     RasVisualizer();
 	~RasVisualizer();
@@ -30,7 +32,7 @@ public:
 
 private:
         void subObjCallback(const ras_carla::RasObjectArray &in_obj_array);
-        void shiftFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
+        void intMarkerCallback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
         visualization_msgs::Marker createMarker(const ras_carla::RasObject &in_obj);
         void createInteractiveMarker(ras_carla::RasObject &in_obj);
         void setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, ras_carla::RasObject in_obj);
