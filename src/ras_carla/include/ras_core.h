@@ -40,7 +40,7 @@ private:
     bool m_conservative_recognition;
 
     std::unordered_map<int, ras_carla::RasObject> m_obj_map;
-    std::unordered_map<int, std::vector<int>> m_wp_obj_map;
+    std::map<int, std::vector<int>> m_wp_obj_map;
     geometry_msgs::Pose m_ego_pose;
     geometry_msgs::Twist m_ego_twist;
     int m_ego_id;
@@ -61,7 +61,9 @@ private:
 	void subActorCallback(const carla_msgs::CarlaActorList &in_actor_list);
     void subOdomCallback(const nav_msgs::Odometry &in_odom);
     void subObjCallback(const derived_object_msgs::ObjectArray &in_obj_array);
-    std::vector<int> setCrossWp(ras_carla::RasObject &obj);
-    void takeAttendance();
+    std::vector<int> findWpOfObj(ras_carla::RasObject &obj);
+    void manageMarkers();
     void subShiftCallback(const ras_carla::RasObject &in_msg);
+    void calcOccupancyWp(const std::vector<int> &in_wp_vec, const ras_carla::RasObject &in_obj);
+    bool isCollideObstacle(const ras_carla::RasObject &in_obj, const int &wp);
 };

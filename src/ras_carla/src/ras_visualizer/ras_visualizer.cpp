@@ -56,16 +56,16 @@ visualization_msgs::Marker RasVisualizer::createMarker(const ras_carla::RasObjec
     marker.scale.y = marker_scale*in_obj.object.shape.dimensions[1];
     marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2];
 
-    if (marker.id == 0)
-    {
-        marker.color.r = 1;
-        marker.color.g = 0;
-    }
-    else
-    {
-        marker.color.r = 0;
-        marker.color.g = 1;
-    }
+    if (!in_obj.is_important)
+	{
+		marker.color.r = 1;
+		marker.color.g = 0;
+	}
+	else
+	{
+		marker.color.r = 0;
+		marker.color.g = 1;
+	}
     marker.color.b = 0;
     marker.color.a = 0.3;
 
@@ -121,7 +121,7 @@ void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMark
     marker.scale.y = marker_scale*in_obj.object.shape.dimensions[1];
     marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2];
 
-	if (!in_obj.touch)
+	if (!in_obj.is_important)
 	{
 		marker.color.r = 1;
 		marker.color.g = 0;

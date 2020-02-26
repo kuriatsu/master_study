@@ -28,11 +28,16 @@ geometry_msgs::Pose Ras::tfTransformer(const geometry_msgs::Pose &current_pose, 
     return transformed_pose;
 }
 
-double Ras::quatToYaw(const geometry_msgs::Quaternion in_quat)
+double Ras::quatToYaw(const geometry_msgs::Quaternion &in_quat)
 {
     double roll, pitch, yaw;
 
     tf::Quaternion tf_quat(in_quat.x, in_quat.y, in_quat.z, in_quat.w);
     tf::Matrix3x3(tf_quat).getRPY(roll, pitch, yaw);
     return yaw;
+}
+
+float Ras::calcDistOfPoints(const geometry_msgs::Point &p_1, const geometry_msgs::Point &p_2)
+{
+    return sqrt(pow(p_1.x - p_2.x, 2) + pow(p_1.y - p_2.y, 2));
 }
