@@ -35,6 +35,6 @@ private:
         void intMarkerCallback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
         visualization_msgs::Marker createMarker(const ras_carla::RasObject &in_obj);
         void createInteractiveMarker(ras_carla::RasObject &in_obj);
-        void setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, ras_carla::RasObject in_obj);
-        void setMarkerToMarkerControl(visualization_msgs::InteractiveMarkerControl &control, ras_carla::RasObject in_obj);
+        void setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, const ras_carla::RasObject &in_obj);
+        void setMarkerToMarkerControl(visualization_msgs::InteractiveMarkerControl &control, const ras_carla::RasObject &in_obj);
 };

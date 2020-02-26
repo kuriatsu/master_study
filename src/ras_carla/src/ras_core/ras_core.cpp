@@ -109,7 +109,7 @@ void RasCore::subObjCallback(const derived_object_msgs::ObjectArray &in_obj_arra
 			selected_obj.distance = ras_obj.distance;
 			// selected_obj.is_front = (in_obj_pose.position.x > 0.5) ? true : false;
 			// selected_obj.is_same_lane = (fabs(in_obj_pose.position.y) > 0.5) ? true : false;
-            selected_obj.cross_wp_list = setCrossWp(selected_obj);
+            setCrossWp(selected_obj);
             std::cout << "map obj:" << e.id << "," << selected_obj.cross_wp_list[0] << std::endl;
 		}
 	}
@@ -117,7 +117,7 @@ void RasCore::subObjCallback(const derived_object_msgs::ObjectArray &in_obj_arra
 }
 
 
-std::vector<int> RasCore::setCrossWp(ras_carla::RasObject &in_obj)
+RasCore::setCrossWp(ras_carla::RasObject &in_obj)
 {
     std::vector<int> cross_wp_list;
 
@@ -206,7 +206,7 @@ std::vector<int> RasCore::setCrossWp(ras_carla::RasObject &in_obj)
         }
     }
     std::sort(cross_wp_list.begin(), cross_wp_list.end());
-    return cross_wp_list;
+    in_obj.cross_wp_list.emplace_back(cross_wp_list);
 }
 
 
@@ -216,9 +216,9 @@ void RasCore::takeAttendance()
 	std::vector<int> erase_key_vec, critical_obj_id_vec;
 	ras_carla::RasObjectArray obj_array;
     ras_carla::RasObject wall;
-    int min_dist_of_wp_from_ego = m_wps_vec.size(), dist_of_wp_from_ego, closest_wp;
+    int min_dist = m_wps_vec.size(), dist, closest_wp;
 
-	for(const auto &e : m_obj_map)
+	for (const auto &e : m_obj_map)
 	{
 		// erace old object
         // ROS_INFO("get erase key");
@@ -229,21 +229,21 @@ void RasCore::takeAttendance()
 		}
 
         // get closest stop waypoint and effective obstacles
-        for (size_t i = e.second.touch; i < e.second.cross_wp_list.size(); i++)
+        for (size_t i = 0; i < e.second.cross_wp_list.size(); i++)
         {
             // std::cout << "cross wp list size : " << e.second.cross_wp_list.size() << "index : " << i << std::endl;
-            dist_of_wp_from_ego = e.second.cross_wp_list[i] - m_ego_wp;
+            dist = e.second.cross_wp_list[i] - m_ego_wp;
             // if closer waypoint is found, clear vector and insert new one
-            if (dist_of_wp_from_ego < min_dist_of_wp_from_ego)
+            if (0 < dist_of_wp_ego && dist < min_dist)
             {
                 critical_obj_id_vec.clear();
-                min_dist_of_wp_from_ego = dist_of_wp_from_ego;
+                min_dist = dist;
                 critical_obj_id_vec.emplace_back(e.second.object.id);
                 closest_wp = e.second.cross_wp_list[i];
                 // std::cout << e.first << ", " <<  closest_wp << std::endl;
             }
             // if critical obstacle is found at second time, add it to vector
-            else if (dist_of_wp_from_ego == min_dist_of_wp_from_ego)
+            else if (dist == min_dist)
             {
                 critical_obj_id_vec.emplace_back(e.first);
             }
@@ -271,7 +271,7 @@ void RasCore::takeAttendance()
     // finally add wall
     wall.object.header.stamp = ros::Time::now();
     wall.object.header.frame_id = "map";
-    wall.object.id = 8888;
+    wall.object.id = 0;
     wall.object.pose = m_wps_vec[closest_wp];
     wall.object.shape.type = shape_msgs::SolidPrimitive::BOX;
     wall.object.shape.dimensions.emplace_back(0.1);
@@ -295,7 +295,7 @@ void RasCore::subShiftCallback(const ras_carla::RasObject &in_msg)
 	{
         ras_carla::RasObject &obj = m_obj_map[id];
 		std::cout << "touched" << std::endl;
-        obj.touch ++;
+        obj.touch_num ++;
 		takeAttendance();
 	}
 }
