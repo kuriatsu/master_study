@@ -32,8 +32,8 @@ private:
     ros::Subscriber sub_shift;
 	ros::Subscriber sub_odom;
     ros::Subscriber sub_trajectory;
-    ros::Publisher pub_point_cross;
-    ros::Publisher pub_point_close;
+    ros::Publisher pub_wp_cross;
+    ros::Publisher pub_wp_obj;
 
     int m_keep_time;
     float m_max_vision;
@@ -69,4 +69,5 @@ private:
     void calcOccupancyWp(const std::vector<int> &in_wp_vec, const ras_carla::RasObject &in_obj);
     bool isCollideObstacle(const ras_carla::RasObject &in_obj, const int &wp);
     int findWallWp(std::vector<int> &critical_obj_id_vec);
+    void pubOccupancyWp(const geometry_msgs::Point &in_pose, const int &type);
 };

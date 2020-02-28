@@ -5,10 +5,12 @@
 
 #include <interactive_markers/interactive_marker_server.h>
 #include <visualization_msgs/MarkerArray.h>
+#include <jsk_rviz_plugins/PictogramArray.h>
 #include <cmath>
 
 #include "ras_carla/RasObject.h"
 #include "ras_carla/RasObjectArray.h"
+#include "ras_lib.h"
 #include "ras_visualizer.h"
 // #include "std_msgs/Int32.h"
 
@@ -22,6 +24,7 @@ private:
         // ros::Subscriber sub_vehicle_info;
         ros::Publisher pub_fb_obj;
         ros::Publisher pub_marker;
+        ros::Publisher pub_pictgram;
         std::vector<uint32_t> id_vec;
         float marker_scale;
         // float marker_vertical_shrink_rate;
@@ -37,4 +40,5 @@ private:
         void createInteractiveMarker(ras_carla::RasObject &in_obj);
         void setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, const ras_carla::RasObject &in_obj);
         void setMarkerToMarkerControl(visualization_msgs::InteractiveMarkerControl &control, const ras_carla::RasObject &in_obj);
+        jsk_rviz_plugins::Pictogram createPictogram(const ras_carla::RasObject &in_obj, const int &type);
 };

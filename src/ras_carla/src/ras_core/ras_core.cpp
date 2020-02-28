@@ -15,8 +15,8 @@ RasCore::RasCore(): m_ego_wp(0)
     sub_carla_obj = n.subscribe("/carla/objects", 1, &RasCore::subObjCallback, this);
 	sub_shift = n.subscribe("/feedback_info", 10, &RasCore::subShiftCallback, this);
 	pub_obj = n.advertise<ras_carla::RasObjectArray>("/managed_objects", 5);
-    pub_point_close = n.advertise<geometry_msgs::PointStamped>("/closed_wp", 5);
-    pub_point_cross = n.advertise<geometry_msgs::PointStamped>("/crossed_wp", 5);
+    pub_wp_obj = n.advertise<geometry_msgs::PointStamped>("/obj_wp", 5);
+    pub_wp_cross = n.advertise<geometry_msgs::PointStamped>("/crossed_wp", 5);
 	// pub_erase = n.advertise<std_msgs::Int32>("/erase_signal", 1);
 
 	m_obj_map.clear();
@@ -121,6 +121,7 @@ void RasCore::subObjCallback(const derived_object_msgs::ObjectArray &in_obj_arra
 			selected_obj.object = ras_obj.object;
 			selected_obj.distance = ras_obj.distance;
             selected_obj.is_interaction = true;
+            selected_obj.is_important = false;
 			// selected_obj.is_front = (in_obj_pose.position.x > 0.5) ? true : false;
 			// selected_obj.is_same_lane = (fabs(in_obj_pose.position.y) > 0.5) ? true : false;
             calcOccupancyWp(findWpOfObj(selected_obj), selected_obj);
@@ -157,12 +158,7 @@ std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
             }
             // std::cout << "obj_id : " << in_obj.object.id << " wp : " << obj_wp << "close" << std::endl;
             wp_vec.emplace_back(obj_wp);
-
-            geometry_msgs::PointStamped point;
-            point.point = m_wps_vec[obj_wp].position;
-            point.header.stamp = ros::Time::now();
-            point.header.frame_id = "map";
-            pub_point_close.publish(point);
+            pubOccupancyWp(m_wps_vec[obj_wp].position, 0);
 
             // find vertical way of the object from the way to the closest waypoint
             obj_vec_x = m_wps_vec[obj_wp].position.x - in_obj.object.pose.position.x;
@@ -188,11 +184,7 @@ std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
                     {
                         // std::cout << "obj_id : " << in_obj.object.id << " wp : " << cross_wp << "cross" << std::endl;
                         wp_vec.emplace_back(cross_wp);
-                        geometry_msgs::PointStamped point;
-                        point.point = m_wps_vec[cross_wp].position;
-                        point.header.stamp = ros::Time::now();
-                        point.header.frame_id = "map";
-                        pub_point_cross.publish(point);
+                        pubOccupancyWp(m_wps_vec[cross_wp].position, 1);
                     }
                 }
             }
@@ -215,14 +207,8 @@ std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
                 dist_of_wp_obj = sqrt(pow(obj_wp_vec_x, 2) + pow(obj_wp_vec_y, 2));
                 if (inner_prod > 1.0 * dist_of_wp_obj * 0.99)
                 {
-                    // std::cout << "car cross wp added"  << in_obj.object.id<< std::endl;
                     wp_vec.emplace_back(std::distance(m_wps_vec.begin(), itr));
-                    geometry_msgs::PointStamped point;
-                    point.point = m_wps_vec[std::distance(m_wps_vec.begin(), itr)].position;
-                    point.header.stamp = ros::Time::now();
-                    point.header.frame_id = "map";
-                    pub_point_cross.publish(point);
-                    // std::cout << "obj_id : " << in_obj.object.id << " wp : " << std::distance(m_wps_vec.begin(), itr) << "cross car" << std::endl;
+                    pubOccupancyWp(m_wps_vec[std::distance(m_wps_vec.begin(), itr)].position, 1);
                     break;
                 }
             }
@@ -251,17 +237,6 @@ bool RasCore::isCollideObstacle(const ras_carla::RasObject &in_obj, const int &w
             return (dist_of_wp_ego > 0 && dist_of_wp_obj / in_obj.object.twist.linear.x < dist_of_wp_ego / m_ego_twist.linear.x);
             break;
     }
-    // if (in_obj.object.classification == 4)
-    // {
-    //     // if (dist_of_wp_obj < dist_of_wp_ego && dist_of_wp_obj / in_obj.object.twist.linear.x < dist_of_wp_ego / m_ego_twist.linear.x) return true;
-    //     // else return false;
-    // }
-    //
-    // else if (in_obj.object.classification == 6)
-    // {
-    //     if (dist_of_wp_ego > 0 && dist_of_wp_obj / in_obj.object.twist.linear.x < dist_of_wp_ego / m_ego_twist.linear.x) return true;
-    //     else return false;
-    // }
 }
 
 
@@ -309,28 +284,26 @@ void RasCore::manageMarkers()
 
 	for (auto &e : m_obj_map)
 	{
-        std::cout << "1" << std::endl;
 		// erace old object
 		if ((ros::Time::now() - e.second.object.header.stamp) > ros::Duration(m_keep_time))
 		{
             erase_key_vec.emplace_back(e.first);
             continue;
 		}
-        std::cout << "2" << std::endl;
 
-        e.second.is_important = (std::find(critical_obj_id_vec.begin(), critical_obj_id_vec.end(), e.first) != critical_obj_id_vec.end() ) ? true : false;
-        std::cout << "3" << std::endl;
+        if (std::find(critical_obj_id_vec.begin(), critical_obj_id_vec.end(), e.first) != critical_obj_id_vec.end())
+        {
+            e.second.is_important = true;
+            e.second.is_interaction = true;
+        }
         obj_array.objects.emplace_back(e.second);
 	}
-    std::cout << "4" << std::endl;
 
     // erace old object
     for (const auto &e : erase_key_vec)
     {
         m_obj_map.erase(e);
     }
-    std::cout << "6" << std::endl;
-
     std::cout << wall_wp << std::endl;
     if (wall_wp != 0)
     {
@@ -347,7 +320,6 @@ void RasCore::manageMarkers()
         wall.is_important = true;
         obj_array.objects.emplace_back(wall);
     }
-    std::cout << "7" << std::endl;
 
     // publish
 	obj_array.header.stamp = ros::Time::now();
@@ -356,6 +328,24 @@ void RasCore::manageMarkers()
 }
 
 
+void RasCore::pubOccupancyWp(const geometry_msgs::Point &in_pose, const int &type)
+{
+    geometry_msgs::PointStamped point;
+    point.point = in_pose;
+    point.header.stamp = ros::Time::now();
+    point.header.frame_id = "map";
+
+    switch (type)
+    {
+        case 0:
+            pub_wp_obj.publish(point);
+            break;
+        case 1:
+            pub_wp_cross.publish(point);
+            break;
+    }
+}
+
 void RasCore::subShiftCallback(const ras_carla::RasObject &in_msg)
 {
 	int id = in_msg.object.id;
@@ -363,8 +353,8 @@ void RasCore::subShiftCallback(const ras_carla::RasObject &in_msg)
 	{
         ras_carla::RasObject &obj = m_obj_map[id];
 		std::cout << "touched id : " << std::endl;
-
-        obj.is_touched = !obj.is_touched;
+        if (obj.is_important) obj.is_touched = true;
+        else obj.is_touched = false;
 		// manageMarkers();
 	}
 }

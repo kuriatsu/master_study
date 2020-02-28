@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   tf
   autoware_msgs
+  jsk_rviz_plugins
 )
 
 ## Generate messages in the 'msg' folder
@@ -74,3 +75,6 @@ target_link_libraries(fake_ndt_node ${catkin_LIBRARIES})
 
 add_executable(carla_waypoint_publisher_node src/carla_waypoint_publisher.cpp)
 target_link_libraries(carla_waypoint_publisher_node ${catkin_LIBRARIES})
+
+add_executable(test_node src/test.cpp)
+target_link_libraries(test_node ${catkin_LIBRARIES})

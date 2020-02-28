@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   derived_object_msgs
   dynamic_reconfigure
   carla_msgs
+  jsk_rviz_plugins
 )
 
 ## Generate messages in the 'msg' folder

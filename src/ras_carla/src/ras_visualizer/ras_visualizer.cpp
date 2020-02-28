@@ -13,6 +13,7 @@ RasVisualizer::RasVisualizer(): marker_scale(1.0)
 	// sub_erase_signal = n.subscribe("/erase_signal", 5, &RasVisualizer::erase_signal_callback, this);
     pub_fb_obj = n.advertise<ras_carla::RasObject>("/feedback_info", 5);
 	pub_marker = n.advertise<visualization_msgs::MarkerArray>("/ras_marker", 5);
+    pub_pictgram = n.advertise<jsk_rviz_plugins::PictogramArray>("pictogram", 5);
 }
 
 
@@ -25,20 +26,31 @@ void RasVisualizer::subObjCallback(const ras_carla::RasObjectArray &in_obj_array
 {
     server->clear();
     visualization_msgs::MarkerArray marker_array;
+    jsk_rviz_plugins::PictogramArray pictogram_array;
     // ROS_INFO("visualezer subscribed");
-    for (auto itr : in_obj_array.objects)
+    for (auto e : in_obj_array.objects)
     {
-        if (itr.is_interaction)
+        if (e.is_interaction)
         {
-            createInteractiveMarker(itr);
+            createInteractiveMarker(e);
+            if (e.is_important)
+            {
+                pictogram_array.pictograms.emplace_back(createPictogram(e, jsk_rviz_plugins::Pictogram::PICTOGRAM_MODE));
+                pictogram_array.pictograms.emplace_back(createPictogram(e, 1));
+                pictogram_array.pictograms.emplace_back(createPictogram(e, 2));
+
+            }
         }
         else
         {
-            marker_array.markers.emplace_back(createMarker(itr));
+            marker_array.markers.emplace_back(createMarker(e));
         }
     }
+    pictogram_array.header.frame_id = "map";
+    pictogram_array.header.stamp = ros::Time::now();
     server->applyChanges();
     pub_marker.publish(marker_array);
+    pub_pictgram.publish(pictogram_array);
 }
 
 visualization_msgs::Marker RasVisualizer::createMarker(const ras_carla::RasObject &in_obj)
@@ -138,6 +150,84 @@ void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMark
     control.markers.push_back(marker);
 }
 
+
+jsk_rviz_plugins::Pictogram RasVisualizer::createPictogram(const ras_carla::RasObject &in_obj, const int &type)
+{
+    jsk_rviz_plugins::Pictogram pictogram;
+    geometry_msgs::Pose arrow_pose;
+    float arrow_len;
+    std::map <int, std::string> message
+    {
+        {4,"fa-user"},
+        {6, "fa-car"}
+    };
+
+    pictogram.header.stamp = ros::Time::now();
+    pictogram.color.a = 1.0;
+    pictogram.ttl = 10;
+
+    switch (type)
+    {
+        case 0:
+            pictogram.header.frame_id = "map";
+            pictogram.pose.position = in_obj.object.pose.position;
+            pictogram.pose.position.z += 2.0;
+            pictogram.pose.orientation.x = 0.0;
+            pictogram.pose.orientation.y = 1.0;
+            pictogram.pose.orientation.z = 0.0;
+            pictogram.pose.orientation.w = -1.0;
+            pictogram.color.r = 1.0;
+            pictogram.color.g = 0.5;
+            pictogram.color.b = 0.5;
+            pictogram.action = jsk_rviz_plugins::Pictogram::JUMP;
+            pictogram.mode = type;
+            pictogram.character = "fa-angle-double-down";
+            pictogram.speed = 5;
+            pictogram.size = 3;
+            break;
+
+        case 1:
+            pictogram.header.frame_id = "map";
+            pictogram.pose.position = in_obj.object.pose.position;
+            pictogram.pose.position.z += 5.0;
+            pictogram.pose.orientation.x = 0.0;
+            pictogram.pose.orientation.y = 1.0;
+            pictogram.pose.orientation.z = 0.0;
+            pictogram.pose.orientation.w = -1.0;
+            pictogram.color.r = 1.0;
+            pictogram.color.g = 1.0;
+            pictogram.color.b = 1.0;
+            pictogram.action = jsk_rviz_plugins::Pictogram::ADD;
+            pictogram.mode = 0;
+            pictogram.character = message[in_obj.object.classification];
+            pictogram.size = 6;
+            // pictogram.character = message[in_obj.object.classification];
+            break;
+        case 2:
+            pictogram.header.frame_id = "base_link";
+            geometry_msgs::Pose arrow_pose = in_obj.object.pose;
+            arrow_pose.position.x += 10.0;
+            arrow_pose = Ras::tfTransformer(arrow_pose, in_obj.object.header.frame_id, "base_link");
+            arrow_len = sqrt(pow(arrow_pose.position.x, 2) + pow(arrow_pose.position.y, 2));
+            pictogram.pose.orientation.x = 0.0;
+            pictogram.pose.orientation.y = 0.0;
+            pictogram.pose.orientation.z = -arrow_pose.position.y / (arrow_len * 2);
+            pictogram.pose.orientation.w = - arrow_pose.position.x / (arrow_len);
+            pictogram.pose.position.x = 10.0;
+            pictogram.pose.position.y = 0.0;
+            pictogram.pose.position.z = 0.0;
+            pictogram.color.r = 1.0;
+            pictogram.color.g = 0.0;
+            pictogram.color.b = 0.0;
+            pictogram.action = jsk_rviz_plugins::Pictogram::ADD;
+            pictogram.mode = 0;
+            pictogram.character = "fa-angle-double-up";
+            pictogram.size = 3;
+            break;
+    }
+
+    return pictogram;
+}
 
 void RasVisualizer::intMarkerCallback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback)
 {
