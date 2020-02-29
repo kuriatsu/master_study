@@ -14,6 +14,7 @@ import carla
 import argparse
 import pyperclip
 import time
+import math
 import random
 
 def main():
@@ -22,14 +23,35 @@ def main():
     client = carla.Client("127.0.0.1", 2000)
     client.set_timeout(2.0)
     world = client.get_world()
+    debug = world.debug
 
     # print(start)
     # get ego car
+    light_right = []
+    light_left = []
+
     for carla_actor in world.get_actors():
-        print(carla_actor)
+        # print(carla_actor)
         # if carla_actor.type_id.startswith("vehicle"):
         if carla_actor.attributes.get('role_name') == 'ego_vehicle':
             ego_vehicle = carla_actor
+            ego_pose = ego_vehicle.get_transform()
+
+        if carla_actor.type_id == 'traffic.traffic_light':
+            traffic_light = carla_actor
+            light_pose = traffic_light.get_location()
+            vector = light_pose - carla.Location(39.7840614319,-13.4922046661,0.137185171247)
+            print(vector.x ** 2 + vector.y ** 2)
+            if (vector.x ** 2 + vector.y ** 2 < 9.0):
+                print("found_light!!!")
+                traffic_light.set_state(carla.TrafficLightState.Green)
+                traffic_light.set_green_time(30)
+
+            #
+            # if (abs(ego_pose.rotation.yaw - light_pose.rotation.yaw) < 30):
+            # else:
+            #     traffic_light.set_green_time(5)
+
     ####################
     #### speed test ####
     ####################

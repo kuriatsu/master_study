@@ -37,6 +37,7 @@ class SpawnActor(object):
         self.blueprintWalkers = None
         self.blueprintWalkerController = None
         self.control_actor_list = []
+        self.trafficlight_list = []
 
     def readFile(self, filename):
 
@@ -71,6 +72,7 @@ class SpawnActor(object):
                 self.spawnActor(trigger.findall('spawn'))
                 self.moveActor(trigger.findall('move'))
                 self.killActor(trigger.findall('kill'))
+                self.controlTrafficLight(trigger.findall("trafficlight"))
                 self.trigger_index += 1
                 if self.trigger_index == len(self.scenario):
                     sys.exit()
@@ -88,6 +90,16 @@ class SpawnActor(object):
                 warnings.warn('spcecified blueprint is not exist : {}'.format(actor.find('blueprint').text))
 
         return blueprint
+
+    def getTraffcLight(self):
+
+        trafficlight = {}
+        for carla_actor in self.world.get_actors():
+            if carla_actor.type_id == 'traffic.traffic_light':
+                trafficlight['id'] = carla_actor.id
+                trafficlight['location'] = carla_actor.get_location()
+
+        self.trafficlight_list.append(trafficlight)
 
 
     def spawnActor(self, spawn_list):
@@ -269,12 +281,23 @@ class SpawnActor(object):
         self.client.apply_batch(batch)
 
 
-    def controlTrafficLight(self):
+    def controlTrafficLight(self, light_list):
 
-        if self.ego_vehicle.is_at_traffic_light():
-            traffic_light = self.ego_vehicle.get_traffic_light()
-            if traffic_light.get_state() == carla.TrafficLightState.Red:
-                traffic_light.set_state(carla.TrafficLightState.Green)
+        for controll_light in light_list:
+            for trafficlight in self.trafficlight_list:
+                if ((controll_light.find('location').text[0] - trafficlight['location'].x) ** 2 + (controll_light.find('location').text[1] - trafficlight['location'].y) ** 2 < 9.0):
+
+                    actor = self.world.get_actor(controll_light['id'])
+
+                    if (controll_light.find('state') == 'red'):
+                        actor.set_state(carla.TrafficLightState.Red)
+                        actor.set_red_time(float(controll_light.find('time')))
+
+                    elif (controll_light.find('state') == 'green'):
+                        actor.set_state(carla.TrafficLightState.Green)
+                        actor.set_green_time(float(controll_light.find('time')))
+
+                    return
 
 
     def game_loop(self, args):
@@ -289,7 +312,7 @@ class SpawnActor(object):
             self.blueprintWalkers = self.world.get_blueprint_library().filter('walker.pedestrian*')
             self.blueprintWalkerController = self.world.get_blueprint_library().find('controller.ai.walker')
             self.scenario = self.readFile(args.scenario_file)
-
+            self.trafficlight_list = self.getTraffcLight()
             # self.getEgoCar()
             self.spawnActor(self.scenario[0].findall('spawn'))
 
@@ -300,7 +323,6 @@ class SpawnActor(object):
                 else:
                     self.checkTrigger()
                     self.controlActor()
-                    self.controlTrafficLight()
 
                 time.sleep(0.1)
 
