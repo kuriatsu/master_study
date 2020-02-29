@@ -11,13 +11,16 @@ RasCore::RasCore(): m_ego_wp(0)
     sub_trajectory = n.subscribe("/lane_waypoints_array", 5, &RasCore::subTrajectoryCallback, this);
     sub_carla_actor_list = n.subscribe("/carla/actor_list", 1, &RasCore::subActorCallback, this);
     sub_odom = n.subscribe("/carla/ego_vehicle/odometry", 5, &RasCore::subOdomCallback, this);
-
     sub_carla_obj = n.subscribe("/carla/objects", 1, &RasCore::subObjCallback, this);
-	sub_shift = n.subscribe("/feedback_info", 10, &RasCore::subShiftCallback, this);
+    sub_shift = n.subscribe("/feedback_object", 10, &RasCore::subShiftCallback, this);
+
 	pub_obj = n.advertise<ras_carla::RasObjectArray>("/managed_objects", 5);
+    pub_wall = n.advertise<ras_carla::RasObject>("/wall_object", 1);
     pub_wp_obj = n.advertise<geometry_msgs::PointStamped>("/obj_wp", 5);
     pub_wp_cross = n.advertise<geometry_msgs::PointStamped>("/crossed_wp", 5);
-	// pub_erase = n.advertise<std_msgs::Int32>("/erase_signal", 1);
+
+    // pub_erase = n.advertise<std_msgs::Int32>("/erase_signal", 1);
+
 
 	m_obj_map.clear();
 }
@@ -120,7 +123,7 @@ void RasCore::subObjCallback(const derived_object_msgs::ObjectArray &in_obj_arra
 			ras_carla::RasObject &selected_obj = m_obj_map[ras_obj.object.id];
 			selected_obj.object = ras_obj.object;
 			selected_obj.distance = ras_obj.distance;
-            selected_obj.is_interaction = true;
+            selected_obj.is_interaction = false;
             selected_obj.is_important = false;
 			// selected_obj.is_front = (in_obj_pose.position.x > 0.5) ? true : false;
 			// selected_obj.is_same_lane = (fabs(in_obj_pose.position.y) > 0.5) ? true : false;
@@ -296,14 +299,21 @@ void RasCore::manageMarkers()
             e.second.is_important = true;
             e.second.is_interaction = true;
         }
+
+        else if (e.second.is_touched)
+        {
+            e.second.is_important = false;
+            e.second.is_interaction = true;
+        }
+
         obj_array.objects.emplace_back(e.second);
 	}
 
-    // erace old object
-    for (const auto &e : erase_key_vec)
-    {
-        m_obj_map.erase(e);
-    }
+    // publish
+	obj_array.header.stamp = ros::Time::now();
+	obj_array.header.frame_id = "map";
+	pub_obj.publish(obj_array);
+
     std::cout << wall_wp << std::endl;
     if (wall_wp != 0)
     {
@@ -318,13 +328,14 @@ void RasCore::manageMarkers()
         wall.object.shape.dimensions.emplace_back(2.0);
         wall.is_interaction = false;
         wall.is_important = true;
-        obj_array.objects.emplace_back(wall);
+        pub_wall.publish(wall);
     }
 
-    // publish
-	obj_array.header.stamp = ros::Time::now();
-	obj_array.header.frame_id = "map";
-	pub_obj.publish(obj_array);
+    // erace old object
+    for (const auto &e : erase_key_vec)
+    {
+        m_obj_map.erase(e);
+    }
 }
 
 
@@ -352,9 +363,8 @@ void RasCore::subShiftCallback(const ras_carla::RasObject &in_msg)
 	if (m_obj_map.find(id) != m_obj_map.end())
 	{
         ras_carla::RasObject &obj = m_obj_map[id];
-		std::cout << "touched id : " << std::endl;
-        if (obj.is_important) obj.is_touched = true;
-        else obj.is_touched = false;
+		std::cout << "touched" << std::endl;
+        obj.is_touched = !obj.is_touched;
 		// manageMarkers();
 	}
 }

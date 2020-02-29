@@ -9,11 +9,13 @@ RasVisualizer::RasVisualizer(): marker_scale(1.0)
     server.reset(new interactive_markers::InteractiveMarkerServer("ras_visualizer_node"));
 
     sub_obj = n.subscribe("/managed_objects", 5, &RasVisualizer::subObjCallback, this);
+    sub_wall = n.subscribe("/wall_object", 5, &RasVisualizer::subWallCallback, this);
 	// sub_vehicle_info = n.subscribe("/ego_vehicle/", 5, &RasVisualizer::subVehicleInfoCallback, this);
 	// sub_erase_signal = n.subscribe("/erase_signal", 5, &RasVisualizer::erase_signal_callback, this);
-    pub_fb_obj = n.advertise<ras_carla::RasObject>("/feedback_info", 5);
-	pub_marker = n.advertise<visualization_msgs::MarkerArray>("/ras_marker", 5);
-    pub_pictgram = n.advertise<jsk_rviz_plugins::PictogramArray>("pictogram", 5);
+    pub_fb_obj = n.advertise<ras_carla::RasObject>("/feedback_object", 5);
+    pub_marker = n.advertise<visualization_msgs::MarkerArray>("/object_marker", 5);
+	pub_wall = n.advertise<visualization_msgs::Marker>("/wall_marker", 1);
+    pub_pictgram = n.advertise<jsk_rviz_plugins::PictogramArray>("/pictogram", 5);
 }
 
 
@@ -35,7 +37,7 @@ void RasVisualizer::subObjCallback(const ras_carla::RasObjectArray &in_obj_array
             createInteractiveMarker(e);
             if (e.is_important)
             {
-                pictogram_array.pictograms.emplace_back(createPictogram(e, jsk_rviz_plugins::Pictogram::PICTOGRAM_MODE));
+                pictogram_array.pictograms.emplace_back(createPictogram(e, 0));
                 pictogram_array.pictograms.emplace_back(createPictogram(e, 1));
                 pictogram_array.pictograms.emplace_back(createPictogram(e, 2));
 
@@ -52,6 +54,15 @@ void RasVisualizer::subObjCallback(const ras_carla::RasObjectArray &in_obj_array
     pub_marker.publish(marker_array);
     pub_pictgram.publish(pictogram_array);
 }
+
+
+void RasVisualizer::subWallCallback(const ras_carla::RasObject &in_obj)
+{
+    visualization_msgs::Marker marker;
+    marker = createMarker(in_obj);
+    pub_wall.publish(marker);
+}
+
 
 visualization_msgs::Marker RasVisualizer::createMarker(const ras_carla::RasObject &in_obj)
 {
@@ -180,7 +191,7 @@ jsk_rviz_plugins::Pictogram RasVisualizer::createPictogram(const ras_carla::RasO
             pictogram.color.g = 0.5;
             pictogram.color.b = 0.5;
             pictogram.action = jsk_rviz_plugins::Pictogram::JUMP;
-            pictogram.mode = type;
+            pictogram.mode = jsk_rviz_plugins::Pictogram::PICTOGRAM_MODE;
             pictogram.character = "fa-angle-double-down";
             pictogram.speed = 5;
             pictogram.size = 3;
@@ -198,7 +209,7 @@ jsk_rviz_plugins::Pictogram RasVisualizer::createPictogram(const ras_carla::RasO
             pictogram.color.g = 1.0;
             pictogram.color.b = 1.0;
             pictogram.action = jsk_rviz_plugins::Pictogram::ADD;
-            pictogram.mode = 0;
+            pictogram.mode = jsk_rviz_plugins::Pictogram::PICTOGRAM_MODE;
             pictogram.character = message[in_obj.object.classification];
             pictogram.size = 6;
             // pictogram.character = message[in_obj.object.classification];
@@ -213,15 +224,15 @@ jsk_rviz_plugins::Pictogram RasVisualizer::createPictogram(const ras_carla::RasO
             pictogram.pose.orientation.y = 0.0;
             pictogram.pose.orientation.z = -arrow_pose.position.y / (arrow_len * 2);
             pictogram.pose.orientation.w = - arrow_pose.position.x / (arrow_len);
-            pictogram.pose.position.x = 10.0;
+            pictogram.pose.position.x = 3.0;
             pictogram.pose.position.y = 0.0;
             pictogram.pose.position.z = 0.0;
             pictogram.color.r = 1.0;
             pictogram.color.g = 0.0;
             pictogram.color.b = 0.0;
             pictogram.action = jsk_rviz_plugins::Pictogram::ADD;
-            pictogram.mode = 0;
-            pictogram.character = "fa-angle-double-up";
+            pictogram.mode = jsk_rviz_plugins::Pictogram::PICTOGRAM_MODE;
+            pictogram.character = "fa-arrow-up";
             pictogram.size = 3;
             break;
     }

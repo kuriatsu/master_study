@@ -379,7 +379,7 @@ def main():
     argparser.add_argument(
         '-c', '--cameraname',
         metavar='NAME',
-        default='ros_camera',
+        default='wide_front',
         help='camera role name (default: "ros_camera")')
     argparser.add_argument(
         '-e', '--egoname',
@@ -395,13 +395,13 @@ def main():
     argparser.add_argument(
         '-s' ,'--start',
         metavar='x,y,x,y...',
-        default='',
+        default='145.649108887,-1.90140223503,0.14900586009',
         type=parser_position,
         help='start position where the timer starts')
     argparser.add_argument(
         '-g' ,'--goal',
         metavar='x,y,x,y...',
-        default='',
+        default='-145.308700562,91.4853286743,0.0420927219093',
         type=parser_position,
         help='goal position where the timer stops')
 

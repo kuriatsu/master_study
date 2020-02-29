@@ -27,6 +27,7 @@ class RasCore
 {
 private:
     ros::Publisher pub_obj;
+    ros::Publisher pub_wall;
 	ros::Subscriber sub_carla_actor_list;
 	ros::Subscriber sub_carla_obj;
     ros::Subscriber sub_shift;
