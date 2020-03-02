@@ -16,13 +16,17 @@ class RasAutowareConnector{
 
 private:
     ros::Subscriber sub_obj;
+    ros::Subscriber sub_wall;
     ros::Publisher pub_obj;
     // ros::Publisher pub_polygon;
     float polygon_interval;
+    autoware_msgs::DetectedObject wall;
 public :
     RasAutowareConnector();
 
 private :
-    void subObjCallback(ras_carla::RasObjectArray in_obj_array);
-    geometry_msgs::PolygonStamped calcPolygon(ras_carla::RasObject &in_obj);
+    void subWallCallback(const ras_carla::RasObject &in_obj);
+    void subObjCallback(const ras_carla::RasObjectArray &in_obj_array);
+    autoware_msgs::DetectedObject rasToAutowareObject(const ras_carla::RasObject &in_obj);
+    geometry_msgs::PolygonStamped calcPolygon(const ras_carla::RasObject &in_obj);
 };

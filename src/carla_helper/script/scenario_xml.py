@@ -93,13 +93,16 @@ class SpawnActor(object):
 
     def getTraffcLight(self):
 
-        trafficlight = {}
+        trafficlight_list = []
+
         for carla_actor in self.world.get_actors():
             if carla_actor.type_id == 'traffic.traffic_light':
+                trafficlight = {}
                 trafficlight['id'] = carla_actor.id
                 trafficlight['location'] = carla_actor.get_location()
+                trafficlight_list.append(trafficlight)
 
-        self.trafficlight_list.append(trafficlight)
+        return trafficlight_list
 
 
     def spawnActor(self, spawn_list):
@@ -282,23 +285,22 @@ class SpawnActor(object):
 
 
     def controlTrafficLight(self, light_list):
-
         for controll_light in light_list:
             for trafficlight in self.trafficlight_list:
-                if ((controll_light.find('location').text[0] - trafficlight['location'].x) ** 2 + (controll_light.find('location').text[1] - trafficlight['location'].y) ** 2 < 9.0):
+                if ((controll_light.find('location').text[0] - trafficlight.get('location').x) ** 2 + (controll_light.find('location').text[1] - trafficlight['location'].y) ** 2 < 9.0):
 
-                    actor = self.world.get_actor(controll_light['id'])
+                    actor = self.world.get_actor(trafficlight.get('id'))
+                    print('control trafficlight')
 
-                    if (controll_light.find('state') == 'red'):
+                    if (controll_light.find('state').text == 'red'):
                         actor.set_state(carla.TrafficLightState.Red)
-                        actor.set_red_time(float(controll_light.find('time')))
+                        actor.set_red_time(float(controll_light.find('time').text))
 
-                    elif (controll_light.find('state') == 'green'):
+                    elif (controll_light.find('state').text == 'green'):
+                        actor.set_green_time(float(controll_light.find('time').text))
                         actor.set_state(carla.TrafficLightState.Green)
-                        actor.set_green_time(float(controll_light.find('time')))
 
-                    return
-
+                    continue
 
     def game_loop(self, args):
         print('hello game_loop')

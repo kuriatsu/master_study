@@ -318,8 +318,8 @@ void RasCore::manageMarkers()
     if (wall_wp != 0)
     {
         // finally add wall
-        wall.object.header.stamp = ros::Time::now();
-        wall.object.header.frame_id = "map";
+        wall.object.header.stamp = obj_array.header.stamp;
+        wall.object.header.frame_id = obj_array.header.frame_id;
         wall.object.id = 0;
         wall.object.pose = m_wps_vec[wall_wp];
         wall.object.shape.type = shape_msgs::SolidPrimitive::BOX;

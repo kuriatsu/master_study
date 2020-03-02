@@ -36,6 +36,12 @@ line_thickness = {
 'walker' : 0.2,
 'vehicle' : 1.0
 }
+trafficlight_color = {
+'red' : carla.Color(255, 0, 0),
+'green' : carla.Color(0, 255, 0),
+'yellow' : carla.Color(255, 255, 0)
+
+}
 def readFile(filename):
 
     tree = ET.parse(filename)
@@ -119,6 +125,12 @@ def main():
             if action.tag == "kill":
                 debug.draw_point(location=actor_position[action.attrib.get('id')]+carla.Location(x=1.0), life_time=args.lifetime, size=0.1, color=color[int(trriger.attrib.get('id'))%10])
                 debug.draw_string(location=actor_position[action.attrib.get('id')]+carla.Location(x=1.0, z=1.0), text='kill', color=carla.Color(255,0,0), life_time=args.lifetime)
+
+            if action.tag == "trafficlight":
+                buf = action.find('location').text
+                location = carla.Location(buf[0], buf[1], buf[2])
+                debug.draw_point(location=location, life_time=args.lifetime, size=0.1, color=color[int(trriger.attrib.get('id'))%10])
+                debug.draw_string(location=location+carla.Location(x=2.0, z=1.0), text=action.find("time").text, color=trafficlight_color[action.find("state").text], life_time=args.lifetime)
 
                 # else:
                     # if start is not None:
