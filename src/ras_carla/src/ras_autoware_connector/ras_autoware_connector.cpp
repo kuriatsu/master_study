@@ -14,7 +14,7 @@ RasAutowareConnector::RasAutowareConnector(): polygon_interval(0.5)//, keep_time
 
 void RasAutowareConnector::subWallCallback(const ras_carla::RasObject &in_obj)
 {
-    wall = rasToAutowareObject(in_obj);
+    wall.emplace_back(rasToAutowareObject(in_obj));
 }
 
 
@@ -29,10 +29,13 @@ void RasAutowareConnector::subObjCallback(const ras_carla::RasObjectArray &in_ob
         out_obj = rasToAutowareObject(in_obj_array.objects[index]);
         out_obj_array.objects.emplace_back(out_obj);
     }
+    // std::cout << "obj stamp : " <<out_obj_array.header.stamp << " wall stamp : "  <<  wall.header.stamp<< std::endl;
 
-    if (wall.header.stamp == out_obj_array.header.stamp)
+    if (!wall.empty())
     {
-        out_obj_array.objects.emplace_back(wall);
+        out_obj_array.objects.emplace_back(wall[0]);
+        std::cout << "added wall" << std::endl;
+        wall.pop_back();
     }
 
     pub_obj.publish(out_obj_array);

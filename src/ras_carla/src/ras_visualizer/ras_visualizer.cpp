@@ -10,12 +10,8 @@ RasVisualizer::RasVisualizer(): marker_scale(1.0)
 
     sub_obj = n.subscribe("/managed_objects", 5, &RasVisualizer::subObjCallback, this);
     sub_wall = n.subscribe("/wall_object", 5, &RasVisualizer::subWallCallback, this);
-	// sub_vehicle_info = n.subscribe("/ego_vehicle/", 5, &RasVisualizer::subVehicleInfoCallback, this);
-	// sub_erase_signal = n.subscribe("/erase_signal", 5, &RasVisualizer::erase_signal_callback, this);
     pub_fb_obj = n.advertise<ras_carla::RasObject>("/feedback_object", 5);
     pub_marker = n.advertise<jsk_recognition_msgs::BoundingBoxArray>("/object_marker", 5);
-    // pub_marker = n.advertise<jsk_recognition_msgs::PolygonArray>("/object_polygon", 5);
-    // pub_wall = n.advertise<visualization_msgs::Marker>("/wall_marker", 1);
 	pub_wall = n.advertise<jsk_rviz_plugins::Pictogram>("/wall_marker", 1);
     pub_pictgram = n.advertise<jsk_rviz_plugins::PictogramArray>("/pictogram", 5);
 }
@@ -30,8 +26,6 @@ void RasVisualizer::subObjCallback(const ras_carla::RasObjectArray &in_obj_array
 {
     server->clear();
     jsk_recognition_msgs::BoundingBoxArray marker_array;
-    // jsk_recognition_msgs::PolygonArray polygon_array;
-    // visualization_msgs::MarkerArray marker_array;
     jsk_rviz_plugins::PictogramArray pictogram_array;
     for (auto e : in_obj_array.objects)
     {
@@ -45,11 +39,6 @@ void RasVisualizer::subObjCallback(const ras_carla::RasObjectArray &in_obj_array
                 pictogram_array.pictograms.emplace_back(createPictogram(e, 2));
             }
         }
-        // else
-        // {
-        //     marker_array.boxes.emplace_back(createMarker(e));
-        //    // createMarker(e, polygon_array);
-        // }
         marker_array.boxes.emplace_back(createMarker(e));
     }
 
@@ -67,9 +56,6 @@ void RasVisualizer::subWallCallback(const ras_carla::RasObject &in_obj)
     jsk_rviz_plugins::Pictogram pictogram;
     pictogram = createPictogram(in_obj, 3);
     pub_wall.publish(pictogram);
-    // visualization_msgs::Marker marker;
-    // marker = createMarker(in_obj);
-    // pub_wall.publish(marker);
 }
 
 
@@ -94,78 +80,6 @@ jsk_recognition_msgs::BoundingBox RasVisualizer::createMarker(const ras_carla::R
     return marker;
 }
 
-
-// visualization_msgs::Marker RasVisualizer::createMarker(const ras_carla::RasObject &in_obj)
-// {
-//     visualization_msgs::Marker marker;
-//
-//     marker.header = in_obj.object.header;
-//     marker.ns = "ras";
-//     marker.id = in_obj.object.id;
-//
-//     marker.type = visualization_msgs::Marker::CUBE;
-//     marker.action = visualization_msgs::Marker::ADD;
-//     marker.pose = in_obj.object.pose;
-//     marker.scale.x = marker_scale*in_obj.object.shape.dimensions[0];
-//     marker.scale.y = marker_scale*in_obj.object.shape.dimensions[1];
-//     marker.scale.z = marker_scale*in_obj.object.shape.dimensions[2];
-//
-//     if (in_obj.object.classification == derived_object_msgs::Object::CLASSIFICATION_CAR || in_obj.object.classification == derived_object_msgs::Object::CLASSIFICATION_BARRIER)
-//     {
-//         marker.scale.z += marker_scale*in_obj.object.shape.dimensions[2];
-//     }
-//
-//     if (in_obj.is_important)
-// 	{
-// 		marker.color.r = 1;
-// 		marker.color.g = 0;
-// 	}
-// 	else
-// 	{
-// 		marker.color.r = 0;
-// 		marker.color.g = 1;
-// 	}
-//     marker.color.b = 0;
-//     marker.color.a = 0.5;
-//
-//     marker.lifetime = ros::Duration(0.1);
-//     return marker;
-// }
-
-
-// void RasVisualizer::createMarker(const ras_carla::RasObject &in_obj, jsk_recognition_msgs::PolygonArray &polygon_array)
-// {
-//     jsk_recognition_msgs::Polygon polygon;
-//     geometry_msgs::Point32 point;
-//     float obj_yaw = Ras::quatToYaw(in_obj.object.pose.orientation);
-//     float radius = in_obj.object.shape.dimensions[0] / 2;
-//     geometry_msgs::point obj_position = in_obj.object.pose.position;
-//
-//     point.x = radius * cos(obj_yaw) + obj_position.x;
-//     point.y = radius * sin(obj_yaw) + obj_position.y;
-//     point.z = obj_position.z;
-//     polygon.points.emplace_back(point);
-//
-//     point.x = - radius * cos(obj_yaw) + obj_position.x;
-//     point.y = - radius * sin(obj_yaw) + obj_position.y;
-//     point.z = obj_position.z;
-//     polygon.points.emplace_back(point);
-//
-//     point.x = radius * cos(obj_yaw) + obj_position.x;
-//     point.y = radius * sin(obj_yaw) + obj_position.y;
-//     point.z = obj_position.z + in_obj.object.shape.dimensions[3];
-//     polygon.points.emplace_back(point);
-//
-//     point.x = - radius * cos(obj_yaw) + obj_position.x;
-//     point.y = - radius * sin(obj_yaw) + obj_position.y;
-//     point.z = obj_position.z + in_obj.object.shape.dimensions[3];
-//     polygon.points.emplace_back(point);
-//
-//     polygon.header = in_obj.object.header;
-//
-//     polygon_array.polygons.emplace_back(polygon);
-//     polygon_array.labels.emplace_back(in_obj.object.id);
-// }
 
 void RasVisualizer::createInteractiveMarker(ras_carla::RasObject &in_obj)
 {
@@ -320,10 +234,14 @@ jsk_rviz_plugins::Pictogram RasVisualizer::createPictogram(const ras_carla::RasO
 
         case 3:
         {
+            geometry_msgs::Quaternion quat = in_obj.object.pose.orientation;
             pictogram.header.frame_id = "map";
-            pictogram.pose = in_obj.object.pose;
+            pictogram.pose.position = in_obj.object.pose.position;
             pictogram.pose.position.z = 1.0;
-            pictogram.pose.orientation.x = -1.0;
+            pictogram.pose.orientation.x = quat.z * 0.7 + quat.x * 0.7;
+            pictogram.pose.orientation.y = -quat.w * 0.7 + quat.y * 0.7;
+            pictogram.pose.orientation.z = - quat.x * 0.7 + quat.z * 0.7;
+            pictogram.pose.orientation.w = quat.y * 0.7 + quat.w * 0.7;
             pictogram.color.r = 1.0;
             pictogram.color.g = 0.6;
             pictogram.color.b = 0.0;

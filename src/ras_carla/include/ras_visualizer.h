@@ -23,15 +23,12 @@ private:
 
     ros::Subscriber sub_obj;
     ros::Subscriber sub_wall;
-    // ros::Subscriber sub_erase_signal;
-    // ros::Subscriber sub_vehicle_info;
     ros::Publisher pub_fb_obj;
     ros::Publisher pub_marker;
     ros::Publisher pub_wall;
     ros::Publisher pub_pictgram;
     std::vector<uint32_t> id_vec;
     float marker_scale;
-    // float marker_vertical_shrink_rate;
 public:
     RasVisualizer();
 	~RasVisualizer();
@@ -41,8 +38,6 @@ private:
     void subObjCallback(const ras_carla::RasObjectArray &in_obj_array);
     void subWallCallback(const ras_carla::RasObject &in_obj);
     void intMarkerCallback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
-    // visualization_msgs::Marker createMarker(const ras_carla::RasObject &in_obj);
-    // void createMarker(const ras_carla::RasObject &in_obj, jsk_recognition_msgs::PolygonArray &polygon_array);
     jsk_recognition_msgs::BoundingBox createMarker(const ras_carla::RasObject &in_obj);
     void createInteractiveMarker(ras_carla::RasObject &in_obj);
     void setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, const ras_carla::RasObject &in_obj);
