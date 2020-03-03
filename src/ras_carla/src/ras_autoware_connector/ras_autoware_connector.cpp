@@ -5,8 +5,8 @@ RasAutowareConnector::RasAutowareConnector(): polygon_interval(0.5)//, keep_time
 {
     ros::NodeHandle n;
 
-    sub_obj = n.subscribe("/managed_objects", 5, &RasAutowareConnector::subObjCallback, this);
     sub_wall = n.subscribe("/wall_object", 5, &RasAutowareConnector::subWallCallback, this);
+    sub_obj = n.subscribe("/managed_objects", 5, &RasAutowareConnector::subObjCallback, this);
     pub_obj = n.advertise<autoware_msgs::DetectedObjectArray>("/tracked_objects", 5);
     // pub_polygon = n.advertise<geometry_msgs::PolygonStamped>("/ras_polygon", 10);
 }
@@ -14,7 +14,7 @@ RasAutowareConnector::RasAutowareConnector(): polygon_interval(0.5)//, keep_time
 
 void RasAutowareConnector::subWallCallback(const ras_carla::RasObject &in_obj)
 {
-    wall = rasToAutowareObject(in_obj);
+    wall.emplace_back(rasToAutowareObject(in_obj));
 }
 
 
@@ -23,6 +23,7 @@ void RasAutowareConnector::subObjCallback(const ras_carla::RasObjectArray &in_ob
     autoware_msgs::DetectedObjectArray out_obj_array;
     autoware_msgs::DetectedObject out_obj;
     out_obj_array.header = in_obj_array.header;
+    // geometry_msgs::PolygonStamped polygon;
 
     for (size_t index = 0; index < in_obj_array.objects.size(); index++)
     {
@@ -30,9 +31,11 @@ void RasAutowareConnector::subObjCallback(const ras_carla::RasObjectArray &in_ob
         out_obj_array.objects.emplace_back(out_obj);
     }
 
-    if (wall.header.stamp == out_obj_array.header.stamp)
+    if (!wall.empty())
     {
-        out_obj_array.objects.emplace_back(wall);
+        out_obj_array.objects.emplace_back(wall[0]);
+        // std::cout << "added wall" << std::endl;
+        wall.pop_back();
     }
 
     pub_obj.publish(out_obj_array);
@@ -126,5 +129,7 @@ geometry_msgs::PolygonStamped RasAutowareConnector::calcPolygon(const ras_carla:
         point.y = x * sin( 2 * M_PI + yaw ) + y * cos( 2 * M_PI + yaw ) + in_obj.object.pose.position.y;
         polygon_stamped.polygon.points.emplace_back(point);
     }
+    // pub_polygon.publish(polygon_stamped);
+
     return polygon_stamped;
 }

@@ -98,9 +98,9 @@ void RasVisualizer::createPolygon(const ras_carla::RasObject &in_obj, jsk_recogn
     polygon_array.polygons.emplace_back(polygon);
     polygon_array.labels.emplace_back(in_obj.object.id);
     if (in_obj.is_important)
-        polygon_array.likelihood.emplace_back(1.0);
-    else
         polygon_array.likelihood.emplace_back(100.0);
+    else
+        polygon_array.likelihood.emplace_back(1.0);
 
 }
 

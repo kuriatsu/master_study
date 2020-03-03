@@ -20,7 +20,7 @@ private:
     ros::Publisher pub_obj;
     // ros::Publisher pub_polygon;
     float polygon_interval;
-    autoware_msgs::DetectedObject wall;
+    std::vector<autoware_msgs::DetectedObject> wall;
 public :
     RasAutowareConnector();
 
