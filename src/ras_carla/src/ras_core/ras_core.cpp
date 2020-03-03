@@ -331,7 +331,7 @@ void RasCore::manageMarkers()
         // finally add wall
         wall.object.header.stamp = obj_array.header.stamp;
         wall.object.header.frame_id = obj_array.header.frame_id;
-        wall.object.id = 0;
+        wall.object.id = obj_array.objects.back().object.id + 1;
         wall.object.pose = m_wps_vec[wall_wp];
         wall.object.shape.type = shape_msgs::SolidPrimitive::BOX;
         wall.object.shape.dimensions.emplace_back(0.1);
