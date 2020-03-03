@@ -4,7 +4,9 @@
 #include <tf/transform_listener.h>
 
 #include <interactive_markers/interactive_marker_server.h>
-#include <visualization_msgs/MarkerArray.h>
+#include <jsk_recognition_msgs/BoundingBoxArray.h>
+// #include <jsk_recognition_msgs/PolygonArray.h>
+// #include <visualization_msgs/MarkerArray.h>
 #include <jsk_rviz_plugins/PictogramArray.h>
 #include <cmath>
 
@@ -39,7 +41,9 @@ private:
     void subObjCallback(const ras_carla::RasObjectArray &in_obj_array);
     void subWallCallback(const ras_carla::RasObject &in_obj);
     void intMarkerCallback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
-    visualization_msgs::Marker createMarker(const ras_carla::RasObject &in_obj);
+    // visualization_msgs::Marker createMarker(const ras_carla::RasObject &in_obj);
+    // void createMarker(const ras_carla::RasObject &in_obj, jsk_recognition_msgs::PolygonArray &polygon_array);
+    jsk_recognition_msgs::BoundingBox createMarker(const ras_carla::RasObject &in_obj);
     void createInteractiveMarker(ras_carla::RasObject &in_obj);
     void setMarkerControl(visualization_msgs::InteractiveMarker &int_marker, const ras_carla::RasObject &in_obj);
     void setMarkerToMarkerControl(visualization_msgs::InteractiveMarkerControl &control, const ras_carla::RasObject &in_obj);

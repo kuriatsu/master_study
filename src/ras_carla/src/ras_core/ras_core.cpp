@@ -73,11 +73,11 @@ void RasCore::subOdomCallback(const nav_msgs::Odometry &in_odom)
     m_brakable_wp = ego_wp + (int)((pow(m_ego_twist.linear.x * 3.6, 2) / (254 * 0.7)) / m_wp_interval);
     for (const auto &e : m_wp_obj_map[ego_wp])
     {
-        ROS_INFO_STREAM(m_obj_map[e]);
-        std::cout << "on : "<< e  << std::endl;
+        // ROS_INFO_STREAM(m_obj_map[e]);
+        // std::cout << "on : "<< e  << std::endl;
         m_obj_map[e].is_touched = false;
-        std::cout << "to"<< std::endl;
-        ROS_INFO_STREAM(m_obj_map[e]);
+        // std::cout << "to"<< std::endl;
+        // ROS_INFO_STREAM(m_obj_map[e]);
     }
 }
 
@@ -142,12 +142,11 @@ std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
 
     switch(in_obj.object.classification)
     {
-        case 4:
+        case derived_object_msgs::Object::CLASSIFICATION_PEDESTRIAN:
         {
             // ROS_INFO("findWpOfObj pedestrian");
-            float min_dist_of_wp_obj = m_max_vision, inner_prod, obj_vec_x, obj_vec_y, obj_vec_len, obj_wp_vec_x, obj_wp_vec_y, obj_wp_vec_len, dist_of_wp_obj, wp_vec_x, wp_vec_y;
-            int obj_wp, cross_wp;
-
+            float min_dist_of_wp_obj = m_max_vision, dist_of_wp_obj;
+            int close_wp, perp_wp;
             // find closest waypoint from object
             for (auto itr = m_wps_vec.begin(); itr < m_wps_vec.end(); itr++)
             // for (auto itr = m_wps_vec.begin(); itr != m_wps_vec.end(); itr++)
@@ -156,59 +155,57 @@ std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
                 if (dist_of_wp_obj < min_dist_of_wp_obj)
                 {
                     min_dist_of_wp_obj = dist_of_wp_obj;
-                    obj_wp = std::distance(m_wps_vec.begin(), itr);
+                    close_wp = std::distance(m_wps_vec.begin(), itr);
                 }
             }
-            // std::cout << "obj_id : " << in_obj.object.id << " wp : " << obj_wp << "close" << std::endl;
-            wp_vec.emplace_back(obj_wp);
-            pubOccupancyWp(m_wps_vec[obj_wp].position, 0);
 
-            // find vertical way of the object from the way to the closest waypoint
-            obj_vec_x = m_wps_vec[obj_wp].position.x - in_obj.object.pose.position.x;
-            obj_vec_y = m_wps_vec[obj_wp].position.y - in_obj.object.pose.position.y;
+            RasVector obj_closewp_vec(in_obj.object.pose.position, m_wps_vec[close_wp].position);
+            RasVector obj_vec(in_obj.object.pose);
 
+            if (isSameDirection(obj_closewp_vec, obj_vec, 0.7))
+            {
+                // std::cout << "obj_id : " << in_obj.object.id << " wp : " << close_wp << "close" << std::endl;
+                wp_vec.emplace_back(close_wp);
+                pubOccupancyWp(m_wps_vec[close_wp].position, 0);
+            }
+
+            // find perpendicular waypoint from close waypoint and object
             for (auto itr = m_wps_vec.begin(); itr != m_wps_vec.end(); itr++)
             {
-                cross_wp = std::distance(m_wps_vec.begin(), itr);
-                if(cross_wp == 0) continue;
-                if(cross_wp == obj_wp) continue;
-                obj_wp_vec_x = itr->position.x - in_obj.object.pose.position.x;
-                obj_wp_vec_y = itr->position.y - in_obj.object.pose.position.y;
+                perp_wp = std::distance(m_wps_vec.begin(), itr);
 
-                inner_prod = obj_vec_x * obj_wp_vec_x + obj_vec_y * obj_wp_vec_y; // inner prod of closest_wp-in_obj vec and target_wp-in_obj vec
-                obj_vec_len = sqrt(pow(obj_vec_x, 2) + pow(obj_vec_y, 2));
-                obj_wp_vec_len = sqrt(pow(obj_wp_vec_x, 2) + pow(obj_wp_vec_y, 2));
-                if (fabs(inner_prod) < obj_vec_len * obj_wp_vec_len * 0.05 || inner_prod > obj_vec_len * obj_wp_vec_len * 0.8)
+                if(perp_wp == 0) continue;
+                if(perp_wp == close_wp) continue;
+
+                RasVector obj_perpwp_vec(in_obj.object.pose.position, itr->position);
+
+                if (isPerpendicular(obj_closewp_vec, obj_perpwp_vec, 0.05) || isSameDirection(obj_closewp_vec, obj_perpwp_vec, 0.8));
                 {
-                    wp_vec_x = itr->position.x - (itr-1)->position.x;
-                    wp_vec_y = itr->position.y - (itr-1)->position.y;
-                    inner_prod = wp_vec_x * obj_wp_vec_x + wp_vec_y * obj_wp_vec_y;
-                    if (fabs(inner_prod) < m_wp_interval * sqrt(pow(obj_wp_vec_x, 2) + pow(obj_wp_vec_y, 2)) * 0.05)
+                    // is the path and obj-wp perpendicular?
+                    RasVector path_vec((itr-1)->position, itr->position);
+
+                    if (isPerpendicular(path_vec, obj_perpwp_vec, 0.05) && isSameDirection(obj_vec, obj_perpwp_vec, 0.7))
                     {
-                        // std::cout << "obj_id : " << in_obj.object.id << " wp : " << cross_wp << "cross" << std::endl;
-                        wp_vec.emplace_back(cross_wp);
-                        pubOccupancyWp(m_wps_vec[cross_wp].position, 1);
+                        // std::cout << "obj_id : " << in_obj.object.id << " wp : " << perp_wp << "cross" << std::endl;
+                        wp_vec.emplace_back(perp_wp);
+                        pubOccupancyWp(m_wps_vec[perp_wp].position, 1);
                     }
                 }
             }
             break;
         }
 
-        case 6:
+        case derived_object_msgs::Object::CLASSIFICATION_CAR:
         {
             // ROS_INFO("findWpOfObj car");
             float obj_vec_x, obj_vec_y, obj_wp_vec_x, obj_wp_vec_y, inner_prod, dist_of_wp_obj;
-            obj_vec_x = cos(Ras::quatToYaw(in_obj.object.pose.orientation));
-            obj_vec_y = sin(Ras::quatToYaw(in_obj.object.pose.orientation));
+            RasVector obj_vec(in_obj.object.pose);
 
             for (auto itr = m_wps_vec.begin(); itr != m_wps_vec.end(); itr ++)
             {
-                obj_wp_vec_x = itr->position.x - in_obj.object.pose.position.x;
-                obj_wp_vec_y = itr->position.y - in_obj.object.pose.position.y;
+                RasVector obj_wp_vec(in_obj.object.pose.position, itr->position);
 
-                inner_prod = obj_vec_x * obj_wp_vec_x + obj_vec_y * obj_wp_vec_y;
-                dist_of_wp_obj = sqrt(pow(obj_wp_vec_x, 2) + pow(obj_wp_vec_y, 2));
-                if (inner_prod > 1.0 * dist_of_wp_obj * 0.99)
+                if (isSameDirection(obj_vec, obj_wp_vec, 0.99))
                 {
                     wp_vec.emplace_back(std::distance(m_wps_vec.begin(), itr));
                     pubOccupancyWp(m_wps_vec[std::distance(m_wps_vec.begin(), itr)].position, 1);
@@ -219,6 +216,20 @@ std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
         }
     }
     return wp_vec;
+}
+
+bool RasCore::isSameDirection(const RasVector &vec_1, const RasVector &vec_2, const float &thres)
+{
+    // is close wp same direction with the object
+    float inner_prod = vec_1.x * vec_2.x + vec_1.y * vec_2.y;
+    return (inner_prod > vec_1.len * vec_2.len * thres);
+}
+
+
+bool RasCore::isPerpendicular(const RasVector &vec_1, const RasVector &vec_2, const float &thres)
+{
+    float inner_prod = vec_1.x * vec_2.x + vec_1.y * vec_2.y;
+    return (fabs(inner_prod) < vec_1.len * vec_2.len * thres);
 }
 
 
@@ -233,10 +244,10 @@ bool RasCore::isCollideObstacle(const ras_carla::RasObject &in_obj, const int &w
 
     switch (in_obj.object.classification)
     {
-        case 4:
+        case derived_object_msgs::Object::CLASSIFICATION_PEDESTRIAN:
             return (dist_of_wp_obj < dist_of_wp_ego || dist_of_wp_obj / in_obj.object.twist.linear.x < dist_of_wp_ego / m_ego_twist.linear.x);
             break;
-        case 6:
+        case derived_object_msgs::Object::CLASSIFICATION_CAR:
             return (dist_of_wp_ego > 0 && dist_of_wp_obj / in_obj.object.twist.linear.x < dist_of_wp_ego / m_ego_twist.linear.x);
             break;
     }
@@ -266,7 +277,7 @@ int RasCore::findWallWp(std::vector<int> &critical_obj_id_vec)
             {
                 critical_obj_id_vec.emplace_back(obj_id);
                 // wall_wp = e.first;
-                std::cout << "wall wp is :" << e.first << std::endl;
+                // std::cout << "wall wp is :" << e.first << std::endl;
                 return(e.first);
             }
         }
@@ -283,7 +294,7 @@ void RasCore::manageMarkers()
     int wall_wp;
 
     wall_wp = findWallWp(critical_obj_id_vec);
-    std::cout << "critical object : " << critical_obj_id_vec.size() << std::endl;
+    // std::cout << "critical object : " << critical_obj_id_vec.size() << std::endl;
 
 	for (auto &e : m_obj_map)
 	{
@@ -314,7 +325,7 @@ void RasCore::manageMarkers()
 	obj_array.header.frame_id = "map";
 	pub_obj.publish(obj_array);
 
-    std::cout << wall_wp << std::endl;
+    // std::cout << wall_wp << std::endl;
     if (wall_wp != 0)
     {
         // finally add wall
@@ -326,6 +337,7 @@ void RasCore::manageMarkers()
         wall.object.shape.dimensions.emplace_back(0.1);
         wall.object.shape.dimensions.emplace_back(5.0);
         wall.object.shape.dimensions.emplace_back(2.0);
+        wall.object.classification = derived_object_msgs::Object::CLASSIFICATION_BARRIER;
         wall.is_interaction = false;
         wall.is_important = true;
         pub_wall.publish(wall);

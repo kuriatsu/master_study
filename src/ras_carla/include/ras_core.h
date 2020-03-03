@@ -71,4 +71,6 @@ private:
     bool isCollideObstacle(const ras_carla::RasObject &in_obj, const int &wp);
     int findWallWp(std::vector<int> &critical_obj_id_vec);
     void pubOccupancyWp(const geometry_msgs::Point &in_pose, const int &type);
+    bool isSameDirection(const RasVector &vec_1, const RasVector &vec_2, const float &thres);
+    bool isPerpendicular(const RasVector &vec_1, const RasVector &vec_2, const float &thres);
 };
