@@ -79,11 +79,12 @@ def main():
     #     time.sleep(0.02)
 
     for carla_actor in world.get_actors():
-        if carla_actor.attributes.get('role_name') == 'hero':
+        if carla_actor.attributes.get('role_name') == 'ego_vehicle':
             ego_vehicle = carla_actor
             print("found")
 
-    ego_vehicle.set_location(carla.Location(40.0, -190.0,0.0))
+    # ego_vehicle.set_transform(carla.Transform(carla.Location(206.5,95.9,1.0),carla.Rotation(-0.0,-89.5,0.0)))
+    ego_vehicle.set_location(carla.Location(24.4732303619,189.31539917,-0.00411247229204))
     # while True:
         # ego_vehicle.set_velocity(carla.Vector3D(100.0, 0.0,0.0))
         # time.sleep(1.0)

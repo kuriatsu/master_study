@@ -11,8 +11,8 @@ RasVisualizer::RasVisualizer(): marker_scale(1.0)
     sub_obj = n.subscribe("/managed_objects", 5, &RasVisualizer::subObjCallback, this);
     sub_wall = n.subscribe("/wall_object", 5, &RasVisualizer::subWallCallback, this);
     pub_fb_obj = n.advertise<ras_carla::RasObject>("/feedback_object", 5);
-    pub_marker = n.advertise<jsk_recognition_msgs::BoundingBoxArray>("/object_marker", 5);
-	pub_wall = n.advertise<jsk_rviz_plugins::Pictogram>("/wall_marker", 1);
+    pub_box = n.advertise<jsk_recognition_msgs::BoundingBoxArray>("/object_box", 5);
+	pub_wall = n.advertise<visualization_msgs::Marker>("/wall_marker", 1);
     pub_pictgram = n.advertise<jsk_rviz_plugins::PictogramArray>("/pictogram", 5);
 }
 
@@ -22,10 +22,11 @@ RasVisualizer::~RasVisualizer()
     server.reset();
 }
 
+
 void RasVisualizer::subObjCallback(const ras_carla::RasObjectArray &in_obj_array)
 {
     server->clear();
-    jsk_recognition_msgs::BoundingBoxArray marker_array;
+    jsk_recognition_msgs::BoundingBoxArray box_array;
     jsk_rviz_plugins::PictogramArray pictogram_array;
     for (auto e : in_obj_array.objects)
     {
@@ -39,27 +40,34 @@ void RasVisualizer::subObjCallback(const ras_carla::RasObjectArray &in_obj_array
                 pictogram_array.pictograms.emplace_back(createPictogram(e, 2));
             }
         }
-        marker_array.boxes.emplace_back(createMarker(e));
+        box_array.boxes.emplace_back(createBox(e));
     }
 
-    marker_array.header = in_obj_array.header;
+    if (!wall_pictogram.empty() && !wall_marker.empty())
+    {
+        pictogram_array.pictograms.emplace_back(wall_pictogram[0]);
+        pub_wall.publish(wall_marker[0]);
+        wall_pictogram.pop_back();
+        wall_marker.pop_back();
+    }
+
+    box_array.header = in_obj_array.header;
     pictogram_array.header = in_obj_array.header;
 
     server->applyChanges();
-    pub_marker.publish(marker_array);
+    pub_box.publish(box_array);
     pub_pictgram.publish(pictogram_array);
 }
 
 
 void RasVisualizer::subWallCallback(const ras_carla::RasObject &in_obj)
 {
-    jsk_rviz_plugins::Pictogram pictogram;
-    pictogram = createPictogram(in_obj, 3);
-    pub_wall.publish(pictogram);
+    wall_pictogram.emplace_back(createPictogram(in_obj, 3));
+    wall_marker.emplace_back(createMarker(in_obj));
 }
 
 
-jsk_recognition_msgs::BoundingBox RasVisualizer::createMarker(const ras_carla::RasObject &in_obj)
+jsk_recognition_msgs::BoundingBox RasVisualizer::createBox(const ras_carla::RasObject &in_obj)
 {
     jsk_recognition_msgs::BoundingBox marker;
 
@@ -77,6 +85,31 @@ jsk_recognition_msgs::BoundingBox RasVisualizer::createMarker(const ras_carla::R
     }
 
     marker.value = (in_obj.is_important) ? 100.0 : 50.0;
+    return marker;
+}
+
+
+visualization_msgs::Marker RasVisualizer::createMarker(const ras_carla::RasObject &in_obj)
+{
+    visualization_msgs::Marker marker;
+
+    marker.header = in_obj.object.header;
+    marker.ns = "ras";
+    marker.id = in_obj.object.id;
+
+    marker.type = visualization_msgs::Marker::CUBE;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.pose = in_obj.object.pose;
+    marker.scale.x = in_obj.object.shape.dimensions[0];
+    marker.scale.y = in_obj.object.shape.dimensions[1];
+    marker.scale.z = in_obj.object.shape.dimensions[2];
+
+    marker.color.r = 1.0;
+    marker.color.g = 1.0;
+    marker.color.b = 1.0;
+    marker.color.a = 0.2;
+
+    marker.lifetime = ros::Duration(0.1);
     return marker;
 }
 
@@ -139,7 +172,7 @@ void RasVisualizer::setMarkerToMarkerControl(visualization_msgs::InteractiveMark
 		marker.color.g = 1;
 	}
     marker.color.b = 0;
-    marker.color.a = 0.0;
+    marker.color.a = 0.2;
 
     // marker.lifetime = ros::Duration(2.0);
     control.markers.push_back(marker);
@@ -212,14 +245,14 @@ jsk_rviz_plugins::Pictogram RasVisualizer::createPictogram(const ras_carla::RasO
 
             pictogram.header.frame_id = "base_link";
             geometry_msgs::Pose arrow_pose = in_obj.object.pose;
-            arrow_pose.position.x += 8.0;
             arrow_pose = Ras::tfTransformer(arrow_pose, in_obj.object.header.frame_id, "base_link");
             arrow_len = sqrt(pow(arrow_pose.position.x, 2) + pow(arrow_pose.position.y, 2));
+            arrow_pose.position.x -= 5.0;
             pictogram.pose.orientation.x = 0.0;
             pictogram.pose.orientation.y = 0.0;
             pictogram.pose.orientation.z = -arrow_pose.position.y / (arrow_len * 2);
             pictogram.pose.orientation.w = - arrow_pose.position.x / (arrow_len);
-            pictogram.pose.position.x = 8.0;
+            pictogram.pose.position.x = 5.0;
             pictogram.pose.position.y = 0.0;
             pictogram.pose.position.z = 0.0;
             pictogram.color.r = 1.0;
@@ -237,13 +270,13 @@ jsk_rviz_plugins::Pictogram RasVisualizer::createPictogram(const ras_carla::RasO
             geometry_msgs::Quaternion quat = in_obj.object.pose.orientation;
             pictogram.header.frame_id = "map";
             pictogram.pose.position = in_obj.object.pose.position;
-            pictogram.pose.position.z = 1.0;
+            pictogram.pose.position.z = 0.5;
             pictogram.pose.orientation.x = quat.z * 0.7 + quat.x * 0.7;
             pictogram.pose.orientation.y = -quat.w * 0.7 + quat.y * 0.7;
             pictogram.pose.orientation.z = - quat.x * 0.7 + quat.z * 0.7;
             pictogram.pose.orientation.w = quat.y * 0.7 + quat.w * 0.7;
             pictogram.color.r = 1.0;
-            pictogram.color.g = 0.6;
+            pictogram.color.g = 0.0;
             pictogram.color.b = 0.0;
             pictogram.action = jsk_rviz_plugins::Pictogram::ADD;
             pictogram.mode = jsk_rviz_plugins::Pictogram::PICTOGRAM_MODE;

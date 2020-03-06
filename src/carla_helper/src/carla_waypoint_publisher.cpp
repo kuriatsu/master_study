@@ -30,7 +30,8 @@ WaypointPublisher::WaypointPublisher()
 
 	pub_waypoint = n.advertise<autoware_msgs::LaneArray>("/lane_waypoints_array", 1, true);
 
-	std::string file_name = "/home/mad-carla/share/Town05_waypoint_3.csv";
+	std::string file_name = "/home/mad-carla/share/Town05_waypoint_short_demo_1.csv";
+    // std::string file_name;
 	// n.getParam("/file_name", file_name);
 	std::cout << file_name << std::endl;
 	readFile(file_name);

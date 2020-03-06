@@ -248,18 +248,18 @@ class HUD(object):
         ego_loc = self.ego_vehicle.get_location()
         v = self.ego_vehicle.get_velocity()
 
-        # start timer and stop it
-        if self.start_loc and self.goal_loc:
-            if (ego_loc.x - self.start_loc[0])**2 + (ego_loc.y - self.start_loc[1])**2 < 4.0:
-                self.start_time = self.simulation_time
-
-            if (ego_loc.x - self.goal_loc[0])**2 + (ego_loc.y - self.goal_loc[1])**2 < 4.0:
-                self.start_time = 0.0
-                del self.start_loc[0:2]
-                del self.goal_loc[0:2]
-
-            elif self.start_time != 0.0:
-                self.stop_watch = self.simulation_time - self.start_time
+        # # start timer and stop it
+        # if self.start_loc and self.goal_loc:
+        #     if (ego_loc.x - self.start_loc[0])**2 + (ego_loc.y - self.start_loc[1])**2 < 4.0:
+        #         self.start_time = self.simulation_time
+        #
+        #     if (ego_loc.x - self.goal_loc[0])**2 + (ego_loc.y - self.goal_loc[1])**2 < 4.0:
+        #         self.start_time = 0.0
+        #         del self.start_loc[0:2]
+        #         del self.goal_loc[0:2]
+        #
+        #     elif self.start_time != 0.0:
+        #         self.stop_watch = self.simulation_time - self.start_time
 
         # judge the collision is worth counting as one collision
         if colhist[self.frame - 1] != 0: # count the first collision
@@ -392,18 +392,18 @@ def main():
         default='3840x1080',
         type=parser_res,
         help='window resolution (default: 800x600)')
-    argparser.add_argument(
-        '-s' ,'--start',
-        metavar='x,y,x,y...',
-        default='145.649108887,-1.90140223503,0.14900586009',
-        type=parser_position,
-        help='start position where the timer starts')
-    argparser.add_argument(
-        '-g' ,'--goal',
-        metavar='x,y,x,y...',
-        default='-145.308700562,91.4853286743,0.0420927219093',
-        type=parser_position,
-        help='goal position where the timer stops')
+    # argparser.add_argument(
+    #     '-s' ,'--start',
+    #     metavar='x,y,x,y...',
+    #     default='145.649108887,-1.90140223503,0.14900586009',
+    #     type=parser_position,
+    #     help='start position where the timer starts')
+    # argparser.add_argument(
+    #     '-g' ,'--goal',
+    #     metavar='x,y,x,y...',
+    #     default='-145.308700562,91.4853286743,0.0420927219093',
+    #     type=parser_position,
+    #     help='goal position where the timer stops')
 
     args = argparser.parse_args()
 

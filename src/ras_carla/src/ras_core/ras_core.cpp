@@ -197,19 +197,17 @@ std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
 
         case derived_object_msgs::Object::CLASSIFICATION_CAR:
         {
-            // ROS_INFO("findWpOfObj car");
             float obj_vec_x, obj_vec_y, obj_wp_vec_x, obj_wp_vec_y, inner_prod, dist_of_wp_obj;
             RasVector obj_vec(in_obj.object.pose);
-
+            // std::cout << obj_vec.x << ", " << obj_vec.y << ", " << obj_vec.len << std::endl;
             for (auto itr = m_wps_vec.begin(); itr != m_wps_vec.end(); itr ++)
             {
                 RasVector obj_wp_vec(in_obj.object.pose.position, itr->position);
-
-                if (isSameDirection(obj_vec, obj_wp_vec, 0.99))
+                if (isSameDirection(obj_vec, obj_wp_vec, 0.999))
                 {
-                    wp_vec.emplace_back(std::distance(m_wps_vec.begin(), itr));
                     pubOccupancyWp(m_wps_vec[std::distance(m_wps_vec.begin(), itr)].position, 1);
-                    break;
+                    wp_vec.emplace_back(std::distance(m_wps_vec.begin(), itr));
+                    // break;
                 }
             }
             break;
@@ -245,11 +243,16 @@ bool RasCore::isCollideObstacle(const ras_carla::RasObject &in_obj, const int &w
     switch (in_obj.object.classification)
     {
         case derived_object_msgs::Object::CLASSIFICATION_PEDESTRIAN:
+        {
             return (dist_of_wp_obj < dist_of_wp_ego || dist_of_wp_obj / in_obj.object.twist.linear.x < dist_of_wp_ego / m_ego_twist.linear.x);
             break;
+        }
         case derived_object_msgs::Object::CLASSIFICATION_CAR:
+        {
+            // return true;
             return (dist_of_wp_ego > 0 && dist_of_wp_obj / in_obj.object.twist.linear.x < dist_of_wp_ego / m_ego_twist.linear.x);
             break;
+        }
     }
 }
 
@@ -336,7 +339,7 @@ void RasCore::manageMarkers()
         wall.object.shape.type = shape_msgs::SolidPrimitive::BOX;
         wall.object.shape.dimensions.emplace_back(0.1);
         wall.object.shape.dimensions.emplace_back(5.0);
-        wall.object.shape.dimensions.emplace_back(2.0);
+        wall.object.shape.dimensions.emplace_back(4.0);
         wall.object.classification = derived_object_msgs::Object::CLASSIFICATION_BARRIER;
         wall.is_interaction = false;
         wall.is_important = true;

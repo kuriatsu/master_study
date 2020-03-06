@@ -1,5 +1,5 @@
 <launch>
-    <arg name='file_name' default='/home/mad-carla/share/Town05_waypoints_3.csv'/>
+    <arg name='file_name' default='/home/mad-carla/share/Town05_waypoints_short_demo_1.csv'/>
     <node pkg="carla_helper" type="carla_waypoint_publisher_node" name="waypoint_publisher"/>
         <param name="file_name" value='$(arg file_name)' />
 

@@ -317,6 +317,7 @@ class SpawnActor(object):
             self.trafficlight_list = self.getTraffcLight()
             # self.getEgoCar()
             self.spawnActor(self.scenario[0].findall('spawn'))
+            self.moveActor(self.scenario[0].findall('move'))
 
             while True:
                 self.world.wait_for_tick()

@@ -51,19 +51,19 @@
         <spawn id="10">
             <type>walker</type>
             <blueprint>walker.pedestrian.0008</blueprint>
-            <transform>21.3416748047,113.80871582,1.10391521454,0.0,1.8999941349,0.0</transform>
+            <transform>20.5808563232,151.871200562,1.10352861881,0.0,0.0999999046326,0.0</transform>
         </spawn>
         <spawn id="11">
             <type>walker</type>
-            <blueprint>walker.pedestrian.0002</blueprint>
-            <transform>47.6397399902,152.688919067,1.13273584843,0.0,-176.200027466,0.0</transform>
+            <blueprint>walker.pedestrian.0003</blueprint>
+            <transform>24.5585441589,-139.074768066,1.10389256477,0.0,2.99999475479,0.0</transform>
         </spawn>
+        <move id="1">
+            <speed>30.0</speed>
+        </move>
     </trigger>
     <trigger id="1">
-        <location>44.3533630371,204.987625122,-0.00375003810041</location>
-        <move id="1">
-            <speed>15.0</speed>
-        </move>
+        <location>207.324798584,51.6601142883,0.12889637053</location>
         <move id="2">
             <speed>18.0</speed>
         </move>
@@ -80,13 +80,13 @@
             <state>green</state>
             <time>30.0</time>
         </trafficlight>
+        <move id="3">
+            <speed>15.0</speed>
+        </move>
+        <move id="4">
+            <speed>20.0</speed>
+        </move>
     </trigger>
-    <move id="3">
-        <speed>15.0</speed>
-    </move>
-    <move id="4">
-        <speed>20.0</speed>
-    </move>
     <trigger id="3">
         <location>47.615776062,-201.315246582,-0.00392295839265</location>
         <move id="5">
@@ -101,6 +101,13 @@
         </move>
     </trigger>
     <trigger id="4">
+        <location>31.7855930328,-164.971008301,0.951515197754</location>
+        <move id="11">
+            <speed>3.0</speed>
+            <goal>48.9884262085,-138.974960327,1.13933289051</goal>
+        </move>
+    </trigger>
+    <trigger id="5">
         <location>27.5648479462,-133.143676758,-0.00493865972385</location>
         <trafficlight>
             <location>20.6975364685,-99.3774871826,1.10390031338</location>
@@ -127,13 +134,6 @@
         <kill id="3"/>
         <kill id="4"/>
         <kill id="5"/>
-    </trigger>
-    <trigger id="5">
-        <location>25.3815689087,-61.2746391296,-0.00387409212999</location>
-        <move id="7">
-            <speed>3.0</speed>
-            <goal>39.5861129761,-51.120929718,1.10212206841</goal>
-        </move>
     </trigger>
     <trigger id="6">
         <location>25.1721363068,-39.1161308289,-0.00480243656784</location>
@@ -184,18 +184,18 @@
         <kill id="7"/>
         <kill id="8"/>
         <kill id="9"/>
+        <kill id="11"/>
 
     </trigger>
     <trigger id="8">
-        <location>24.7906894684,115.742973328,-0.00455142976716</location>
-        <move id="11">
-            <speed>4.0</speed>
-            <goal>20.4364795685,152.090606689,1.10391521454</goal>
+        <location>24.4462127686,106.715194702,-0.00565765378997</location>
+        <move id="10">
+            <speed>3.0</speed>
+            <goal>43.3544960022,151.893753052,1.13830113411</goal>
         </move>
     </trigger>
     <trigger id="9">
         <location>24.4732303619,189.31539917,-0.00411247229204</location>
         <kill id="10"/>
-        <kill id="11"/>
     </trigger>
 </data>
