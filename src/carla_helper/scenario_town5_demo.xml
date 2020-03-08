@@ -35,7 +35,7 @@
         </spawn>
         <spawn id="7">
             <type>walker</type>
-            <blueprint>walker.pedestrian.0005</blueprint>
+            <blueprint>walker.pedestrian.0007</blueprint>
             <transform>21.9097862244,-51.7175521851,1.10390245914,0.0,0.399993896484,0.0</transform>
         </spawn>
         <spawn id="8">
@@ -45,12 +45,12 @@
         </spawn>
         <spawn id="9">
             <type>walker</type>
-            <blueprint>walker.pedestrian.0006</blueprint>
+            <blueprint>walker.pedestrian.0007</blueprint>
             <transform>21.5526542664,47.0035133362,1.10339605808,0.0,3.19992208481,0.0</transform>
         </spawn>
         <spawn id="10">
             <type>walker</type>
-            <blueprint>walker.pedestrian.0008</blueprint>
+            <blueprint>walker.pedestrian.0010</blueprint>
             <transform>20.5808563232,151.871200562,1.10352861881,0.0,0.0999999046326,0.0</transform>
         </spawn>
         <spawn id="11">
@@ -61,6 +61,12 @@
         <move id="1">
             <speed>30.0</speed>
         </move>
+        <pose id="7">
+            <form>call_right</form>
+        </pose>
+        <pose id="9">
+            <form>phone_right</form>
+        </pose>
     </trigger>
     <trigger id="1">
         <location>207.324798584,51.6601142883,0.12889637053</location>
