@@ -186,8 +186,7 @@ class SpawnActor(object):
 
     def poseActor(self, pose_list):
 
-        def poseCallLeft(world_id):
-            try:
+        def poseCallLeft():
                 arm_L = ('crl_arm__L', carla.Transform(location=carla.Location(x=0.2, z=1.45), rotation=carla.Rotation(yaw=60, pitch=20)))
                 forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.31, y=0.16, z=1.54), rotation=carla.Rotation(yaw=20, pitch=158, roll=0)))
                 hand_L = ('crl_hand__L', carla.Transform(location=carla.Location(x=0.13, y=0.1, z=1.62), rotation=carla.Rotation(pitch=20, yaw=90)))
@@ -195,12 +194,7 @@ class SpawnActor(object):
                 forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=-90, pitch=70)))
                 return [arm_L, forearm_L, hand_L, arm_R, forearm_R]
 
-            except:
-                print('cannot set pose. worle_id: ', world_id)
-                return
-
-        def poseCallRight(world_id):
-            try:
+        def poseCallRight():
                 arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.2, z=1.45), rotation=carla.Rotation(yaw=-60, pitch=-20)))
                 forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.31, y=0.16, z=1.54), rotation=carla.Rotation(yaw=-20, pitch=-158, roll=0)))
                 hand_R = ('crl_hand__R', carla.Transform(location=carla.Location(x=-0.13, y=0.1, z=1.62), rotation=carla.Rotation(roll=0, pitch=-170, yaw=90)))
@@ -208,12 +202,7 @@ class SpawnActor(object):
                 forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=90, pitch=-70, roll=180)))
                 return [arm_R, forearm_R, hand_R, arm_L, forearm_L]
 
-            except:
-                print('cannot set pose. worle_id: ', world_id)
-                return
-
-        def posePhoneRight(world_id):
-            try:
+        def posePhoneRight():
                 arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.16, z=1.49), rotation=carla.Rotation(yaw=-70, pitch=50)))
                 forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.18, y=0.14, z=1.3), rotation=carla.Rotation(yaw=-140, roll=-30, pitch=-30)))
                 hand_R = ('crl_hand__R', carla.Transform(location=carla.Location(x=-0.04, y=0.265, z=1.40), rotation=carla.Rotation(roll=-30, pitch=128, yaw=0)))
@@ -222,43 +211,37 @@ class SpawnActor(object):
                 neck = ('crl_neck__c', carla.Transform(location=carla.Location(x=0, y=0.0, z=1.55), rotation=carla.Rotation(yaw=180, roll=50, pitch=0)))
                 return [arm_R, forearm_R, hand_R, arm_L, forearm_L, neck]
 
-            except:
-                print('cannot set pose. worle_id: ', world_id)
-                return
-
-        def posePhoneLeft(world_id):
-            try:
+        def posePhoneLeft():
                 arm_L = ('crl_arm__L', carla.Transform(location=carla.Location(x=0.17, z=1.48), rotation=carla.Rotation(yaw=-110, pitch=-140, roll=0)))
                 forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.18, y=0.22, z=1.35), rotation=carla.Rotation(yaw=140, roll=180, pitch=20)))
                 hand_L = ('crl_hand__L', carla.Transform(location=carla.Location(x=0.04, y=0.34, z=1.40), rotation=carla.Rotation(yaw=170, pitch=-50)))
                 arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.17, y=0.0, z=1.48), rotation=carla.Rotation(yaw=90, roll=90, pitch=70)))
                 forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=-90, pitch=70)))
                 neck = ('crl_neck__c', carla.Transform(location=carla.Location(x=0, y=0.0, z=1.55), rotation=carla.Rotation(yaw=180, roll=50, pitch=0)))
-                return [arm_R, forearm_R, hand_R, arm_L, forearm_L, neck]
-
-            except:
-                print('cannot set pose. worle_id: ', world_id)
-                return
+                return [arm_L, forearm_L, hand_L, arm_R, forearm_R, neck]
 
         for pose in pose_list:
             for spawn in self.scenario.iter('spawn'):
                 if pose.attrib.get('id') == spawn.attrib.get('id'):
                     type = pose.find('form').text
-                    actor = self.world.get_actor(spawn.find('world_id').text)
-                    control = carla.WalkerBoneControl()
+                    try:
+                        actor = self.world.get_actor(spawn.find('world_id').text)
+                        control = carla.WalkerBoneControl()
+                        if type == 'call_right':
+                            control.bone_transforms = poseCallRight()
+                        elif type == 'call_left':
+                            control.bone_transforms = poseCallLeft()
+                        elif type == 'phone_right':
+                            control.bone_transforms = posePhoneRight()
+                        elif type == 'phone_left':
+                            control.bone_transforms = posePhoneLeft()
 
-                    if type == 'call_right':
-                        control.bone_transforms = poseCallRight(id)
-                    elif type == 'call_left':
-                        control.bone_transforms = poseCallLeft(id)
-                    elif type == 'phone_right':
-                        control.bone_transforms = posePhoneRight(id)
-                    elif type == 'phone_left':
-                        control.bone_transforms = posePhoneLeft(id)
+                        actor.apply_control(control)
+                        print('pose: '+ spawn.attrib.get('id'))
 
-                    actor.apply_control(control)
-                    print('pose: '+ spawn.attrib.get('id'))
-
+                    except:
+                        print('cannot set pose. id: ', spawn.attrib.get('id'))
+                        return
 
     def moveActor(self, move_list):
 

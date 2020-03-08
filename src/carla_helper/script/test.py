@@ -81,17 +81,14 @@ def main():
     #####################
     ####teleportation####
     #####################
-    # for carla_actor in world.get_actors():
-    #     if carla_actor.attributes.get('role_name') == 'ego_vehicle':
-    #         ego_vehicle = carla_actor
-    #         print("found")
+    for carla_actor in world.get_actors():
+        if carla_actor.attributes.get('role_name') == 'hero':
+            ego_vehicle = carla_actor
+            print("found")
 
-    # ego_vehicle.set_transform(carla.Transform(carla.Location(206.5,95.9,1.0),carla.Rotation(-0.0,-89.5,0.0)))
-    # ego_vehicle.set_location(carla.Location(24.4732303619,189.31539917,-0.00411247229204))
-    # while True:
-        # ego_vehicle.set_velocity(carla.Vector3D(100.0, 0.0,0.0))
-        # time.sleep(1.0)
-        # while True:
+    ego_vehicle.set_transform(carla.Transform(carla.Location(206.5,95.9,1.0),carla.Rotation(-0.0,-89.5,0.0)))
+    ego_vehicle.set_location(carla.Location(48.0550689697,145.219467163,0.0340613611042))
+    
 
     ##########################
     #### obrtain position ####
@@ -118,10 +115,10 @@ def main():
     ##########################
     ####control skelton#######
     ##########################
-    for carla_actor in world.get_actors():
-        if carla_actor.attributes.get('role_name') == 'ego_vehicle':
-            ego_vehicle = carla_actor
-            print("found")
+    # for carla_actor in world.get_actors():
+    #     if carla_actor.attributes.get('role_name') == 'ego_vehicle':
+    #         ego_vehicle = carla_actor
+    #         print("found")
         ############################
         #####right hand cellphone###
         ############################
@@ -172,21 +169,18 @@ def main():
         ############################
         #####left hand call###
         ############################
-    control = carla.WalkerBoneControl()
-
-    arm_L = ('crl_arm__L', carla.Transform(location=carla.Location(x=0.17, z=1.48), rotation=carla.Rotation(yaw=-110, pitch=-140, roll=0)))
-    forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.18, y=0.22, z=1.35), rotation=carla.Rotation(yaw=140, roll=180, pitch=20)))
-    hand_L = ('crl_hand__L', carla.Transform(location=carla.Location(x=0.04, y=0.34, z=1.40), rotation=carla.Rotation(yaw=170, pitch=-50)))
-    arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.17, y=0.0, z=1.48), rotation=carla.Rotation(yaw=90, roll=90, pitch=70)))
-    forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=-90, pitch=70)))
-    neck = ('crl_neck__c', carla.Transform(location=carla.Location(x=0, y=0.0, z=1.55), rotation=carla.Rotation(yaw=180, roll=50, pitch=0)))
-
-
-    # control.bone_transforms = [arm_L, arm_R, forearm_R, neck]
-    # control.bone_transforms = [arm_L, forearm_L, arm_R, forearm_R, neck]
-    control.bone_transforms = [arm_L, forearm_L, hand_L, arm_R, forearm_R, neck]
-    ego_vehicle.apply_control(control)
-    ego_vehicle.apply_control(control)
+    # control = carla.WalkerBoneControl()
+    #
+    # arm_L = ('crl_arm__L', carla.Transform(location=carla.Location(x=0.17, z=1.48), rotation=carla.Rotation(yaw=-110, pitch=-140, roll=0)))
+    # forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.18, y=0.22, z=1.35), rotation=carla.Rotation(yaw=140, roll=180, pitch=20)))
+    # hand_L = ('crl_hand__L', carla.Transform(location=carla.Location(x=0.04, y=0.34, z=1.40), rotation=carla.Rotation(yaw=170, pitch=-50)))
+    # arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.17, y=0.0, z=1.48), rotation=carla.Rotation(yaw=90, roll=90, pitch=70)))
+    # forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=-90, pitch=70)))
+    # neck = ('crl_neck__c', carla.Transform(location=carla.Location(x=0, y=0.0, z=1.55), rotation=carla.Rotation(yaw=180, roll=50, pitch=0)))
+    #
+    # control.bone_transforms = [arm_L, forearm_L, hand_L, arm_R, forearm_R, neck]
+    # ego_vehicle.apply_control(control)
+    # ego_vehicle.apply_control(control)
 
 if __name__ == '__main__':
 

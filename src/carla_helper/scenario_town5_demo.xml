@@ -58,6 +58,36 @@
             <blueprint>walker.pedestrian.0003</blueprint>
             <transform>24.5585441589,-139.074768066,1.10389256477,0.0,2.99999475479,0.0</transform>
         </spawn>
+        <spawn id="12">
+            <type>walker</type>
+            <blueprint>walker.pedestrian.0007</blueprint>
+            <transform>69.9370422363,150.70249939,1.13979101181,0.0,-86.0999832153,0.0</transform>
+        </spawn>
+        <spawn id="13">
+            <type>walker</type>
+            <blueprint>walker.pedestrian.0007</blueprint>
+            <transform>101.252311707,133.07472229,1.14196908474,0.0,77.099937439,0.0</transform>
+        </spawn>
+        <spawn id="14">
+            <type>ai_walker</type>
+            <blueprint>random</blueprint>
+            <transform>162.465499878,88.9015426636,1.14158427715,0.0,91.6000061035,0.0</transform>
+        </spawn>
+        <spawn id="15">
+            <type>walker</type>
+            <blueprint>walker.pedestrian.0001</blueprint>
+            <transform>160.021102905,59.9911842346,1.14176332951,0.0,56.5999526978,0.0</transform>
+        </spawn>
+        <spawn id="16">
+            <type>ai_vehicle</type>
+            <blueprint>random</blueprint>
+            <transform>138.557357788,1.86025214195,0.968923270702,0.0,-3.29998850822,0.0</transform>
+        </spawn>
+        <spawn id="17">
+            <type>ai_vehicle</type>
+            <blueprint>random</blueprint>
+            <transform>126.333641052,1.93505835533,0.968923270702,0.0,0.499999910593,0.0</transform>
+        </spawn>
         <move id="1">
             <speed>30.0</speed>
         </move>
@@ -203,5 +233,38 @@
     <trigger id="9">
         <location>24.4732303619,189.31539917,-0.00411247229204</location>
         <kill id="10"/>
+        <pose id="12">
+            <form>call_right</form>
+        </pose>
+        <pose id="13">
+            <form>phone_left</form>
+        </pose>
+        <pose id="15">
+            <form>phone_right</form>
+        </pose>
+    </trigger>
+    <trigger id="11">
+        <location>129.258087158,131.3956604,0.0349267609417</location>
+        <move id="14">
+            <speed>3.0</speed>
+        </move>
+    </trigger>
+    <trigger id="12">
+        <location>155.427352905,72.6712722778,0.0339402034879</location>
+        <move id="16">
+            <speed>20.0</speed>
+        </move>
+        <move id="17">
+            <speed>15.0</speed>
+        </move>
+    </trigger>
+    <trigger id="13">
+        <location>114.792320251,-2.06020331383,0.0126166976988</location>
+        <kill id="12"/>
+        <kill id="13"/>
+        <kill id="14"/>
+        <kill id="15"/>
+        <kill id="16"/>
+        <kill id="17"/>
     </trigger>
 </data>

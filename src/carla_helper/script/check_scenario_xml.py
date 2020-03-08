@@ -122,16 +122,19 @@ def main():
                     debug.draw_string(location=actor_position[action.attrib.get('id')]+carla.Location(x=-1.0, z=1.0), text='start', color=carla.Color(255,0,255), life_time=args.lifetime)
                     debug.draw_point(location=start+carla.Location(x=-1.0), life_time=args.lifetime, size=0.1, color=color[int(trriger.attrib.get('id'))%10])
 
-            if action.tag == "kill":
+            if action.tag == 'pose':
                 debug.draw_point(location=actor_position[action.attrib.get('id')]+carla.Location(x=1.0), life_time=args.lifetime, size=0.1, color=color[int(trriger.attrib.get('id'))%10])
-                debug.draw_string(location=actor_position[action.attrib.get('id')]+carla.Location(x=1.0, z=1.0), text='kill', color=carla.Color(255,0,0), life_time=args.lifetime)
+                debug.draw_string(location=actor_position[action.attrib.get('id')]+carla.Location(x=1.0, z=1.0), text=action.find('form').text, color=carla.Color(150,150,0), life_time=args.lifetime)
+
+            if action.tag == "kill":
+                debug.draw_point(location=actor_position[action.attrib.get('id')]+carla.Location(x=2.0), life_time=args.lifetime, size=0.1, color=color[int(trriger.attrib.get('id'))%10])
+                debug.draw_string(location=actor_position[action.attrib.get('id')]+carla.Location(x=2.0, z=1.0), text='kill', color=carla.Color(255,0,0), life_time=args.lifetime)
 
             if action.tag == "trafficlight":
                 buf = action.find('location').text
                 location = carla.Location(buf[0], buf[1], buf[2])
                 debug.draw_point(location=location, life_time=args.lifetime, size=0.1, color=color[int(trriger.attrib.get('id'))%10])
                 debug.draw_string(location=location+carla.Location(x=2.0, z=1.0), text=action.find("time").text, color=trafficlight_color[action.find("state").text], life_time=args.lifetime)
-
                 # else:
                     # if start is not None:
                         # debug.draw_string(location=start+carla.Location(z=1.0), text='start_ai', color=carla.Color(0,255,0), life_time=30)
