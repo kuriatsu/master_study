@@ -250,7 +250,7 @@
         </move>
     </trigger>
     <trigger id="12">
-        <location>155.427352905,72.6712722778,0.0339402034879</location>
+        <location>152.44859314,103.447418213,0.167732715607</location>
         <move id="16">
             <speed>20.0</speed>
         </move>
