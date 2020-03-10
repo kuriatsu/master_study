@@ -86,9 +86,9 @@ def main():
             ego_vehicle = carla_actor
             print("found")
 
-    ego_vehicle.set_transform(carla.Transform(carla.Location(206.5,95.9,1.0),carla.Rotation(-0.0,-89.5,0.0)))
-    ego_vehicle.set_location(carla.Location(48.0550689697,145.219467163,0.0340613611042))
-    
+    # ego_vehicle.set_transform(carla.Transform(carla.Location(206.5,95.9,1.0),carla.Rotation(-0.0,-89.5,0.0)))
+    ego_vehicle.set_location(carla.Location(20.5808563232,151.871200562,1.10352861881))
+
 
     ##########################
     #### obrtain position ####

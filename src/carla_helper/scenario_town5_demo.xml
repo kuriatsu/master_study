@@ -50,8 +50,8 @@
         </spawn>
         <spawn id="10">
             <type>walker</type>
-            <blueprint>walker.pedestrian.0010</blueprint>
-            <transform>20.5808563232,151.871200562,1.10352861881,0.0,0.0999999046326,0.0</transform>
+            <blueprint>walker.pedestrian.0002</blueprint>
+            <transform>20.5808582306,151.871185303,1.10352861881,0.0,-30.500038147,0.0</transform>
         </spawn>
         <spawn id="11">
             <type>walker</type>
@@ -221,16 +221,8 @@
         <kill id="8"/>
         <kill id="9"/>
         <kill id="11"/>
-
     </trigger>
     <trigger id="8">
-        <location>24.4462127686,106.715194702,-0.00565765378997</location>
-        <move id="10">
-            <speed>3.0</speed>
-            <goal>43.3544960022,151.893753052,1.13830113411</goal>
-        </move>
-    </trigger>
-    <trigger id="9">
         <location>24.4732303619,189.31539917,-0.00411247229204</location>
         <kill id="10"/>
         <pose id="12">
@@ -243,13 +235,13 @@
             <form>phone_right</form>
         </pose>
     </trigger>
-    <trigger id="11">
+    <trigger id="9">
         <location>129.258087158,131.3956604,0.0349267609417</location>
         <move id="14">
             <speed>3.0</speed>
         </move>
     </trigger>
-    <trigger id="12">
+    <trigger id="10">
         <location>152.44859314,103.447418213,0.167732715607</location>
         <move id="16">
             <speed>20.0</speed>
@@ -258,7 +250,7 @@
             <speed>15.0</speed>
         </move>
     </trigger>
-    <trigger id="13">
+    <trigger id="11">
         <location>114.792320251,-2.06020331383,0.0126166976988</location>
         <kill id="12"/>
         <kill id="13"/>
