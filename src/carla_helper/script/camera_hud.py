@@ -109,6 +109,9 @@ class Cliant(object):
 
         finally:
             self.set_synchronous_mode(False)
+            self.camera.camera.destroy()
+            print('destroy camera')
+            # if self.camera.spawned_here:
             pygame.quit()
 
 # ==============================================================================
@@ -120,11 +123,18 @@ class Camera(object):
         self.camera = None
         self.image = None
         self.capture = False
+        self.spawned_here=False
 
         for carla_actor in world.get_actors():
             if carla_actor.type_id == "sensor.camera.rgb":
                 if carla_actor.attributes.get('role_name') == args.cameraname:
                     self.camera = carla_actor
+                    print('found camera')
+
+        if self.camera is None:
+            self.camera = self.set_sensor(args, world)
+            self.spawned_here = True
+            print('spawn camera')
 
         weak_self = weakref.ref(self)
         self.camera.listen(lambda image: weak_self().set_image(weak_self, image))
@@ -160,6 +170,25 @@ class Camera(object):
             array = array[:, :, ::-1]
             surface = pygame.surfarray.make_surface(array.swapaxes(0, 1))
             display.blit(surface, (0, 0))
+
+    def set_sensor(self, args, world):
+        """set sensor if specified sensor is not in world
+
+        """
+        for carla_actor in world.get_actors():
+            if carla_actor.attributes.get('role_name') == args.egoname:
+                ego_vehicle = carla_actor
+
+        camera_bp = world.get_blueprint_library().find('sensor.camera.rgb')
+        camera_bp.set_attribute('image_size_x', str(args.res[0]))
+        camera_bp.set_attribute('image_size_y', str(args.res[1]))
+        camera_bp.set_attribute('role_name', args.cameraname)
+        camera_transform = carla.Transform(carla.Location(x=0.0, y=0.0, z=0.0), carla.Rotation(0.0,0.0,0.0))
+        camera = world.spawn_actor(camera_bp, camera_transform, attach_to=ego_vehicle, attachment_type=carla.AttachmentType.SpringArm)
+
+        camera.set_transform(carla.Transform(carla.Location(x=-0.2, y=-0.2, z=0.9), carla.Rotation(0.0,0.0,0.0)))
+        return camera
+
 # ==============================================================================
 # -- CollisionSensor -----------------------------------------------------------
 # ==============================================================================
@@ -248,18 +277,16 @@ class HUD(object):
         ego_loc = self.ego_vehicle.get_location()
         v = self.ego_vehicle.get_velocity()
 
-        # # start timer and stop it
-        # if self.start_loc and self.goal_loc:
-        #     if (ego_loc.x - self.start_loc[0])**2 + (ego_loc.y - self.start_loc[1])**2 < 4.0:
-        #         self.start_time = self.simulation_time
-        #
-        #     if (ego_loc.x - self.goal_loc[0])**2 + (ego_loc.y - self.goal_loc[1])**2 < 4.0:
-        #         self.start_time = 0.0
-        #         del self.start_loc[0:2]
-        #         del self.goal_loc[0:2]
-        #
-        #     elif self.start_time != 0.0:
-        #         self.stop_watch = self.simulation_time - self.start_time
+        # start timer and stop it
+        if self.start_loc and self.goal_loc:
+            if (ego_loc.x - self.start_loc[0])**2 + (ego_loc.y - self.start_loc[1])**2 < 4.0:
+                self.start_time = self.simulation_time
+
+            if (ego_loc.x - self.goal_loc[0])**2 + (ego_loc.y - self.goal_loc[1])**2 < 4.0:
+                self.start_time = 0.0
+
+            elif self.start_time != 0.0:
+                self.stop_watch = self.simulation_time - self.start_time
 
         # judge the collision is worth counting as one collision
         if colhist[self.frame - 1] != 0: # count the first collision
@@ -380,7 +407,7 @@ def main():
         '-c', '--cameraname',
         metavar='NAME',
         default='wide_front',
-        help='camera role name (default: "ros_camera")')
+        help='camera role name (default: "wide_front")')
     argparser.add_argument(
         '-e', '--egoname',
         metavar='NAME',
@@ -391,23 +418,21 @@ def main():
         metavar='WIDTHxHEIGHT',
         default='3840x1080',
         type=parser_res,
-        help='window resolution (default: 800x600)')
-    # argparser.add_argument(
-    #     '-s' ,'--start',
-    #     metavar='x,y,x,y...',
-    #     default='145.649108887,-1.90140223503,0.14900586009',
-    #     type=parser_position,
-    #     help='start position where the timer starts')
-    # argparser.add_argument(
-    #     '-g' ,'--goal',
-    #     metavar='x,y,x,y...',
-    #     default='-145.308700562,91.4853286743,0.0420927219093',
-    #     type=parser_position,
-    #     help='goal position where the timer stops')
+        help='window resolution (default: 3840x1080)')
+    argparser.add_argument(
+        '-s' ,'--start',
+        metavar='x,y,x,y...',
+        default='145.649108887,-1.90140223503,0.14900586009',
+        type=parser_position,
+        help='start position where the timer starts')
+    argparser.add_argument(
+        '-g' ,'--goal',
+        metavar='x,y,x,y...',
+        default='-145.308700562,91.4853286743,0.0420927219093',
+        type=parser_position,
+        help='goal position where the timer stops')
 
     args = argparser.parse_args()
-
-    # args.width, args.heigh = [int(x) for x in args.res.split('x')]
 
     try:
         client = Cliant(args)

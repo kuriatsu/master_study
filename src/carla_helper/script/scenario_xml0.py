@@ -10,7 +10,6 @@ try:
         sys.version_info.major,
         sys.version_info.minor,
         'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
-    sys.path.append("./")
 except IndexError:
     pass
 
@@ -24,9 +23,8 @@ import warnings
 import random
 import math
 import time
-from pose import PoseDefine
 
-class ScenarioXML(object):
+class SpawnActor(object):
 
     def __init__(self):
         self.client = None
@@ -38,35 +36,22 @@ class ScenarioXML(object):
         self.blueprintVehicles = None
         self.blueprintWalkers = None
         self.blueprintWalkerController = None
-        self.pose_define = None
         self.control_actor_list = []
         self.trafficlight_list = []
 
     def readFile(self, filename):
-        """read xml file and return root of ElementTree, elements of some lists are changed from text to float.
-        [args]
-        filename: path to xml file
-        [return]
-        root of the ElementTree
-        """
 
         tree = ET.parse(filename)
         root = tree.getroot()
-        edit_tag_list = ['transform', 'location', 'target'] # tags of list which you want to use as float list, not text
+        edit_tag_list = ['transform', 'location', 'goal']
 
-        # convert text list to float list
         for tag in edit_tag_list:
             for itr in root.iter(tag):
-                if itr.text is not None:
-                    itr.text = [float(val) for val in itr.text.split(',')]
+                itr.text = [float(val) for val in itr.text.split(',')]
         return root
 
 
     def getEgoCar(self):
-        """ get ego vehicle actor
-        [return]
-        self.ego_vehicle : actor of echo vehicle
-        """
 
         for carla_actor in self.world.get_actors():
             if carla_actor.type_id.startswith("vehicle"):
@@ -75,12 +60,10 @@ class ScenarioXML(object):
 
 
     def checkTrigger(self):
-        """check Trigger and run action
-        """
 
         if self.scenario is not None:
             ego_pose = self.ego_vehicle.get_transform()
-            trigger = self.scenario[self.trigger_index] # get trigger tree from scenario tree
+            trigger = self.scenario[self.trigger_index]
             distance = (ego_pose.location.x - trigger[0].text[0]) ** 2 \
                        + (ego_pose.location.y - trigger[0].text[1]) ** 2
 
@@ -203,7 +186,39 @@ class ScenarioXML(object):
 
     def poseActor(self, pose_list):
 
-        control = carla.WalkerBoneControl()
+        def poseCallLeft():
+                arm_L = ('crl_arm__L', carla.Transform(location=carla.Location(x=0.2, z=1.45), rotation=carla.Rotation(yaw=60, pitch=20)))
+                forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.31, y=0.16, z=1.54), rotation=carla.Rotation(yaw=20, pitch=158, roll=0)))
+                hand_L = ('crl_hand__L', carla.Transform(location=carla.Location(x=0.13, y=0.1, z=1.62), rotation=carla.Rotation(pitch=20, yaw=90)))
+                arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.17, y=0.0, z=1.48), rotation=carla.Rotation(yaw=90, roll=90, pitch=70)))
+                forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=-90, pitch=70)))
+                return [arm_L, forearm_L, hand_L, arm_R, forearm_R]
+
+        def poseCallRight():
+                arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.2, z=1.45), rotation=carla.Rotation(yaw=-60, pitch=-20)))
+                forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.31, y=0.16, z=1.54), rotation=carla.Rotation(yaw=-20, pitch=-158, roll=0)))
+                hand_R = ('crl_hand__R', carla.Transform(location=carla.Location(x=-0.13, y=0.1, z=1.62), rotation=carla.Rotation(roll=0, pitch=-170, yaw=90)))
+                arm_L = ('crl_arm__L', carla.Transform(location=carla.Location(x=0.17, y=0.0, z=1.48), rotation=carla.Rotation(yaw=-90, pitch=-70)))
+                forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=90, pitch=-70, roll=180)))
+                return [arm_R, forearm_R, hand_R, arm_L, forearm_L]
+
+        def posePhoneRight():
+                arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.16, z=1.49), rotation=carla.Rotation(yaw=-70, pitch=50)))
+                forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.18, y=0.14, z=1.3), rotation=carla.Rotation(yaw=-140, roll=-30, pitch=-30)))
+                hand_R = ('crl_hand__R', carla.Transform(location=carla.Location(x=-0.04, y=0.265, z=1.40), rotation=carla.Rotation(roll=-30, pitch=128, yaw=0)))
+                arm_L = ('crl_arm__L', carla.Transform(location=carla.Location(x=0.17, y=0.0, z=1.48), rotation=carla.Rotation(yaw=-90, pitch=-70)))
+                forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=90, pitch=-70, roll=180)))
+                neck = ('crl_neck__c', carla.Transform(location=carla.Location(x=0, y=0.0, z=1.55), rotation=carla.Rotation(yaw=180, roll=50, pitch=0)))
+                return [arm_R, forearm_R, hand_R, arm_L, forearm_L, neck]
+
+        def posePhoneLeft():
+                arm_L = ('crl_arm__L', carla.Transform(location=carla.Location(x=0.17, z=1.48), rotation=carla.Rotation(yaw=-110, pitch=-140, roll=0)))
+                forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.18, y=0.22, z=1.35), rotation=carla.Rotation(yaw=140, roll=180, pitch=20)))
+                hand_L = ('crl_hand__L', carla.Transform(location=carla.Location(x=0.04, y=0.34, z=1.40), rotation=carla.Rotation(yaw=170, pitch=-50)))
+                arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.17, y=0.0, z=1.48), rotation=carla.Rotation(yaw=90, roll=90, pitch=70)))
+                forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=-90, pitch=70)))
+                neck = ('crl_neck__c', carla.Transform(location=carla.Location(x=0, y=0.0, z=1.55), rotation=carla.Rotation(yaw=180, roll=50, pitch=0)))
+                return [arm_L, forearm_L, hand_L, arm_R, forearm_R, neck]
 
         for pose in pose_list:
             for spawn in self.scenario.iter('spawn'):
@@ -211,17 +226,24 @@ class ScenarioXML(object):
                     type = pose.find('form').text
                     try:
                         actor = self.world.get_actor(spawn.find('world_id').text)
-                        control.bone_transform = self.pose_define.pose_dict.get(type)
-                        actor.apply_control(control)
-                        time.sleep(0.05)
+                        control = carla.WalkerBoneControl()
+                        if type == 'call_right':
+                            control.bone_transforms = poseCallRight()
+                        elif type == 'call_left':
+                            control.bone_transforms = poseCallLeft()
+                        elif type == 'phone_right':
+                            control.bone_transforms = posePhoneRight()
+                        elif type == 'phone_left':
+                            control.bone_transforms = posePhoneLeft()
+
                         actor.apply_control(control)
                         print('pose: '+ spawn.attrib.get('id'))
+
                     except:
                         print('cannot set pose. id: ', spawn.attrib.get('id'))
                         return
 
-
-    def moveActor(self, move_elem_list):
+    def moveActor(self, move_list):
 
         def moveAiWalker(world_id, speed):
             try:
@@ -241,91 +263,69 @@ class ScenarioXML(object):
                 print('cannot start AI vehicle. world_id: ', world_id)
                 return
 
-        def moveInnocentActor(world_id, type, target_list):
-            """add motion information to the stack
-            world_id : actir id under the carla
-            """
+        def moveInnocentActor(world_id, type, speed, goal):
             control_actor = {}
-            control_actor['actor'] = self.world.get_actor(world_id)
+            actor = self.world.get_actor(world_id)
+            control_actor['actor'] = actor
             control_actor['type'] = type
-            control_actor['target_index'] = 0
-            control_actor['target_list'] = target_list
+            control_actor['goal'] = carla.Location(goal[0], goal[1], goal[2])
+            control_actor['speed'] = speed
             self.control_actor_list.append(control_actor)
 
-        for move_elem in move_elem_list:
-            for spawn_elem in self.scenario.iter('spawn'):
-                if move_elem.attrib.get('id') == spawn_elem.attrib.get('id'):
-                    type = spawn_elem.find('type').text
+        for move in move_list:
+            for spawn in self.scenario.iter('spawn'):
+                if move.attrib.get('id') == spawn.attrib.get('id'):
+                    type = spawn.find('type').text
                     if type == 'ai_walker':
-                        moveAiWalker(spawn_elem.find('ai_controller_id').text, float(move_elem.find('target').attrib.get('speed')))
+                        moveAiWalker(spawn.find('ai_controller_id').text, float(move.find('speed').text))
                     elif type == 'ai_vehicle':
-                        moveAiVehicle(spawn_elem.find('world_id').text)
+                        moveAiVehicle(spawn.find('world_id').text)
                     elif type == 'walker' or type == 'vehicle':
-                        moveInnocentActor(spawn_elem.find('world_id').text, type, move_elem.findall('target')) # take over world info in spawn element and move info in move element
-                    print("move: " + spawn_elem.attrib.get("id"));
+                        moveInnocentActor(spawn.find('world_id').text, type, float(move.find('speed').text), move.find('goal').text)
+                    print("move: " + spawn.attrib.get("id"));
+
+
 
 
     def controlActor(self):
-        """control actor in loop
-        [args]
-        self.control_actor_list : actor dictionary for control them in loop
-
-        """
         # debug = self.world.debug
         for control_actor in self.control_actor_list:
-
             if control_actor['actor'].is_alive == False:
-
                 self.control_actor_list.remove(control_actor)
                 print("Innocent actor ", control_actor['actor'].id, "is dead")
                 continue
-
             else:
-                # some information for movng
-                actor = control_actor.get('actor')
+                actor = control_actor['actor']
                 transform = actor.get_transform()
-                goal = control_actor.get('target_list')[control_actor.get('target_index')].text
-                speed = float(control_actor.get('target_list')[control_actor.get('target_index')].attrib.get('speed'))
-
-                # calc culent motion vector and distance to the target
-                vector = carla.Vector3D(goal[0] - transform.location.x,
-                                               goal[1] - transform.location.y,
-                                              goal[2] - transform.location.z)
+                vector = carla.Vector3D(control_actor['goal'].x - transform.location.x,
+                                               control_actor['goal'].y - transform.location.y,
+                                              control_actor['goal'].z)
                 dist = math.sqrt(vector.x ** 2 + vector.y ** 2)
-
-                # normalize vector to calcurate velocity
                 vector.x = vector.x / dist
                 vector.y = vector.y / dist
                 # debug.draw_arrow(begin=transform.location ,end=transform.location + carla.Location(vector.x, vector.y, 0.0), life_time=0.5)
 
-                # update distination if move has multiple targets
-                if dist < 1.0:
-                    if control_actor.get('target_index') + 1 < len(control_actor.get('target_list')):
-                        control_actor['target_index'] += 1
-                    # if actor reached target and doesn't have next targets, dicelerate to make them natural.
-                    else:
-                        self.control_actor_list.remove(control_actor)
-                        # if control_actor['type'] == 'walker':
-                        #     speed = speed * dist
-                        # else if control_actor['type'] == 'vehicle':
-                        #     self.control_actor_list.remove(control_actor)
-
             if control_actor['type'] == 'walker':
-                control = carla.WalkerControl(direction=vector, speed=speed)
+
+                control = carla.WalkerControl(direction=vector, speed=control_actor.get('speed'))
                 control_actor['actor'].apply_control(control)
 
             elif control_actor['type'] == 'vehicle':
                 # calc vel and rotation
-                alpha = math.atan(vector.y / vector.x) - transform.rotation.yaw
-                omega = 2 * speed * math.sin(alpha) / dist
+                if dist < 1.0:
+                    control_actor['actor'].set_velocity(carla.Vector3D(0.0,0.0,0.0))
+                    self.control_actor_list.remove(control_actor)
+                else:
+                    alpha = math.atan(vector.y / vector.x) - transform.rotation.yaw
+                    omega = 2 * control_actor['speed'] * math.sin(alpha) / dist
 
-                control = carla.VehicleControl()
-                velocity = carla.Vector3D()
-                velocity.x = vector.x * speed
-                velocity.y = vector.y  * speed
-                velocity.z = 0.0
-                control_actor['actor'].set_velocity(velocity)
-                control_actor['actor'].set_angular_velocity(carla.Vector3D(0.0, 0.0, omega))
+                    control = carla.VehicleControl()
+                    velocity = carla.Vector3D()
+                    velocity.x = vector.x * control_actor['speed']
+                    velocity.y = vector.y  * control_actor['speed']
+                    velocity.z = 0.0
+                    control_actor['actor'].set_velocity(velocity)
+                    control_actor['actor'].set_angular_velocity(carla.Vector3D(0.0, 0.0, omega))
 
 
     def killActor(self, death_note):
@@ -376,7 +376,6 @@ class ScenarioXML(object):
             self.blueprintWalkerController = self.world.get_blueprint_library().find('controller.ai.walker')
             self.scenario = self.readFile(args.scenario_file)
             self.trafficlight_list = self.getTraffcLight()
-            self.pose_define = PoseDefine()
             # self.getEgoCar()
             self.spawnActor(self.scenario[0].findall('spawn'))
             self.moveActor(self.scenario[0].findall('move'))
@@ -426,8 +425,8 @@ def main():
     args = argparser.parse_args()
 
     try:
-        scenario_xml = ScenarioXML()
-        scenario_xml.game_loop(args)
+        spawn_actor = SpawnActor()
+        spawn_actor.game_loop(args)
     finally:
         print('finish')
 

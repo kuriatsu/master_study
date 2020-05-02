@@ -27,25 +27,23 @@
     <trigger id="1">
         <location>130.047607422,-2.44484376907,0.0143852643669</location>
         <move id="0">
-            <speed>2.0</speed>
+            <target speed="2.0"/>
         </move>
         <move id="2">
-            <speed>4.0</speed>
-            <goal>110.707000732,9.84315395355,1.09916758537</goal>
+            <target speed="4.0">110.707000732,9.84315395355,1.09916758537</target>
+            <target speed="2.0">91.6044311523,10.6292161942,1.10389995575</target>
         </move>
         <move id="4">
-            <speed>8.0</speed>
+            <target speed="8.0"/>
         </move>
     </trigger>
     <trigger id="2">
         <location>119.130821228,-2.46624326706,0.0138290869072</location>
         <move id="2">
-            <speed>2.0</speed>
-            <goal>91.6044311523,10.6292161942,1.10389995575</goal>
+            <target speed="5.0">98.6044311523,16.6292161942,1.10389995575</target>
         </move>
         <move id="8">
-            <speed>8.0</speed>
-            <goal>99.2578582764,19.9713745117,0.953500270844</goal>
+            <target speed="8.0">99.2578582764,19.9713745117,0.953500270844</target>
         </move>
     </trigger>
     <trigger id="3">

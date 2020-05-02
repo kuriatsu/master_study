@@ -214,7 +214,7 @@
             <transform>-76.1733856201,6.37776374817,-0.0133644482121,0.0,-1.36016857624,0.0</transform>
         </spawn>
         <spawn id="42">
-            <type>vehicle</type>
+            <type>ai_vehicle</type>
             <blueprint>random</blueprint>
             <transform>-65.5242843628,3.02553462982,-0.013641204685,0.0,-0.0575561411679,0.0</transform>
         </spawn>
@@ -584,11 +584,6 @@
         <move id="55">
             <speed>12.0</speed>
         </move>
-    </trigger>
-    <trigger id="3">
-        <location>3.21676540375,-4.58571434021,0.0421811677516</location>
-        <move>
-            <goal
     </trigger>
     <trigger id="4">
         <location>-128.590194702,-4.02866220474,0.0419894009829</location>

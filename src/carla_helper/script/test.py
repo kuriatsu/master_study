@@ -29,6 +29,12 @@ def main():
     # get ego car
 
 # ##########################
+# spawn actor
+############################
+    blueprint = world.get_blueprint_library().find('static.prop.plasticbag')
+    transform = carla.Transform(carla.Location(-210.104354858,1.57313215733,0.51499998569), carla.Rotation(0.0,75.1999435425,0.0))
+    world.spawn_actor(blueprint, transform)
+# ##########################
 # traffic light
 ############################
     # light_right = []
@@ -81,14 +87,14 @@ def main():
     #####################
     ####teleportation####
     #####################
-    for carla_actor in world.get_actors():
-        if carla_actor.attributes.get('role_name') == 'hero':
-            ego_vehicle = carla_actor
-            print("found")
+    # for carla_actor in world.get_actors():
+    #     if carla_actor.attributes.get('role_name') == 'hero':
+    #         ego_vehicle = carla_actor
+    #         print("found")
+    #
+    # ego_vehicle.set_transform(carla.Transform(carla.Location(206.5,95.9,1.0),carla.Rotation(-0.0,-89.5,0.0)))
+    # ego_vehicle.set_location(carla.Location(48.0550689697,145.219467163,0.0340613611042))
 
-    ego_vehicle.set_transform(carla.Transform(carla.Location(206.5,95.9,1.0),carla.Rotation(-0.0,-89.5,0.0)))
-    ego_vehicle.set_location(carla.Location(48.0550689697,145.219467163,0.0340613611042))
-    
 
     ##########################
     #### obrtain position ####
