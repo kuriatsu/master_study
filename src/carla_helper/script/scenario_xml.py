@@ -28,19 +28,19 @@ from pose import PoseDefine
 
 class ScenarioXML(object):
 
-    def __init__(self):
-        self.client = None
-        self.world = None
+    def __init__(self, client, world, scenario_file):
+        self.client = client
+        self.world = world
         self.ego_vehicle = None
-        self.scenario = None
+        self.ego_pose = None
+        self.scenario = self.readFile(scenario_file)
         self.intrusion_thres = 3.0
         self.trigger_index = 1
-        self.blueprintVehicles = None
-        self.blueprintWalkers = None
-        self.blueprintWalkerController = None
-        self.pose_define = None
+        self.blueprint = None
         self.control_actor_list = []
-        self.trafficlight_list = []
+        self.trafficlight_list = self.getTraffcLight()
+        self.pose_define = PoseDefine()
+
 
     def readFile(self, filename):
         """read xml file and return root of ElementTree, elements of some lists are changed from text to float.
@@ -52,7 +52,7 @@ class ScenarioXML(object):
 
         tree = ET.parse(filename)
         root = tree.getroot()
-        edit_tag_list = ['transform', 'location', 'target'] # tags of list which you want to use as float list, not text
+        edit_tag_list = ['transform', 'location', 'waypoint'] # tags of list which you want to use as float list, not text
 
         # convert text list to float list
         for tag in edit_tag_list:
@@ -71,19 +71,23 @@ class ScenarioXML(object):
         for carla_actor in self.world.get_actors():
             if carla_actor.type_id.startswith("vehicle"):
                 if carla_actor.attributes.get('role_name') == 'ego_vehicle':
-                    self.ego_vehicle = carla_actor
+                    return carla_actor
 
 
     def checkTrigger(self):
         """check Trigger and run action
+        ~return~
+        0 : not on the trigger
+        1 : found the trigger
+        2 : end of scenario
+        3 : no scenario
         """
 
         if self.scenario is not None:
-            ego_pose = self.ego_vehicle.get_transform()
             trigger = self.scenario[self.trigger_index] # get trigger tree from scenario tree
-            distance = (ego_pose.location.x - trigger[0].text[0]) ** 2 \
-                       + (ego_pose.location.y - trigger[0].text[1]) ** 2
-
+            distance = (self.ego_pose.location.x - trigger[0].text[0]) ** 2 \
+                       + (self.ego_pose.location.y - trigger[0].text[1]) ** 2
+            print(distance)
             if distance < self.intrusion_thres:
                 print(self.trigger_index)
                 self.spawnActor(trigger.findall('spawn'))
@@ -91,22 +95,37 @@ class ScenarioXML(object):
                 self.killActor(trigger.findall('kill'))
                 self.controlTrafficLight(trigger.findall("trafficlight"))
                 self.poseActor(trigger.findall("pose"))
-                self.poseActor(trigger.findall("pose"))
+                # self.poseActor(trigger.findall("pose"))
                 self.trigger_index += 1
                 if self.trigger_index == len(self.scenario):
-                    sys.exit()
+                    return 2
 
+                return 1
+            else:
+                return 0
+        else:
+            return 3
 
-    def getBlueprint(self, blueprint_list, name):
+    def getBlueprint(self, type, name):
+    # def getBlueprint(self, blueprint_list, name):
 
         if name == 'random':
-            blueprint = random.choice(blueprint_list)
+            if 'walker' in type:
+                blueprint = random.choice(self.blueprint.filter('walker.*'))
+            elif 'vehicle' in type:
+                blueprint = random.choice(self.blueprint.filter('vehicle.*'))
+            elif 'static' in type:
+                blueprint = random.choice(self.blueprint.filter('static.*'))
+            else:
+                warnings.warn('spcecified blueprint is not exist : {}'.format(actor.find('blueprint').text))
+                return
+
         else:
             try:
-                blueprint = blueprint_list.find(name)
+                blueprint = self.blueprint.find(name)
             except ValueError:
-                blueprint = random.choice(blueprint_list)
                 warnings.warn('spcecified blueprint is not exist : {}'.format(actor.find('blueprint').text))
+                return
 
         return blueprint
 
@@ -132,20 +151,21 @@ class ScenarioXML(object):
         for spawn in spawn_list:
             actor_ids = {}
 
+            blueprint = self.getBlueprint(spawn.find('type').text, spawn.find('blueprint').text)
+            blueprint.set_attribute('role_name', spawn.attrib.get('id'))
+
             # set blueprint for walker
             if 'walker' in spawn.find('type').text:
 
                 if spawn.find('type').text == 'ai_walker':
                     ai_walkers_list.append(spawn)
 
-                blueprint = self.getBlueprint(self.blueprintWalkers, spawn.find('blueprint').text)
                 # set as not invencible
                 if blueprint.has_attribute('is_invincible'):
                     blueprint.set_attribute('is_invincible', 'false')
 
             # set blueprint for vehicle
             elif 'vehicle' in spawn.find('type').text:
-                blueprint = self.getBlueprint(self.blueprintVehicles, spawn.find('blueprint').text)
 
                 if blueprint.has_attribute('color'):
                     color = random.choice(blueprint.get_attribute('color').recommended_values)
@@ -155,7 +175,6 @@ class ScenarioXML(object):
                     driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
                     blueprint.set_attribute('driver_id', driver_id)
 
-                blueprint.set_attribute('role_name', 'driver')
 
             # append command to spawn actor to batch
             buf = spawn.find('transform').text
@@ -173,6 +192,9 @@ class ScenarioXML(object):
                 if spawn in ai_walkers_list:
                     ai_walkers_list.remove(spawn)
                 for trigger in self.scenario.findall('trigger'):
+                    for pose in trigger.findall('pose'):
+                        if pose.attrib.get('id') == spawn.attrib.get('id'):
+                            trigger.remove(pose)
                     for move in trigger.findall('move'):
                         if move.attrib.get('id') == spawn.attrib.get('id'):
                             trigger.remove(move)
@@ -187,7 +209,7 @@ class ScenarioXML(object):
         # append command to spawn ai_controller to batch
         batch = []
         for ai_walker in ai_walkers_list:
-            batch.append(carla.command.SpawnActor(self.blueprintWalkerController, carla.Transform(), ai_walker.find('world_id').text))
+            batch.append(carla.command.SpawnActor(self.blueprint.find('controller.ai.walker'), carla.Transform(), ai_walker.find('world_id').text))
         results = self.client.apply_batch_sync(batch, True)
 
         # conduct spawn ai controller
@@ -203,22 +225,36 @@ class ScenarioXML(object):
 
     def poseActor(self, pose_list):
 
+
+        def posePhone():
+            arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.16, z=1.49), rotation=carla.Rotation(yaw=-70, pitch=50)))
+            forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.18, y=0.14, z=1.3), rotation=carla.Rotation(yaw=-140, roll=-30, pitch=-30)))
+            hand_R = ('crl_hand__R', carla.Transform(location=carla.Location(x=-0.04, y=0.265, z=1.40), rotation=carla.Rotation(roll=-30, pitch=128, yaw=0)))
+            arm_L = ('crl_arm__L', carla.Transform(location=carla.Location(x=0.17, y=0.0, z=1.48), rotation=carla.Rotation(yaw=-90, pitch=-70)))
+            forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=90, pitch=-70, roll=180)))
+            neck = ('crl_neck__c', carla.Transform(location=carla.Location(x=0, y=0.0, z=1.55), rotation=carla.Rotation(yaw=180, roll=50, pitch=0)))
+            return [arm_R, forearm_R, hand_R, arm_L, forearm_L, neck]
+
+
         control = carla.WalkerBoneControl()
 
         for pose in pose_list:
             for spawn in self.scenario.iter('spawn'):
                 if pose.attrib.get('id') == spawn.attrib.get('id'):
                     type = pose.find('form').text
-                    try:
-                        actor = self.world.get_actor(spawn.find('world_id').text)
-                        control.bone_transform = self.pose_define.pose_dict.get(type)
-                        actor.apply_control(control)
-                        time.sleep(0.05)
-                        actor.apply_control(control)
-                        print('pose: '+ spawn.attrib.get('id'))
-                    except:
-                        print('cannot set pose. id: ', spawn.attrib.get('id'))
-                        return
+                    actor = self.world.get_actor(spawn.find('world_id').text)
+                    # control.bone_transform = posePhone()
+                    control.bone_transform = self.pose_define.pose_dict.get(type)()
+                    time.sleep(0.05)
+                    actor.apply_control(control)
+                    time.sleep(0.05)
+                    actor.apply_control(control)
+                    print('pose: '+ spawn.attrib.get('id'))
+                    print(control.bone_transform)
+                    # try:
+                    # except:
+                    #     print('cannot set pose. id: ', spawn.attrib.get('id'))
+                    #     return
 
 
     def moveActor(self, move_elem_list):
@@ -241,15 +277,14 @@ class ScenarioXML(object):
                 print('cannot start AI vehicle. world_id: ', world_id)
                 return
 
-        def moveInnocentActor(world_id, type, target_list):
+        def moveInnocentActor(world_id, type, waypoints):
             """add motion information to the stack
             world_id : actir id under the carla
             """
             control_actor = {}
             control_actor['actor'] = self.world.get_actor(world_id)
             control_actor['type'] = type
-            control_actor['target_index'] = 0
-            control_actor['target_list'] = target_list
+            control_actor['waypoints'] = waypoints
             self.control_actor_list.append(control_actor)
 
         for move_elem in move_elem_list:
@@ -257,11 +292,11 @@ class ScenarioXML(object):
                 if move_elem.attrib.get('id') == spawn_elem.attrib.get('id'):
                     type = spawn_elem.find('type').text
                     if type == 'ai_walker':
-                        moveAiWalker(spawn_elem.find('ai_controller_id').text, float(move_elem.find('target').attrib.get('speed')))
+                        moveAiWalker(spawn_elem.find('ai_controller_id').text, float(move_elem.find('waypoint').attrib.get('speed')))
                     elif type == 'ai_vehicle':
                         moveAiVehicle(spawn_elem.find('world_id').text)
                     elif type == 'walker' or type == 'vehicle':
-                        moveInnocentActor(spawn_elem.find('world_id').text, type, move_elem.findall('target')) # take over world info in spawn element and move info in move element
+                        moveInnocentActor(spawn_elem.find('world_id').text, type, move_elem.findall('waypoint')) # take over world info in spawn element and move info in move element
                     print("move: " + spawn_elem.attrib.get("id"));
 
 
@@ -280,17 +315,22 @@ class ScenarioXML(object):
                 print("Innocent actor ", control_actor['actor'].id, "is dead")
                 continue
 
+            elif not control_actor.get('waypoints'):
+                self.control_actor_list.remove(control_actor)
+                continue
             else:
                 # some information for movng
                 actor = control_actor.get('actor')
                 transform = actor.get_transform()
-                goal = control_actor.get('target_list')[control_actor.get('target_index')].text
-                speed = float(control_actor.get('target_list')[control_actor.get('target_index')].attrib.get('speed'))
-
+                point = control_actor.get('waypoints')[0].text
+                speed = float(control_actor.get('waypoints')[0].attrib.get('speed'))
                 # calc culent motion vector and distance to the target
-                vector = carla.Vector3D(goal[0] - transform.location.x,
-                                               goal[1] - transform.location.y,
-                                              goal[2] - transform.location.z)
+                print(control_actor.get('waypoints'))
+                vector = carla.Vector3D(
+                    float(point[0]) - transform.location.x,
+                    float(point[1]) - transform.location.y,
+                    float(point[2]) - transform.location.z
+                    )
                 dist = math.sqrt(vector.x ** 2 + vector.y ** 2)
 
                 # normalize vector to calcurate velocity
@@ -299,12 +339,13 @@ class ScenarioXML(object):
                 # debug.draw_arrow(begin=transform.location ,end=transform.location + carla.Location(vector.x, vector.y, 0.0), life_time=0.5)
 
                 # update distination if move has multiple targets
-                if dist < 1.0:
-                    if control_actor.get('target_index') + 1 < len(control_actor.get('target_list')):
-                        control_actor['target_index'] += 1
+                if (control_actor['type'] == 'walker' and dist < 1.0) or (control_actor['type'] == 'vehicle' and dist < 5.0):
+
                     # if actor reached target and doesn't have next targets, dicelerate to make them natural.
-                    else:
-                        self.control_actor_list.remove(control_actor)
+                    print(control_actor.get('waypoints'))
+
+                    del control_actor.get('waypoints')[0]
+                    print(control_actor.get('waypoints'))
                         # if control_actor['type'] == 'walker':
                         #     speed = speed * dist
                         # else if control_actor['type'] == 'vehicle':
@@ -363,48 +404,46 @@ class ScenarioXML(object):
 
                     continue
 
-    def game_loop(self, args):
-        print('hello game_loop')
-        try:
-            print('hello try')
 
-            self.client = carla.Client(args.host, args.port)
-            self.client.set_timeout(2.0)
-            self.world = self.client.get_world()
-            self.blueprintVehicles = self.world.get_blueprint_library().filter('vehicle.*')
-            self.blueprintWalkers = self.world.get_blueprint_library().filter('walker.pedestrian*')
-            self.blueprintWalkerController = self.world.get_blueprint_library().find('controller.ai.walker')
-            self.scenario = self.readFile(args.scenario_file)
-            self.trafficlight_list = self.getTraffcLight()
-            self.pose_define = PoseDefine()
-            # self.getEgoCar()
-            self.spawnActor(self.scenario[0].findall('spawn'))
-            self.moveActor(self.scenario[0].findall('move'))
-            self.poseActor(self.scenario[0].findall('pose'))
-            self.poseActor(self.scenario[0].findall('pose'))
+def game_loop(args):
 
-            while True:
-                self.world.wait_for_tick()
-                if self.ego_vehicle is None:
-                    self.getEgoCar()
-                else:
-                    self.checkTrigger()
-                    self.controlActor()
+    try:
+        client = carla.Client(args.host, args.port)
+        client.set_timeout(2.0)
+        world = sx.client.get_world()
+        sx = ScenarioXML(client, world, args.scenario_file)
+        sx.blueprint = sx.world.get_blueprint_library()
 
-                time.sleep(0.1)
+        sx.spawnActor(sx.scenario[0].findall('spawn'))
+        sx.moveActor(sx.scenario[0].findall('move'))
+        sx.poseActor(sx.scenario[0].findall('pose'))
+        sx.ego_vehicle = sx.getEgoCar()
 
-        finally:
-            batch = []
-            for carla_actor in self.world.get_actors():
-                if carla_actor.type_id.startswith("vehicle") or carla_actor.type_id.startswith("walker") or carla_actor.type_id.startswith("controller"):
-                    if carla_actor.attributes.get('role_name') != 'ego_vehicle':
-                        batch.append(carla.command.DestroyActor(carla_actor.id))
+        while sx.checkTrigger() in [0, 1]:
+            sx.world.wait_for_tick()
+            if sx.ego_vehicle is None:
+                sx.getEgoCar()
+            else:
+                self.ego_pose = self.ego_vehicle.get_transform()
+                sx.controlActor()
 
-            self.client.apply_batch(batch)
-            print('collapsed')
+            time.sleep(0.1)
+
+    except:
+        return False
+
+    finally:
+        batch = []
+        for carla_actor in sx.world.get_actors():
+            if carla_actor.type_id.startswith("vehicle") or carla_actor.type_id.startswith("walker") or carla_actor.type_id.startswith("controller"):
+                if carla_actor.attributes.get('role_name') != 'ego_vehicle':
+                    batch.append(carla.command.DestroyActor(carla_actor.id))
+
+        self.client.apply_batch(batch)
+        return True
 
 
-def main():
+if __name__ == '__main__':
 
     argparser = argparse.ArgumentParser( description = __doc__)
     argparser.add_argument(
@@ -425,11 +464,4 @@ def main():
         help='scenario file (default: scenario.xml)')
     args = argparser.parse_args()
 
-    try:
-        scenario_xml = ScenarioXML()
-        scenario_xml.game_loop(args)
-    finally:
-        print('finish')
-
-if __name__ == '__main__':
-    main()
+    game_loop(args)

@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+import scenario_xml
+import rospy
+
 
 class TestEgoCar(object):
 
@@ -34,7 +37,46 @@ class TestEgoCar(object):
 		finally:
 			print('exit game loop')
 
-def main():
+def main(args):
+    rospy.init_node('my_carla_bridge')
+    try:
+        sx = ScenarioXML(args.scenario_file)
+        sx.client = carla.Client(args.host, args.port)
+        sx.client.set_timeout(2.0)
+        sx.world = sx.client.get_world()
+        sx.blueprint = sx.world.get_blueprint_library()
+
+        sx.getEgoCar()
+        sx.spawnActor(sx.scenario[0].findall('spawn'))
+        sx.moveActor(sx.scenario[0].findall('move'))
+        sx.poseActor(sx.scenario[0].findall('pose'))
+
+
+        while sx.checkTrigger():
+            sx.world.wait_for_tick()
+            if sx.ego_vehicle is None:
+                sx.getEgoCar()
+            else:
+                sx.controlActor()
+
+            time.sleep(0.1)
+
+    except:
+        return False
+
+    finally:
+        batch = []
+        for carla_actor in sx.world.get_actors():
+            if carla_actor.type_id.startswith("vehicle") or carla_actor.type_id.startswith("walker") or carla_actor.type_id.startswith("controller"):
+                if carla_actor.attributes.get('role_name') != 'ego_vehicle':
+                    batch.append(carla.command.DestroyActor(carla_actor.id))
+
+        self.client.apply_batch(batch)
+        return True
+
+
+if __name__ == '__main__':
+
 	argparser = argparse.ArgumentParser( description = __doc__ )
 	argparser.add_argument(
 		'--host',
@@ -47,16 +89,11 @@ def main():
 		default=2000,
 		type=int,
 		help='TCP port to listen to (default: 2000)')
+   argparser.add_argument(
+        '-s', '--scenario_file',
+        metavar='S',
+        default='/home/mad-carla/share/catkin_ws/src/carla_helper/scenario.xml',
+        help='scenario file (default: scenario.xml)')
 	args = argparser.parse_args()
 
-
-	try:
-		test_ego_car = TestEgoCar()
-		test_ego_car.game_loop(args)
-	finally:
-		print('EXIT')
-
-if __name__ == '__main__':
-
-    try:
-        main()
+    main(args)
