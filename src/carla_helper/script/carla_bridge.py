@@ -99,22 +99,22 @@ class CarlaBridge(object):
                     derived_obj.classification = Object.CLASSIFICATION_OTHER_VEHICLE
                 self.ros_actors.append(derived_obj)
 
-            # elif actor.type_id.startswith('static'):
-            #     self.carla_actors.append(actor)
-            #     derived_obj = Object()
-            #     derived_obj.id = actor.id
-            #     derived_obj.shape.type = SolidPrimitive.BOX
-            #     # print(self.scenario_xml.blueprint.find(actor.type_id).size)
-            #     size = 1
-            #     # size = self.scenario_xml.blueprint.find(actor.type_id).size
-            #     derived_obj.shape.dimensions = [
-            #         float(size)*2,
-            #         float(size)*2,
-            #         float(size)*2
-            #         ]
-            #
-            #     derived_obj.classification = Object.CLASSIFICATION_UNKNOWN
-            #     self.ros_actors.append(derived_obj)
+            elif actor.type_id.startswith('static'):
+                self.carla_actors.append(actor)
+                derived_obj = Object()
+                derived_obj.id = actor.id
+                derived_obj.shape.type = SolidPrimitive.BOX
+                # print(self.scenario_xml.blueprint.find(actor.type_id).size)
+                size = 1
+                # size = self.scenario_xml.blueprint.find(actor.type_id).size
+                derived_obj.shape.dimensions = [
+                    float(size)*2,
+                    float(size)*2,
+                    float(size)*2
+                    ]
+
+                derived_obj.classification = Object.CLASSIFICATION_UNKNOWN
+                self.ros_actors.append(derived_obj)
 
 
 
@@ -218,7 +218,6 @@ class CarlaBridge(object):
             print('restart')
             self.startScenario(self.scenario_file)
         elif flag == 1:
-            print('next_trigger')
             self.getActors()
             self.updateActors()
             self.scenario_xml.controlActor()
@@ -247,6 +246,11 @@ class CarlaBridge(object):
         self.getActors()
         scenario_xml.ego_vehicle = self.ego_vehicle
         self.scenario_xml = scenario_xml
+        print('started')
+
+
+    def __del__(self):
+        del self.scenario_xml
 
 
 def main(args):
@@ -265,14 +269,7 @@ def main(args):
         rospy.spin()
 
     finally:
-        batch = []
-        for carla_actor in carla_bridge.world.get_actors():
-            if carla_actor.type_id.startswith("vehicle") or carla_actor.type_id.startswith("walker") or carla_actor.type_id.startswith("controller"):
-                if carla_actor.attributes.get('role_name') != 'ego_vehicle':
-                    batch.append(carla.command.DestroyActor(carla_actor.id))
-
-        carla_bridge.client.apply_batch(batch)
-
+        del carla_bridge
         print('finished')
 
 

@@ -40,6 +40,7 @@ class ScenarioXML(object):
         self.control_actor_list = []
         self.trafficlight_list = self.getTraffcLight()
         self.pose_define = PoseDefine()
+        self.spawned_static_objects_id = []
 
 
     def readFile(self, filename):
@@ -69,9 +70,8 @@ class ScenarioXML(object):
         """
 
         for carla_actor in self.world.get_actors():
-            if carla_actor.type_id.startswith("vehicle"):
-                if carla_actor.attributes.get('role_name') == 'ego_vehicle':
-                    return carla_actor
+            if carla_actor.attributes.get('role_name') == 'ego_vehicle':
+                return carla_actor
 
 
     def checkTrigger(self):
@@ -87,9 +87,9 @@ class ScenarioXML(object):
             trigger = self.scenario[self.trigger_index] # get trigger tree from scenario tree
             distance = (self.ego_pose.location.x - trigger[0].text[0]) ** 2 \
                        + (self.ego_pose.location.y - trigger[0].text[1]) ** 2
-            print(distance)
+            # print('trigger', distance)
             if distance < self.intrusion_thres:
-                print(self.trigger_index)
+                # print(self.trigger_index)
                 self.spawnActor(trigger.findall('spawn'))
                 self.moveActor(trigger.findall('move'))
                 self.killActor(trigger.findall('kill'))
@@ -175,7 +175,6 @@ class ScenarioXML(object):
                     driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
                     blueprint.set_attribute('driver_id', driver_id)
 
-
             # append command to spawn actor to batch
             buf = spawn.find('transform').text
             transform = carla.Transform(carla.Location(buf[0], buf[1], buf[2]), carla.Rotation(buf[3], buf[4], buf[5]))
@@ -205,6 +204,14 @@ class ScenarioXML(object):
             else:
                 world_id = ET.SubElement(spawn_list[i], 'world_id')
                 world_id.text = results[i].actor_id
+                # print(spawn_list[i].find('type').text)
+                if spawn_list[i].find('type').text == 'static':
+                    control_actor = {}
+                    control_actor['actor'] = self.world.get_actor(world_id.text)
+                    control_actor['type'] = 'static'
+                    # print('control_actor', control_actor)
+                    self.control_actor_list.append(control_actor)
+
 
         # append command to spawn ai_controller to batch
         batch = []
@@ -225,8 +232,7 @@ class ScenarioXML(object):
 
     def poseActor(self, pose_list):
 
-
-        def posePhone():
+        def posePhoneLeft():
             arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.16, z=1.49), rotation=carla.Rotation(yaw=-70, pitch=50)))
             forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.18, y=0.14, z=1.3), rotation=carla.Rotation(yaw=-140, roll=-30, pitch=-30)))
             hand_R = ('crl_hand__R', carla.Transform(location=carla.Location(x=-0.04, y=0.265, z=1.40), rotation=carla.Rotation(roll=-30, pitch=128, yaw=0)))
@@ -236,25 +242,19 @@ class ScenarioXML(object):
             return [arm_R, forearm_R, hand_R, arm_L, forearm_L, neck]
 
 
-        control = carla.WalkerBoneControl()
 
+        control = carla.WalkerBoneControl()
+        pose_define = PoseDefine()
         for pose in pose_list:
             for spawn in self.scenario.iter('spawn'):
                 if pose.attrib.get('id') == spawn.attrib.get('id'):
-                    type = pose.find('form').text
                     actor = self.world.get_actor(spawn.find('world_id').text)
-                    # control.bone_transform = posePhone()
-                    control.bone_transform = self.pose_define.pose_dict.get(type)()
-                    time.sleep(0.05)
+                    # control.bone_transforms = posePhoneLeft()
+                    control.bone_transforms = pose_define.pose_dict.get(pose.find('form').text)()
                     actor.apply_control(control)
-                    time.sleep(0.05)
+                    time.sleep(1)
                     actor.apply_control(control)
                     print('pose: '+ spawn.attrib.get('id'))
-                    print(control.bone_transform)
-                    # try:
-                    # except:
-                    #     print('cannot set pose. id: ', spawn.attrib.get('id'))
-                    #     return
 
 
     def moveActor(self, move_elem_list):
@@ -287,6 +287,7 @@ class ScenarioXML(object):
             control_actor['waypoints'] = waypoints
             self.control_actor_list.append(control_actor)
 
+
         for move_elem in move_elem_list:
             for spawn_elem in self.scenario.iter('spawn'):
                 if move_elem.attrib.get('id') == spawn_elem.attrib.get('id'):
@@ -297,6 +298,8 @@ class ScenarioXML(object):
                         moveAiVehicle(spawn_elem.find('world_id').text)
                     elif type == 'walker' or type == 'vehicle':
                         moveInnocentActor(spawn_elem.find('world_id').text, type, move_elem.findall('waypoint')) # take over world info in spawn element and move info in move element
+                    # elif type == 'static':
+                    #     moveStaticActor(spawn_elem.find('world_id').text, type) # take over world info in spawn element and move info in move element
                     print("move: " + spawn_elem.attrib.get("id"));
 
 
@@ -306,58 +309,48 @@ class ScenarioXML(object):
         self.control_actor_list : actor dictionary for control them in loop
 
         """
+        def calcControl(control_actor):
+            # some information for movng
+            transform = control_actor.get('actor').get_transform()
+            point = control_actor.get('waypoints')[0].text
+            speed = float(control_actor.get('waypoints')[0].attrib.get('speed'))
+            # calc culent motion vector and distance to the target
+            vector = carla.Vector3D(
+                float(point[0]) - transform.location.x,
+                float(point[1]) - transform.location.y,
+                float(point[2]) - transform.location.z
+                )
+            dist = math.sqrt(vector.x ** 2 + vector.y ** 2)
+            # normalize vector to calcurate velocity
+            vector.x = vector.x / dist
+            vector.y = vector.y / dist
+            # debug.draw_arrow(begin=transform.location ,end=transform.location + carla.Location(vector.x, vector.y, 0.0), life_time=0.5)
+            return vector, speed, dist, transform.rotation.yaw
+
+
         # debug = self.world.debug
         for control_actor in self.control_actor_list:
 
             if control_actor['actor'].is_alive == False:
-
                 self.control_actor_list.remove(control_actor)
                 print("Innocent actor ", control_actor['actor'].id, "is dead")
                 continue
 
-            elif not control_actor.get('waypoints'):
-                self.control_actor_list.remove(control_actor)
-                continue
-            else:
-                # some information for movng
-                actor = control_actor.get('actor')
-                transform = actor.get_transform()
-                point = control_actor.get('waypoints')[0].text
-                speed = float(control_actor.get('waypoints')[0].attrib.get('speed'))
-                # calc culent motion vector and distance to the target
-                print(control_actor.get('waypoints'))
-                vector = carla.Vector3D(
-                    float(point[0]) - transform.location.x,
-                    float(point[1]) - transform.location.y,
-                    float(point[2]) - transform.location.z
-                    )
-                dist = math.sqrt(vector.x ** 2 + vector.y ** 2)
-
-                # normalize vector to calcurate velocity
-                vector.x = vector.x / dist
-                vector.y = vector.y / dist
-                # debug.draw_arrow(begin=transform.location ,end=transform.location + carla.Location(vector.x, vector.y, 0.0), life_time=0.5)
-
-                # update distination if move has multiple targets
-                if (control_actor['type'] == 'walker' and dist < 1.0) or (control_actor['type'] == 'vehicle' and dist < 5.0):
-
-                    # if actor reached target and doesn't have next targets, dicelerate to make them natural.
-                    print(control_actor.get('waypoints'))
-
+            if control_actor['type'] == 'walker' and control_actor.get('waypoints'):
+                vector, speed, dist, _ = calcControl(control_actor)
+                if dist < 1.0:
                     del control_actor.get('waypoints')[0]
-                    print(control_actor.get('waypoints'))
-                        # if control_actor['type'] == 'walker':
-                        #     speed = speed * dist
-                        # else if control_actor['type'] == 'vehicle':
-                        #     self.control_actor_list.remove(control_actor)
 
-            if control_actor['type'] == 'walker':
                 control = carla.WalkerControl(direction=vector, speed=speed)
                 control_actor['actor'].apply_control(control)
 
-            elif control_actor['type'] == 'vehicle':
+            elif control_actor['type'] == 'vehicle' and control_actor.get('waypoints'):
                 # calc vel and rotation
-                alpha = math.atan(vector.y / vector.x) - transform.rotation.yaw
+                vector, speed, dist, yaw = calcControl(control_actor)
+                if control_actor['type'] == 'vehicle' and dist < 5.0:
+                    del control_actor.get('waypoints')[0]
+
+                alpha = math.atan(vector.y / vector.x) - yaw
                 omega = 2 * speed * math.sin(alpha) / dist
 
                 control = carla.VehicleControl()
@@ -367,6 +360,21 @@ class ScenarioXML(object):
                 velocity.z = 0.0
                 control_actor['actor'].set_velocity(velocity)
                 control_actor['actor'].set_angular_velocity(carla.Vector3D(0.0, 0.0, omega))
+            # update distination if move has multiple targets
+
+            elif control_actor['type'] == 'static':
+                transform = control_actor.get('actor').get_transform()
+                dist = math.sqrt(
+                    (self.ego_pose.location.x - transform.location.x) ** 2
+                    + (self.ego_pose.location.y - transform.location.y) ** 2
+                    )
+                # print('static', dist)
+                if dist < 4.0:
+                    control_actor.get('actor').destroy()
+                    self.control_actor_list.remove(control_actor)
+
+            else:
+                self.control_actor_list.remove(control_actor)
 
 
     def killActor(self, death_note):
@@ -404,43 +412,48 @@ class ScenarioXML(object):
 
                     continue
 
+    def __del__(self):
+        batch = []
+        for spawn in self.scenario.iter('spawn'):
+            if spawn.find('type').text == 'static':
+                batch.append(carla.command.DestroyActor(spawn.find('world_id').text))
+
+        for actor in self.world.get_actors():
+            if actor.type_id.startswith("vehicle") or actor.type_id.startswith("walker") or actor.type_id.startswith("controller"):
+                if actor.attributes.get('role_name') != 'ego_vehicle':
+                    batch.append(carla.command.DestroyActor(actor.id))
+
+        self.client.apply_batch(batch)
+
+
 
 def game_loop(args):
 
     try:
         client = carla.Client(args.host, args.port)
         client.set_timeout(2.0)
-        world = sx.client.get_world()
+        world = client.get_world()
         sx = ScenarioXML(client, world, args.scenario_file)
         sx.blueprint = sx.world.get_blueprint_library()
 
+        sx.ego_vehicle = sx.getEgoCar()
+        sx.ego_pose = sx.ego_vehicle.get_transform()
         sx.spawnActor(sx.scenario[0].findall('spawn'))
         sx.moveActor(sx.scenario[0].findall('move'))
         sx.poseActor(sx.scenario[0].findall('pose'))
-        sx.ego_vehicle = sx.getEgoCar()
 
         while sx.checkTrigger() in [0, 1]:
             sx.world.wait_for_tick()
             if sx.ego_vehicle is None:
                 sx.getEgoCar()
             else:
-                self.ego_pose = self.ego_vehicle.get_transform()
+                sx.ego_pose = sx.ego_vehicle.get_transform()
                 sx.controlActor()
 
             time.sleep(0.1)
 
-    except:
-        return False
-
     finally:
-        batch = []
-        for carla_actor in sx.world.get_actors():
-            if carla_actor.type_id.startswith("vehicle") or carla_actor.type_id.startswith("walker") or carla_actor.type_id.startswith("controller"):
-                if carla_actor.attributes.get('role_name') != 'ego_vehicle':
-                    batch.append(carla.command.DestroyActor(carla_actor.id))
-
-        self.client.apply_batch(batch)
-        return True
+        del sx
 
 
 if __name__ == '__main__':
@@ -460,7 +473,7 @@ if __name__ == '__main__':
     argparser.add_argument(
         '-s', '--scenario_file',
         metavar='S',
-        default='/home/mad-carla/share/catkin_ws/src/carla_helper/scenario.xml',
+        default='/home/mad-carla/share/catkin_ws/src/carla_helper/scenario_test.xml',
         help='scenario file (default: scenario.xml)')
     args = argparser.parse_args()
 

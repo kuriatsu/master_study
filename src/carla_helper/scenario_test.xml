@@ -4,7 +4,7 @@
     <trigger id="0">
         <location>145.133712769,-2.25406098366,0.0168727841228</location>
         <spawn id="0">
-            <type>ai_walker</type>
+            <type>walker</type>
             <blueprint>walker.pedestrian.0001</blueprint>
             <transform>136.310256958,-8.84174442291,1.1199285984,0.0,179.300003052,0.0</transform>
         </spawn>
@@ -34,6 +34,10 @@
     </trigger>
     <trigger id="1">
         <location>130.047607422,-2.44484376907,0.0143852643669</location>
+
+        <move id="0">
+            <waypoint speed="2.0">137.310256958,-8.84174442291,1.5199285984,0.0,109.300003052,0.0</waypoint>
+        </move>
         <move id="2">
             <waypoint speed="4.0">110.707000732,9.84315395355,1.09916758537</waypoint>
             <waypoint speed="2.0">91.6044311523,10.6292161942,1.10389995575</waypoint>
@@ -44,9 +48,6 @@
     </trigger>
     <trigger id="2">
         <location>119.130821228,-2.46624326706,0.0138290869072</location>
-        <move id="0">
-            <waypoint speed="2.0"/>
-        </move>
         <move id="8">
             <waypoint speed="8.0">99.2578582764,19.9713745117,0.953500270844</waypoint>
         </move>
@@ -57,5 +58,6 @@
         <kill id="2"/>
         <kill id="4"/>
         <kill id="8"/>
+        <kill id="9"/>
     </trigger>
 </data>
