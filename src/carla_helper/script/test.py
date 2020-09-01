@@ -31,9 +31,9 @@ def main():
 # ##########################
 # spawn actor
 ############################
-    blueprint = world.get_blueprint_library().find('static.prop.plasticbag')
-    transform = carla.Transform(carla.Location(-210.104354858,1.57313215733,0.51499998569), carla.Rotation(0.0,75.1999435425,0.0))
-    world.spawn_actor(blueprint, transform)
+    # blueprint = world.get_blueprint_library().find('static.prop.plasticbag')
+    # transform = carla.Transform(carla.Location(-210.104354858,1.57313215733,0.51499998569), carla.Rotation(0.0,75.1999435425,0.0))
+    # world.spawn_actor(blueprint, transform)
 # ##########################
 # traffic light
 ############################
@@ -87,23 +87,13 @@ def main():
     #####################
     ####teleportation####
     #####################
-<<<<<<< HEAD
-    # for carla_actor in world.get_actors():
-    #     if carla_actor.attributes.get('role_name') == 'hero':
-    #         ego_vehicle = carla_actor
-    #         print("found")
-    #
-    # ego_vehicle.set_transform(carla.Transform(carla.Location(206.5,95.9,1.0),carla.Rotation(-0.0,-89.5,0.0)))
-    # ego_vehicle.set_location(carla.Location(48.0550689697,145.219467163,0.0340613611042))
-=======
     for carla_actor in world.get_actors():
         if carla_actor.attributes.get('role_name') == 'hero':
-            ego_vehicle = carla_actor
+            hero = carla_actor
             print("found")
 
     # ego_vehicle.set_transform(carla.Transform(carla.Location(206.5,95.9,1.0),carla.Rotation(-0.0,-89.5,0.0)))
-    ego_vehicle.set_location(carla.Location(20.5808563232,151.871200562,1.10352861881))
->>>>>>> 258d635633223562b3173078f7d6335d0c0fff24
+    hero.set_location(carla.Location(48.0550689697,145.219467163,0.0340613611042))
 
 
     ##########################

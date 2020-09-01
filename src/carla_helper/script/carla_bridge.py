@@ -73,10 +73,12 @@ class CarlaBridge(object):
         for actor in self.world.get_actors():
             if actor.attributes.get('role_name') in ['ego_vehicle', 'hero']:
                 self.ego_vehicle = actor
+                self.scenario_xml.ego_vehicle = actor
 
             elif actor.type_id.startswith("vehicle") or actor.type_id.startswith("walker"):
                 self.carla_actors.append(actor)
-                derived_obj = Object()
+                derived_obj = Object(detection_level=self.getActorProb(actor.id))
+
                 derived_obj.id = actor.id
                 derived_obj.shape.type = SolidPrimitive.BOX
                 derived_obj.shape.dimensions = [
@@ -101,7 +103,7 @@ class CarlaBridge(object):
 
             elif actor.type_id.startswith('static'):
                 self.carla_actors.append(actor)
-                derived_obj = Object()
+                derived_obj = Object(detection_level=self.getActorProb(actor.id))
                 derived_obj.id = actor.id
                 derived_obj.shape.type = SolidPrimitive.BOX
                 # print(self.scenario_xml.blueprint.find(actor.type_id).size)
@@ -117,6 +119,22 @@ class CarlaBridge(object):
                 self.ros_actors.append(derived_obj)
 
 
+    def getActorProb(self, world_id):
+        """find spawn actor info from scenario_xml and return probability
+        if None, return 0
+        ~args~
+        world_id
+        ~return~
+        actor probability from scenario_xml
+        """
+        for spawn in self.scenario_xml.scenario.iter('spawn'):
+            if spawn.find('world_id') is not None and int(spawn.find('world_id').text) == world_id:
+                if spawn.find('probability') is not None:
+                    return int(spawn.find('probability').text)
+                else:
+                    return 0
+
+        return 0
 
 
     def updateActors(self):
@@ -243,9 +261,8 @@ class CarlaBridge(object):
         scenario_xml.moveActor(scenario_xml.scenario[0].findall('move'))
         scenario_xml.poseActor(scenario_xml.scenario[0].findall('pose'))
 
-        self.getActors()
-        scenario_xml.ego_vehicle = self.ego_vehicle
         self.scenario_xml = scenario_xml
+        self.getActors()
         print('started')
 
 

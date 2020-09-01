@@ -136,6 +136,10 @@ void RasCore::subObjCallback(const derived_object_msgs::ObjectArray &in_obj_arra
 }
 
 
+/*
+get waypoint related to in_obj
+check distance, the same direction or perpendicular from object
+*/
 std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
 {
     std::vector<int> wp_vec;
@@ -216,6 +220,7 @@ std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
     return wp_vec;
 }
 
+
 bool RasCore::isSameDirection(const RasVector &vec_1, const RasVector &vec_2, const float &thres)
 {
     // is close wp same direction with the object
@@ -231,6 +236,9 @@ bool RasCore::isPerpendicular(const RasVector &vec_1, const RasVector &vec_2, co
 }
 
 
+/*
+check the collition between in_obj and ego_vehicle
+*/
 bool RasCore::isCollideObstacle(const ras_carla::RasObject &in_obj, const int &wp)
 {
     float dist_of_wp_ego, dist_of_wp_obj;
@@ -266,6 +274,12 @@ void RasCore::calcOccupancyWp(const std::vector<int> &in_wp_vec, const ras_carla
 }
 
 
+/*
+search wall waypoint from start to goal
+skip passed wapoint
+check the collision with object related to the waypoint
+then return wall waypoint and object list on the waypoint
+*/
 int RasCore::findWallWp(std::vector<int> &critical_obj_id_vec)
 {
     for (const auto &e : m_wp_obj_map)
@@ -288,6 +302,10 @@ int RasCore::findWallWp(std::vector<int> &critical_obj_id_vec)
     return 0;
 }
 
+
+/*
+publish object and wall
+*/
 void RasCore::manageMarkers()
 {
     // ROS_INFO("tekaAttendance");
@@ -343,6 +361,7 @@ void RasCore::manageMarkers()
         wall.object.classification = derived_object_msgs::Object::CLASSIFICATION_BARRIER;
         wall.is_interaction = false;
         wall.is_important = true;
+        wall.distance = abs(m_ego_wp - wall_wp) * m_wp_interval;
         pub_wall.publish(wall);
     }
 
@@ -372,6 +391,11 @@ void RasCore::pubOccupancyWp(const geometry_msgs::Point &in_pose, const int &typ
     }
 }
 
+
+/*
+the intaractive marker is created for is_interaction=true object
+the feedback is also from is_interaction=true object, not from unrelated objects
+*/
 void RasCore::subShiftCallback(const ras_carla::RasObject &in_msg)
 {
 	int id = in_msg.object.id;

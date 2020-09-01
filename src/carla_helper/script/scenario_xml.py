@@ -184,31 +184,33 @@ class ScenarioXML(object):
         # conduct spawn actor
         results = self.client.apply_batch_sync(batch)
         for i in range(len(results)):
-            spawn = spawn_list[i]
+            spawned_actor = spawn_list[i]
             if results[i].error:
                 warnings.warn(results[i].error)
-                print("removes ", spawn.attrib.get('id'))
-                if spawn in ai_walkers_list:
-                    ai_walkers_list.remove(spawn)
+                print("removes ", spawned_actor.attrib.get('id'))
+                if spawned_actor in ai_walkers_list:
+                    ai_walkers_list.remove(spawned_actor)
                 for trigger in self.scenario.findall('trigger'):
                     for pose in trigger.findall('pose'):
-                        if pose.attrib.get('id') == spawn.attrib.get('id'):
+                        if pose.attrib.get('id') == spawned_actor.attrib.get('id'):
                             trigger.remove(pose)
                     for move in trigger.findall('move'):
-                        if move.attrib.get('id') == spawn.attrib.get('id'):
+                        if move.attrib.get('id') == spawned_actor.attrib.get('id'):
                             trigger.remove(move)
                     for kill in trigger.findall('kill'):
-                        if kill.attrib.get('id') == spawn.attrib.get('id'):
+                        if kill.attrib.get('id') == spawned_actor.attrib.get('id'):
                             trigger.remove(kill)
 
             else:
-                world_id = ET.SubElement(spawn_list[i], 'world_id')
+                world_id = ET.SubElement(spawned_actor, 'world_id')
                 world_id.text = results[i].actor_id
-                # print(spawn_list[i].find('type').text)
-                if spawn_list[i].find('type').text == 'static':
+                # print(spawned_actor_list[i].find('type').text)
+                if spawned_actor.find('type').text == 'static':
                     control_actor = {}
                     control_actor['actor'] = self.world.get_actor(world_id.text)
                     control_actor['type'] = 'static'
+                    control_actor['collision_range'] = spawned_actor.find('collision_range').text
+                    control_actor['invincible'] = True if spawned_actor.find('invincible').text == 'true' else False
                     # print('control_actor', control_actor)
                     self.control_actor_list.append(control_actor)
 
@@ -231,17 +233,6 @@ class ScenarioXML(object):
 
 
     def poseActor(self, pose_list):
-
-        def posePhoneLeft():
-            arm_R = ('crl_arm__R', carla.Transform(location=carla.Location(x=-0.16, z=1.49), rotation=carla.Rotation(yaw=-70, pitch=50)))
-            forearm_R = ('crl_forearm__R', carla.Transform(location=carla.Location(x=-0.18, y=0.14, z=1.3), rotation=carla.Rotation(yaw=-140, roll=-30, pitch=-30)))
-            hand_R = ('crl_hand__R', carla.Transform(location=carla.Location(x=-0.04, y=0.265, z=1.40), rotation=carla.Rotation(roll=-30, pitch=128, yaw=0)))
-            arm_L = ('crl_arm__L', carla.Transform(location=carla.Location(x=0.17, y=0.0, z=1.48), rotation=carla.Rotation(yaw=-90, pitch=-70)))
-            forearm_L = ('crl_forearm__L', carla.Transform(location=carla.Location(x=0.17, y=-0.07, z=1.29), rotation=carla.Rotation(yaw=90, pitch=-70, roll=180)))
-            neck = ('crl_neck__c', carla.Transform(location=carla.Location(x=0, y=0.0, z=1.55), rotation=carla.Rotation(yaw=180, roll=50, pitch=0)))
-            return [arm_R, forearm_R, hand_R, arm_L, forearm_L, neck]
-
-
 
         control = carla.WalkerBoneControl()
         pose_define = PoseDefine()
@@ -309,6 +300,7 @@ class ScenarioXML(object):
         self.control_actor_list : actor dictionary for control them in loop
 
         """
+
         def calcControl(control_actor):
             # some information for movng
             transform = control_actor.get('actor').get_transform()
@@ -369,9 +361,15 @@ class ScenarioXML(object):
                     + (self.ego_pose.location.y - transform.location.y) ** 2
                     )
                 # print('static', dist)
-                if dist < 4.0:
-                    control_actor.get('actor').destroy()
-                    self.control_actor_list.remove(control_actor)
+                if dist < float(control_actor.get('collision_range')):
+                    if control_actor.get('invincible'):
+                        vel = self.ego_vehicle.get_velocity()
+                        if math.sqrt(vel.x ** 2 + vel.y ** 2) * 3.6 < 5.0:
+                            control_actor.get('actor').destroy()
+                            self.control_actor_list.remove(control_actor)
+                    else:
+                        control_actor.get('actor').destroy()
+                        self.control_actor_list.remove(control_actor)
 
             else:
                 self.control_actor_list.remove(control_actor)
