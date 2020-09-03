@@ -216,6 +216,25 @@ std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
             }
             break;
         }
+
+        case derived_object_msgs::Object::CLASSIFICATION_UNKNOWN:
+        {
+            float min_dist_of_wp_obj = m_max_vision, dist_of_wp_obj;
+            int min_wp;
+            // find closest waypoint from object
+            for (auto itr = m_wps_vec.begin(); itr < m_wps_vec.end(); itr++)
+            // for (auto itr = m_wps_vec.begin(); itr != m_wps_vec.end(); itr++)
+            {
+                dist_of_wp_obj = Ras::calcDistOfPoints(itr->position, in_obj.object.pose.position);
+                if (dist_of_wp_obj < min_dist_of_wp_obj)
+                {
+                    min_dist_of_wp_obj = dist_of_wp_obj;
+                    close_wp = std::distance(m_wps_vec.begin(), itr);
+                }
+            }
+            wp_vec.emplace_back(close_wp);
+            pubOccupancyWp(m_wps_vec[close_wp].position, 0);
+        }
     }
     return wp_vec;
 }
@@ -259,6 +278,12 @@ bool RasCore::isCollideObstacle(const ras_carla::RasObject &in_obj, const int &w
         {
             // return true;
             return (dist_of_wp_ego > 0 && dist_of_wp_obj / in_obj.object.twist.linear.x < dist_of_wp_ego / m_ego_twist.linear.x);
+            break;
+        }
+        case derived_object_msgs::Object::CLASSIFICATION_UNKNOWN:
+        {
+            // return true;
+            return (dist_of_wp_obj < 5.0);
             break;
         }
     }

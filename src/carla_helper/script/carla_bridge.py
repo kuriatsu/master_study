@@ -87,13 +87,14 @@ class CarlaBridge(object):
                     actor.bounding_box.extent.z*2
                     ]
 
-                if actor.type_id in bike_blueprints:
-                    derived_obj.classification = Object.CLASSIFICATION_BIKE
-                elif actor.type_id in motorcycle_blueprints:
-                    derived_obj.classification = Object.CLASSIFICATION_MOTORCYCLE
-                elif actor.type_id in truck_blueprints:
-                    derived_obj.classification = Object.CLASSIFICATION_TRUCK
-                elif actor.type_id.startswith("vehicle"):
+                # if actor.type_id in bike_blueprints:
+                #     derived_obj.classification = Object.CLASSIFICATION_BIKE
+                # elif actor.type_id in motorcycle_blueprints:
+                #     derived_obj.classification = Object.CLASSIFICATION_MOTORCYCLE
+                # elif actor.type_id in truck_blueprints:
+                #     derived_obj.classification = Object.CLASSIFICATION_TRUCK
+                # elif actor.type_id.startswith("vehicle"):
+                if actor.type_id.startswith("vehicle"):
                     derived_obj.classification = Object.CLASSIFICATION_CAR
                 elif actor.type_id.startswith("walker"):
                     derived_obj.classification = Object.CLASSIFICATION_PEDESTRIAN
