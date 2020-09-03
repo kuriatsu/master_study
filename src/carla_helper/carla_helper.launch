@@ -5,6 +5,6 @@
 
     <!-- <node pkg="carla_helper" type="add_intensity_node" name="add)intensity_node"/> -->
 
-    <node pkg="carla_helper" type="fake_ndt_node" name="fake_ndt_node"/>
+    <!-- <node pkg="carla_helper" type="fake_ndt_node" name="fake_ndt_node"/> -->
 
 </launch>

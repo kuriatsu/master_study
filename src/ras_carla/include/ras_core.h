@@ -61,7 +61,7 @@ public:
 private:
     void callbackDynamicReconfigure(ras_carla::rasConfig &config, uint32_t lebel);
     void subTrajectoryCallback(const autoware_msgs::LaneArray &in_array);
-	void subActorCallback(const carla_msgs::CarlaActorList &in_actor_list);
+	// void subActorCallback(const carla_msgs::CarlaActorList &in_actor_list);
     void subOdomCallback(const nav_msgs::Odometry &in_odom);
     void subObjCallback(const derived_object_msgs::ObjectArray &in_obj_array);
     std::vector<int> findWpOfObj(ras_carla::RasObject &obj);

@@ -9,9 +9,9 @@ RasCore::RasCore(): m_ego_wp(0)
 	server.setCallback(server_callback);
 
     sub_trajectory = n.subscribe("/lane_waypoints_array", 5, &RasCore::subTrajectoryCallback, this);
-    sub_carla_actor_list = n.subscribe("/carla/actor_list", 1, &RasCore::subActorCallback, this);
+    // sub_carla_actor_list = n.subscribe("/carla/actor_list", 1, &RasCore::subActorCallback, this);
     sub_odom = n.subscribe("/carla/ego_vehicle/odometry", 5, &RasCore::subOdomCallback, this);
-    sub_carla_obj = n.subscribe("/carla/objects", 1, &RasCore::subObjCallback, this);
+    sub_carla_obj = n.subscribe("/my_carla_actors", 1, &RasCore::subObjCallback, this);
     sub_shift = n.subscribe("/feedback_object", 10, &RasCore::subShiftCallback, this);
 
 	pub_obj = n.advertise<ras_carla::RasObjectArray>("/managed_objects", 5);
@@ -36,17 +36,17 @@ void RasCore::callbackDynamicReconfigure(ras_carla::rasConfig &config, uint32_t 
 }
 
 // get ego_vehicle id to remove ego_object from obstacles
-void RasCore::subActorCallback(const carla_msgs::CarlaActorList &in_actor_list)
-{
-    // ROS_INFO("subActorCallback");
-	for (size_t i = 0; i < in_actor_list.actors.size(); i ++)
-	{
-		if (in_actor_list.actors[i].rolename == m_ego_name)
-		{
-			m_ego_id = in_actor_list.actors[i].id;
-		}
-	}
-}
+// void RasCore::subActorCallback(const carla_msgs::CarlaActorList &in_actor_list)
+// {
+//     // ROS_INFO("subActorCallback");
+// 	for (size_t i = 0; i < in_actor_list.actors.size(); i ++)
+// 	{
+// 		if (in_actor_list.actors[i].rolename == m_ego_name)
+// 		{
+// 			m_ego_id = in_actor_list.actors[i].id;
+// 		}
+// 	}
+// }
 
 void RasCore::subOdomCallback(const nav_msgs::Odometry &in_odom)
 {
@@ -118,7 +118,8 @@ void RasCore::subObjCallback(const derived_object_msgs::ObjectArray &in_obj_arra
 		in_obj_pose = Ras::tfTransformer(ras_obj.object.pose, ras_obj.object.header.frame_id, m_ego_name);
         // ROS_INFO("calc distance");
 		ras_obj.distance = sqrt(pow(in_obj_pose.position.x, 2) + pow(in_obj_pose.position.y, 2));
-		if (m_min_vision < ras_obj.distance && ras_obj.distance < m_max_vision && ras_obj.object.id != m_ego_id)
+        if (m_min_vision < ras_obj.distance && ras_obj.distance < m_max_vision)
+		// if (m_min_vision < ras_obj.distance && ras_obj.distance < m_max_vision && ras_obj.object.id != m_ego_id)
 		{
 			ras_carla::RasObject &selected_obj = m_obj_map[ras_obj.object.id];
 			selected_obj.object = ras_obj.object;
@@ -220,7 +221,7 @@ std::vector<int> RasCore::findWpOfObj(ras_carla::RasObject &in_obj)
         case derived_object_msgs::Object::CLASSIFICATION_UNKNOWN:
         {
             float min_dist_of_wp_obj = m_max_vision, dist_of_wp_obj;
-            int min_wp;
+            int close_wp;
             // find closest waypoint from object
             for (auto itr = m_wps_vec.begin(); itr < m_wps_vec.end(); itr++)
             // for (auto itr = m_wps_vec.begin(); itr != m_wps_vec.end(); itr++)

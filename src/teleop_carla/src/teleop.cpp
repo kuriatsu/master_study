@@ -9,6 +9,7 @@
 
 #include <dynamic_reconfigure/server.h>
 #include <teleop_carla/teleopConfig.h>
+#include <g29-force-feedback/ForceFeedback.h>
 
 class Teleop
 {
@@ -71,6 +72,7 @@ Teleop::Teleop(): m_throttle(0.0), m_brake(0.0), m_back(false), pub_rate(0.1)
     sub_joy = n.subscribe("/joy", 1, &Teleop::joyCallback, this);
     sub_twist = n.subscribe("/twist_cmd", 1, &Teleop::twistCallback, this);
     sub_odom = n.subscribe("/carla/ego_vehicle/odometry", 1, &Teleop::odomCallback, this);
+    pub_ff = n.advertise<g29-force-feedback::ForceFeedback>("/ff_target", 1);
     pub_twist = n.advertise<geometry_msgs::Twist>("/carla/ego_vehicle/twist_cmd", 1);
     pub_vehicle_control = n.advertise<carla_msgs::CarlaEgoVehicleControl>("/carla/ego_vehicle/vehicle_control_cmd", 1);
     ros::Duration(1).sleep();
@@ -89,6 +91,16 @@ void Teleop::callbackDynamicReconfigure(teleop_carla::teleopConfig &config, uint
     m_rosbag_flag = config.rosbag_flag?true:false;
     m_device_type = config.controller;
     m_control_type = config.control_type;
+    m_enable_ff = config.enable_ff?true:false;
+
+    if (m_enable_ff && m_autonomous_mode)
+    {
+        ros::param::set("/mode", 0);
+    }
+    else if (m_enable_ff && !m_autonomous_mode)
+    {
+        ros::param::set("/mode", 1);
+    }
 }
 
 
@@ -104,6 +116,7 @@ void Teleop::dynamicReconfigureUpdate()
     config.rosbag_flag = m_rosbag_flag;
     config.controller = m_device_type;
     config.control_type = m_control_type;
+    config.enable_ff = m_enable_ff;
 
     server.updateConfig(config);
 }
@@ -224,7 +237,15 @@ void Teleop::timerCallback(const ros::TimerEvent&)
             out_twist.linear.x = 0.0;
         }
 
-        out_twist.angular.z = m_autonomous_mode ? calcOmega(m_autoware_twist.angular.z) : calcOmega(m_manual_omega);
+        if ((m_enable_ff && m_autonomous_mode) || !m_autonomous_mode)
+        {
+            put_twist.angular.z = calcOmega(m_manual_omega);
+        }
+        else
+        {
+            out_twist.angular.z = calcOmega(m_autoware_twist.angular.z);
+        }
+
         pub_twist.publish(out_twist);
         // m_autoware_twist.linear.x = 0.0;
     }
@@ -232,6 +253,24 @@ void Teleop::timerCallback(const ros::TimerEvent&)
     {
         pub_vehicle_control.publish(m_vehicle_cmd);
         // pub_twist.publish(m_autoware_twist);
+    }
+
+    if (m_enable_ff)
+    {
+        g29-force-feedback::ForceFeedback ff;
+
+        if (m_autonomous_mode)
+        {
+            ff.angle = -in_twist.twist.angular.z;
+            ff.force = 0.6;
+        }
+        else
+        {
+            ff.angle = 0.0;
+            ff.force = 0.3;
+        }
+        
+        pub_ff.publish(ff)
     }
 }
 
