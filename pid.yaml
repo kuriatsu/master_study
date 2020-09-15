@@ -1,0 +1,27 @@
+!!python/object/new:dynamic_reconfigure.encoding.Config
+dictitems:
+  accel_Kd: 0.13
+  accel_Ki: 0.2
+  accel_Kp: 0.1
+  groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+    dictitems:
+      accel_Kd: 0.13
+      accel_Ki: 0.2
+      accel_Kp: 0.1
+      groups: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      id: 0
+      name: Default
+      parameters: !!python/object/new:dynamic_reconfigure.encoding.Config
+        state: []
+      parent: 0
+      speed_Kd: 0.4
+      speed_Ki: 0.1
+      speed_Kp: 0.15
+      state: true
+      type: ''
+    state: []
+  speed_Kd: 0.4
+  speed_Ki: 0.1
+  speed_Kp: 0.15
+state: []
